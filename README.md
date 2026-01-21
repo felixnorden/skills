@@ -14,6 +14,22 @@ Agent skills are documentation packages that enhance AI agents with domain-speci
 
 Think of agent skills as expert knowledge bases that agents can access when working in specific domains. A Solidity Development skill helps agents write secure smart contracts. A Python Development skill guides agents through Python best practices. Each skill represents accumulated wisdom from experts, refined into actionable guidance.
 
+## Skill Format
+
+Skills follow a standardized format defined in our [specification](SPECIFICATION.md). Each skill is a directory containing at minimum a `SKILL.md` file:
+
+```
+skill-name/
+├── SKILL.md          # Required
+├── scripts/          # Optional - executable code (inside skill folder)
+├── references/       # Optional - additional documentation (inside skill folder)
+└── assets/           # Optional - templates and static resources (inside skill folder)
+```
+
+These optional directories must be nested inside the skill folder itself, not placed at the same level as the skill folder.
+
+The `SKILL.md` file contains YAML frontmatter with skill metadata and Markdown instructions. See [AGENTS.md](AGENTS.md) for detailed guidelines.
+
 ## Our Open Source Foundation
 
 Open Agent Skills is built on the foundation of open source principles. We believe that:
@@ -86,4 +102,3 @@ Ready to explore agent skills? Here's how:
 Open Agent Skills represents the combined expertise of contributors who believe in open, accessible development. Whether you're building your first smart contract or training production AI systems, these skills provide a foundation of established best practices.
 
 Welcome to open agentic development.
-
