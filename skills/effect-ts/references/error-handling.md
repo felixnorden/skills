@@ -1,6 +1,8 @@
 # Error Handling Patterns
 
-Type-safe error management in Effect.
+Type-safe error management in Effect v4.
+
+> **Migrating from v3?** Error handling combinators have been renamed: `catchAll` → `catch`, `catchAllCause` → `catchCause`, `catchSome` → `catchFilter`. See [migration.md](migration.md) for complete details.
 
 ## Error Types
 
@@ -17,36 +19,36 @@ Effect<Success, Error, Requirements>
 
 **Tagged errors (recommended)**
 ```ts
-import { Data } from "effect"
+import { Data } from "effect";
 
 class NetworkError extends Data.TaggedError("NetworkError")<{
-  cause: unknown
+  cause: unknown;
 }> {}
 
 class ValidationError extends Data.TaggedError("ValidationError")<{
-  field: string
-  message: string
+  field: string;
+  message: string;
 }> {}
 
 // Usage
-Effect.fail(new NetworkError({ cause: error }))
+Effect.fail(new NetworkError({ cause: error }));
 ```
 
 **Simple errors**
 ```ts
-Effect.fail("Something went wrong")
-Effect.fail(new Error("Failed"))
+Effect.fail("Something went wrong");
+Effect.fail(new Error("Failed"));
 ```
 
 ## Catching Errors
 
-**Catch all**
+**Catch all (v4: renamed from `catchAll`)**
 ```ts
 effect.pipe(
-  Effect.catchAll((error) => 
+  Effect.catch((error) => 
     Effect.succeed(`Recovered from: ${error}`)
   )
-)
+);
 ```
 
 **Catch specific tags**
@@ -58,7 +60,7 @@ program.pipe(
   Effect.catchTag("ValidationError", (e) =>
     Effect.fail(new BadRequest(e.message))
   )
-)
+);
 ```
 
 **Catch multiple tags**
@@ -69,18 +71,61 @@ effect.pipe(
     TimeoutError: (e) => useCache(e),
     ParseError: (e) => Effect.fail(new BadRequest())
   })
-)
+);
 ```
 
-**Catch some errors**
+**Catch filtered errors (v4: renamed from `catchSome`)**
+```ts
+import { Effect, Filter } from "effect";
+
+effect.pipe(
+  Effect.catchFilter(
+    Filter.fromPredicate((error: MyError) => error._tag === "Retryable"),
+    (error) => Effect.succeed("caught")
+  )
+);
+```
+
+**Catch cause (v4: renamed from `catchAllCause`)**
+```ts
+import { Cause, Effect } from "effect";
+
+const program = Effect.die("defect").pipe(
+  Effect.catchCause((cause) => Effect.succeed("recovered"))
+);
+```
+
+**Catch defects (v4: renamed from `catchAllDefect`)**
 ```ts
 effect.pipe(
-  Effect.catchSome((error) =>
-    error._tag === "Retryable"
-      ? Option.some(retry())
-      : Option.none()
+  Effect.catchDefect((defect) =>
+    Effect.log(`Defect caught: ${defect}`)
   )
-)
+);
+```
+
+**New in v4: Catch reason**
+```ts
+// Catch specific reason within tagged error
+Effect.catchReason(
+  "AiError",
+  "RateLimitError",
+  (reason) => Effect.succeed("rate limited")
+);
+
+// Catch multiple reasons
+Effect.catchReasons("AiError", {
+  RateLimitError: () => Effect.succeed("rate limited"),
+  QuotaExceededError: () => Effect.succeed("quota exceeded")
+});
+```
+
+**New in v4: Catch eager**
+```ts
+// Optimization: evaluates synchronous recovery immediately
+effect.pipe(
+  Effect.catchEager((error) => Effect.succeed("recovered"))
+);
 ```
 
 ## Fallback & Recovery
@@ -90,14 +135,14 @@ effect.pipe(
 primary.pipe(
   Effect.orElse(() => secondary),
   Effect.orElse(() => tertiary)
-)
+);
 ```
 
 **orElseSucceed**
 ```ts
 effect.pipe(
   Effect.orElseSucceed(() => defaultValue)
-)
+);
 ```
 
 **firstSuccessOf**
@@ -106,7 +151,7 @@ Effect.firstSuccessOf([
   fetchFromCache(),
   fetchFromDb(),
   fetchFromApi()
-])
+]);
 ```
 
 ## Retrying
@@ -115,19 +160,19 @@ Effect.firstSuccessOf([
 ```ts
 effect.pipe(
   Effect.retry({ times: 3 })
-)
+);
 ```
 
 **With schedule**
 ```ts
-import { Schedule } from "effect"
+import { Schedule } from "effect";
 
 effect.pipe(
   Effect.retry({
     times: 5,
     schedule: Schedule.exponential("100 millis", 2.0)
   })
-)
+);
 ```
 
 **Conditional retry**
@@ -137,70 +182,116 @@ effect.pipe(
     while: (error) => error._tag === "Transient",
     times: 10
   })
-)
+);
 ```
 
 **Retry with delays**
 ```ts
 // Fixed intervals
-Schedule.spaced("1 second")
+Schedule.spaced("1 second");
 
 // Exponential backoff  
-Schedule.exponential("100 millis", 2.0)
+Schedule.exponential("100 millis", 2.0);
 
 // With jitter
 Schedule.exponential("100 millis").pipe(
   Schedule.jittered
-)
+);
 ```
 
-## Cause Analysis
+## Cause Analysis (v4)
+
+In v4, `Cause<E>` has been flattened to a wrapper around an array of `Reason` values:
+
+```ts
+interface Cause<E> {
+  readonly reasons: ReadonlyArray<Reason<E>>;
+}
+
+type Reason<E> = Fail<E> | Die | Interrupt;
+```
 
 **Full error context**
 ```ts
 Effect.gen(function* () {
   const result = yield* effect.pipe(
     Effect.sandbox,
-    Effect.catchAll((cause) => {
-      // cause contains full error history
-      console.log(Cause.pretty(cause))
-      return Effect.succeed(null)
+    Effect.catch((cause) => {
+      // cause.reasons contains all errors
+      for (const reason of cause.reasons) {
+        switch (reason._tag) {
+          case "Fail":
+            console.log("Failure:", reason.error);
+            break;
+          case "Die":
+            console.log("Defect:", reason.defect);
+            break;
+          case "Interrupt":
+            console.log("Interrupted by:", reason.fiberId);
+            break;
+        }
+      }
+      return Effect.succeed(null);
     })
-  )
-})
+  );
+});
+```
+
+**Cause helpers (v4)**
+```ts
+// Check if cause has specific reason types
+Cause.hasFails(cause);        // has any Fail reasons
+Cause.hasDies(cause);         // has any Die reasons  
+Cause.hasInterrupts(cause);   // has any Interrupt reasons
+Cause.hasInterruptsOnly(cause); // only Interrupt reasons
+
+// Extract reasons
+Cause.findErrorOption(cause);      // Option<E>
+Cause.findError(cause);            // Result<E>
+Cause.findDefect(cause);           // Result<unknown>
+Cause.findInterrupt(cause);        // Result<FiberId>
+
+// Filter reasons
+cause.reasons.filter(Cause.isFailReason);
+cause.reasons.filter(Cause.isDieReason);
+cause.reasons.filter(Cause.isInterruptReason);
+
+// Combine causes
+Cause.combine(cause1, cause2);  // replaces sequential/parallel
 ```
 
 **Die vs Fail**
 ```ts
 // Fail - expected error (in error channel)
-Effect.fail(new ValidationError())
+Effect.fail(new ValidationError());
 
 // Die - defect (not in error channel, unrecoverable)
-Effect.die("Impossible state reached")
+Effect.die("Impossible state reached");
 ```
 
 ## Pattern Matching
 
 **Match on result**
 ```ts
-import { Match } from "effect"
+import { Match } from "effect";
 
 const result = yield* effect.pipe(
   Effect.match({
     onFailure: (error) => `Error: ${error}`,
     onSuccess: (value) => `Success: ${value}`
   })
-)
+);
 ```
 
 **Exit matching**
 ```ts
-const exit = yield* Effect.exit(effect)
+const exit = yield* Effect.exit(effect);
 
 if (Exit.isSuccess(exit)) {
-  console.log(exit.value)
+  console.log(exit.value);
 } else if (Exit.isFailure(exit)) {
-  console.log(Cause.pretty(exit.cause))
+  // v4: exit.cause.reasons for flattened structure
+  console.log(Cause.pretty(exit.cause));
 }
 ```
 
@@ -211,7 +302,7 @@ if (Exit.isSuccess(exit)) {
 const results = yield* Effect.validateAll(
   [validate1, validate2, validate3],
   { concurrency: "unbounded" }
-)
+);
 // Collects ALL errors, not just first
 ```
 
@@ -220,7 +311,7 @@ const results = yield* Effect.validateAll(
 const [errors, successes] = yield* Effect.partition(
   items,
   (item) => validate(item)
-)
+);
 ```
 
 ## Typed Error Unions
@@ -232,19 +323,19 @@ const program: Effect<
   NetworkError | ValidationError | DatabaseError,
   Database
 > = Effect.gen(function* () {
-  const data = yield* fetchData()  // NetworkError
-  const validated = yield* validate(data)  // ValidationError  
-  return yield* save(validated)  // DatabaseError
-})
+  const data = yield* fetchData();  // NetworkError
+  const validated = yield* validate(data);  // ValidationError  
+  return yield* save(validated);  // DatabaseError
+});
 ```
 
 **Widening errors**
 ```ts
-const narrow: Effect<string, NetworkError> = fetchData()
+const narrow: Effect<string, NetworkError> = fetchData();
 
 const wide: Effect<string, Error> = narrow.pipe(
   Effect.mapError((e) => new Error(e.message))
-)
+);
 ```
 
 ## Defect Handling
@@ -252,19 +343,19 @@ const wide: Effect<string, Error> = narrow.pipe(
 **Catch defects (use sparingly)**
 ```ts
 effect.pipe(
-  Effect.catchAllDefect((defect) =>
+  Effect.catchDefect((defect) =>
     Effect.log(`Defect caught: ${defect}`)
   )
-)
+);
 ```
 
 **Refail defects as typed errors**
 ```ts
 effect.pipe(
-  Effect.catchAllDefect((defect) =>
+  Effect.catchDefect((defect) =>
     Effect.fail(new UnexpectedError({ cause: defect }))
   )
-)
+);
 ```
 
 ## Best Practices
@@ -291,12 +382,12 @@ effect.pipe(
   Effect.mapError((e: DbError) => 
     new ApiError({ status: 500, cause: e })
   )
-)
+);
 ```
 
 **Flatten nested errors**
 ```ts
-Effect.flatten(effectOfEffect)
+Effect.flatten(effectOfEffect);
 ```
 
 ## Testing Errors
@@ -306,10 +397,36 @@ Effect.flatten(effectOfEffect)
 const test = Effect.gen(function* () {
   const result = yield* failingEffect.pipe(
     Effect.flip  // Swap success/error channels
-  )
-  expect(result).toBeInstanceOf(MyError)
-})
+  );
+  expect(result).toBeInstanceOf(MyError);
+});
 
 // Flip back
-effect.pipe(Effect.flip).pipe(Effect.flip)  // identity
+effect.pipe(Effect.flip).pipe(Effect.flip);  // identity
 ```
+
+## Migration from v3
+
+### Renamed Combinators
+
+| v3 | v4 |
+|----|-----|
+| `Effect.catchAll` | `Effect.catch` |
+| `Effect.catchAllCause` | `Effect.catchCause` |
+| `Effect.catchAllDefect` | `Effect.catchDefect` |
+| `Effect.catchSome` | `Effect.catchFilter` |
+| `Effect.catchSomeCause` | `Effect.catchCauseFilter` |
+| `Cause.isFailType` | `Cause.isFailReason` |
+| `Cause.isDieType` | `Cause.isDieReason` |
+| `Cause.isInterruptType` | `Cause.isInterruptReason` |
+| `Cause.isFailure` | `Cause.hasFails` |
+| `Cause.isDie` | `Cause.hasDies` |
+| `Cause.isInterrupted` | `Cause.hasInterrupts` |
+| `Cause.isInterruptedOnly` | `Cause.hasInterruptsOnly` |
+| `Cause.failureOption` | `Cause.findErrorOption` |
+| `Cause.failureOrCause` | `Cause.findError` |
+| `Cause.dieOption` | `Cause.findDefect` |
+| `Cause.interruptOption` | `Cause.findInterrupt` |
+| `Cause.sequential` | `Cause.combine` |
+| `Cause.parallel` | `Cause.combine` |
+| `*Exception` classes | `*Error` classes (e.g., `NoSuchElementException` → `NoSuchElementError`) |

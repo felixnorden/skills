@@ -1,53 +1,55 @@
 # API Comparison
 
-Effect vs Promise, fp-ts, and ZIO.
+Effect v4 vs Promise, fp-ts, and ZIO.
+
+> **Migrating from v3?** Service patterns have changed significantly. See [migration.md](migration.md) for details.
 
 ## Effect vs Promise
 
 **Creation**
 ```ts
 // Promise
-const p = Promise.resolve(42)
+const p = Promise.resolve(42);
 
 // Effect
-const e = Effect.succeed(42)
+const e = Effect.succeed(42);
 ```
 
 **Chaining**
 ```ts
 // Promise
-promise.then(x => x * 2)
+promise.then(x => x * 2);
 
 // Effect
-effect.pipe(Effect.map(x => x * 2))
+effect.pipe(Effect.map(x => x * 2));
 ```
 
 **Error handling**
 ```ts
 // Promise (untyped)
-promise.catch(err => handle(err))
+promise.catch(err => handle(err));
 
 // Effect (typed)
 effect.pipe(
-  Effect.catchAll((err: MyError) => handle(err))
-)
+  Effect.catch((err: MyError) => handle(err))
+);
 ```
 
 **Async/await vs gen**
 ```ts
 // Promise
 async function program() {
-  const a = await fetchA()
-  const b = await fetchB()
-  return a + b
+  const a = await fetchA();
+  const b = await fetchB();
+  return a + b;
 }
 
 // Effect
 const program = Effect.gen(function* () {
-  const a = yield* fetchA()
-  const b = yield* fetchB()
-  return a + b
-})
+  const a = yield* fetchA();
+  const b = yield* fetchB();
+  return a + b;
+});
 ```
 
 **Key differences**
@@ -72,17 +74,17 @@ Effect<Value, Error, Context>
 **Basic operations**
 ```ts
 // fp-ts
-import * as TE from "fp-ts/TaskEither"
+import * as TE from "fp-ts/TaskEither";
 
 pipe(
   TE.right(42),
   TE.map(x => x * 2)
-)
+);
 
 // Effect
 Effect.succeed(42).pipe(
   Effect.map(x => x * 2)
-)
+);
 ```
 
 **Error handling**
@@ -91,28 +93,35 @@ Effect.succeed(42).pipe(
 pipe(
   effect,
   TE.mapLeft(e => new CustomError(e))
-)
+);
 
 // Effect
 effect.pipe(
   Effect.mapError(e => new CustomError(e))
-)
+);
 ```
 
-**Services**
+**Services (v4: ServiceMap pattern)**
 ```ts
 // fp-ts (manual)
 interface Has<T> { _tag: unique symbol }
-type AppEnv = Has<Database> & Has<Logger>
+type AppEnv = Has<Database> & Has<Logger>;
 
-// Effect (built-in)
-class Database extends Effect.Service<Database>()("Database", {
-  effect: /* ... */
-}) {}
+// Effect v4 (built-in)
+import { Effect, ServiceMap, Layer } from "effect";
+
+class Database extends ServiceMap.Service<Database>()("Database", {
+  make: Effect.gen(function* () {
+    // ... initialization
+    return { query: (sql: string) => Effect.succeed([]) };
+  })
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 ```
 
 **Key differences**
-- Effect has native services/layers
+- Effect has native services/layers via ServiceMap
 - Effect has runtime system
 - Effect has concurrency primitives
 - Effect has resource management
@@ -138,7 +147,7 @@ ZIO[R, E, A]
 Effect<A, E, R>
 ```
 
-**Service pattern**
+**Service pattern (v4: ServiceMap)**
 ```scala
 // ZIO
 trait UserRepo {
@@ -150,12 +159,16 @@ object UserRepo {
     ZIO.serviceWithZIO[UserRepo](_.find(id))
 }
 
-// Effect
-class UserRepo extends Effect.Service<UserRepo>()("UserRepo", {
-  effect: Effect.succeed({
+// Effect v4
+import { Effect, ServiceMap, Layer } from "effect";
+
+class UserRepo extends ServiceMap.Service<UserRepo>()("UserRepo", {
+  make: Effect.succeed({
     find: (id: string) => Effect.succeed(user)
   })
-}) {}
+}) {
+  static readonly layer = Layer.effect(this, this.make);
+}
 ```
 
 **For comprehension vs gen**
@@ -168,10 +181,10 @@ for {
 
 // Effect
 Effect.gen(function* () {
-  const a = yield* fetchA()
-  const b = yield* fetchB()
-  return a + b
-})
+  const a = yield* fetchA();
+  const b = yield* fetchB();
+  return a + b;
+});
 ```
 
 **Key differences**
@@ -179,8 +192,11 @@ Effect.gen(function* () {
 - Type params reversed
 - ZIO in Scala, Effect in TypeScript
 - Similar concepts, different ecosystems
+- Effect v4 uses ServiceMap (was Context in v3)
 
 ## Common Equivalents
+
+### fp-ts to Effect
 
 | fp-ts | Effect |
 |-------|--------|
@@ -189,18 +205,112 @@ Effect.gen(function* () {
 | `Task<A>` | `Effect<A>` |
 | `IO<A>` | `Effect.sync(() => A)` |
 | `Option<A>` | `Option<A>` |
-| `Either<E, A>` | `Either<A, E>` |
+| `Either<E, A>` | `Result<A, E>` (v4: Either renamed to Result) |
 | `map` | `map` |
 | `chain` | `flatMap` / `andThen` |
 | `mapLeft` | `mapError` |
 | `fold` | `match` |
+
+### Promise to Effect
 
 | Promise | Effect |
 |---------|--------|
 | `Promise.resolve(a)` | `Effect.succeed(a)` |
 | `Promise.reject(e)` | `Effect.fail(e)` |
 | `promise.then(f)` | `effect.pipe(Effect.map(f))` |
-| `promise.catch(f)` | `effect.pipe(Effect.catchAll(f))` |
+| `promise.catch(f)` | `effect.pipe(Effect.catch(f))` |
 | `Promise.all([...])` | `Effect.all([...])` |
 | `Promise.race([...])` | `Effect.race(...)` |
 | `async/await` | `Effect.gen` |
+
+### Effect v3 to v4
+
+| v3 | v4 |
+|----|-----|
+| `Context.Tag(id)<S, T>()` | `ServiceMap.Service<S, T>()(id)` |
+| `Effect.Service<S>()(id, { effect, dependencies })` | `ServiceMap.Service<S>()(id, { make })` with explicit layer |
+| `Effect.Tag(id)<S, T>()` | `ServiceMap.Service<S, T>()(id)` (no static accessors) |
+| `Effect.catchAll` | `Effect.catch` |
+| `Effect.catchAllCause` | `Effect.catchCause` |
+| `Effect.catchAllDefect` | `Effect.catchDefect` |
+| `Effect.fork` | `Effect.forkChild` |
+| `Effect.forkDaemon` | `Effect.forkDetach` |
+| `FiberRef` | `ServiceMap.Reference` |
+| `Scope.extend` | `Scope.provide` |
+| `Runtime<R>` | Removed - use `ServiceMap<R>` |
+| `Either` | `Result` |
+| `@effect/schema` | `effect/unstable/schema` |
+
+## Key v4 Changes
+
+### ServiceMap Replaces Context
+
+**v3:**
+```ts
+import { Context, Effect } from "effect";
+
+class Database extends Context.Tag("Database")<
+  Database,
+  { query: (sql: string) => Effect.Effect<unknown[]> }
+>() {}
+
+const program = Effect.gen(function* () {
+  const db = yield* Database;
+  return yield* db.query("SELECT *");
+});
+```
+
+**v4:**
+```ts
+import { ServiceMap, Effect } from "effect";
+
+class Database extends ServiceMap.Service<Database>()(
+  "Database",
+  { query: (sql: string) => Effect.Effect<unknown[]> }
+)() {}
+
+const program = Effect.gen(function* () {
+  const db = yield* Database;
+  return yield* db.query("SELECT *");
+});
+```
+
+### Yieldable Types
+
+In v4, types like `Option` and `Config` are `Yieldable` but not `Effect` subtypes:
+
+```ts
+// Works in generators
+Effect.gen(function* () {
+  const value = yield* Option.some(42);
+  const config = yield* Config.string("API_KEY");
+});
+
+// Must convert for combinators
+Effect.map(Option.some(42).asEffect(), x => x + 1);
+```
+
+### Non-Yieldable Types
+
+In v4, `Ref`, `Deferred`, and `Fiber` are no longer Effect subtypes:
+
+```ts
+// v3
+const ref = yield* Ref.make(0);
+const value = yield* ref;  // Ref was yieldable
+
+// v4
+const ref = yield* Ref.make(0);
+const value = yield* Ref.get(ref);  // Use explicit method
+```
+
+## Summary
+
+Effect v4 maintains the same core programming model while improving:
+- **Type safety** via Yieldable trait
+- **Explicitness** in service dependencies
+- **Consistency** with ServiceMap replacing Context
+- **Performance** with automatic fiber keep-alive
+- **Simplicity** with unified package versioning
+
+The main migration effort is in service definitions (Context → ServiceMap) and understanding which types are Yieldable vs Effect subtypes.
