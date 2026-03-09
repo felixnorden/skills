@@ -5,47 +5,41 @@ license: MIT
 compatibility: TypeScript 5.0+, Node.js 18+, Deno, Bun, Browser
 metadata:
   author: effect-community
-  version: "2.0"
+  version: "3.0"
   effect-version: "4.x"
 ---
 
 # Effect TypeScript (v4)
 
-> **Migrating from v3?** See [references/migration.md](references/migration.md) for a comprehensive migration guide.
-
 Effect is a powerful TypeScript library for building complex, type-safe programs with composable abstractions for error handling, dependency injection, concurrency, and resource management.
-
-## What's New in v4
-
-- **Unified versioning** - All ecosystem packages share a single version number
-- **Package consolidation** - Platform, RPC, Cluster, and more merged into core `effect`
-- **ServiceMap** - New dependency injection system replacing Context
-- **Yieldable trait** - More explicit type safety for yieldable types
-- **Automatic fiber keep-alive** - No need for `runMain` in most cases
-- **Layer memoization** - Automatic across `Effect.provide` calls
-- **Unstable modules** - New features under `effect/unstable/*` paths
 
 ## Quick Start
 
-**Basic Effect Creation**
+**Using Effect.fn (Recommended)**
 
 ```ts
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 
-// Success
-const success = Effect.succeed(42);
+// Define errors with Schema.TaggedErrorClass
+class FetchError extends Schema.TaggedErrorClass<FetchError>()("FetchError", {
+  message: Schema.String,
+}) {}
 
-// Failure
-const failure = Effect.fail("error");
+// Create functions with Effect.fn
+export const fetchUser = Effect.fn("fetchUser")(
+  function* (id: number) {
+    yield* Effect.logInfo("Fetching user:", id);
 
-// From sync function
-const sync = Effect.sync(() => Math.random());
-
-// From Promise
-const async = Effect.promise(() => fetch("/api"));
+    // Always return when raising an error
+    return yield* new FetchError({ message: "Failed to fetch" });
+  },
+  // Add combinators as additional arguments (no .pipe needed)
+  Effect.catch((error) => Effect.logError(`Error: ${error}`)),
+  Effect.withSpan("fetchUser", { attributes: { method: "Effect.fn" } }),
+);
 ```
 
-**Generator Style (Recommended)**
+**Generator Style**
 
 ```ts
 const program = Effect.gen(function* () {
@@ -61,12 +55,29 @@ const program = Effect.gen(function* () {
 // As Promise
 Effect.runPromise(program).then(console.log);
 
-// Synchronously (unsafe)
-const result = Effect.runSync(program);
+// With NodeRuntime (recommended for apps)
+import { NodeRuntime } from "@effect/platform-node";
+NodeRuntime.runMain(program);
 
-// With Fork (concurrent)
-Effect.runFork(program);
+// Using Layer.launch as entry point
+Layer.launch(WorkerLayer).pipe(NodeRuntime.runMain);
 ```
+
+## What's New in v4
+
+- **Effect.fn** - Recommended way to write functions that return Effects
+- **Schema.TaggedErrorClass** - Type-safe error definitions with Schema
+- **ServiceMap.Service** - Simplified service definition with class extension
+- **Layer.unwrap** - Dynamic layer creation from Effects/Config
+- **LayerMap** - Dynamic resource management keyed by identifiers
+- **PubSub** - In-process event broadcasting
+- **AI modules** - Provider-agnostic LLM integration (effect/unstable/ai)
+- **ExecutionPlan** - Provider fallback strategies for AI
+- **Unified versioning** - All ecosystem packages share a single version number
+- **Package consolidation** - Platform, RPC, Cluster merged into core `effect`
+- **Automatic fiber keep-alive** - No need for `runMain` in most cases
+- **Layer memoization** - Automatic across `Effect.provide` calls
+- **Unstable modules** - New features under `effect/unstable/*` paths
 
 ## Core Type
 
@@ -77,16 +88,6 @@ Effect<Success, Error, Requirements>;
 - **Success**: Value type on success
 - **Error**: Type-tracked errors
 - **Requirements**: Services needed (use `never` if none)
-
-## Common Patterns
-
-See detailed patterns in:
-
-- [references/core-patterns.md](references/core-patterns.md) - Essential Effect patterns
-- [references/error-handling.md](references/error-handling.md) - Error management strategies
-- [references/services-layers.md](references/services-layers.md) - Dependency injection with ServiceMap
-- [references/concurrency.md](references/concurrency.md) - Concurrent operations
-- [references/data-types.md](references/data-types.md) - Option, Either, Chunk, etc.
 
 ## Key Operators
 
@@ -101,6 +102,8 @@ See detailed patterns in:
 
 - `catch` - Handle all errors (v4: renamed from `catchAll`)
 - `catchTag` - Handle specific error types
+- `catchTags` - Handle multiple tagged errors at once
+- `catchReason` / `catchReasons` - Handle errors with reasons
 - `catchFilter` - Handle filtered errors (v4: renamed from `catchSome`)
 - `orElse` - Fallback effect
 - `retry` - Retry with policy
@@ -114,48 +117,135 @@ See detailed patterns in:
 
 ## Best Practices
 
-1. **Use generators** for sequential logic (Effect.gen)
-2. **Type errors explicitly** with tagged errors (Data.TaggedError)
-3. **Prefer pipe** for composition over method chaining
-4. **Use Services** for dependencies, not global state
-5. **Leverage Layer** for dependency graphs
+1. **Use Effect.fn** for functions that return Effects (not Effect.gen alone)
+2. **Define errors with Schema.TaggedErrorClass** for type safety
+3. **Use ServiceMap.Service** for dependency injection
+4. **Build layers explicitly** with `Layer.effect` and compose with `Layer.provide`
+5. **Use ExecutionPlan** for AI provider fallback strategies
 6. **Handle interruptions** with `acquireRelease` for resources
-7. **Use Schema** for validation and serialization (now in `effect/unstable/schema`)
+7. **Use Layer.launch** as application entry point for long-running apps
 8. **Enable dual APIs** when appropriate (data-first + data-last)
 
 ## Common Workflows
 
-**API Call with Retry**
+**Service with Effect.fn**
 
 ```ts
-const fetchUser = (id: string) =>
-  Effect.tryPromise({
-    try: () => fetch(`/users/${id}`).then((r) => r.json()),
-    catch: () => new FetchError(),
-  }).pipe(
-    Effect.retry({ times: 3, schedule: Schedule.exponential("100 millis") }),
+import { Effect, ServiceMap, Layer, Schema } from "effect";
+
+class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
+  "DatabaseError",
+  { cause: Schema.Defect },
+) {}
+
+export class Database extends ServiceMap.Service<
+  Database,
+  {
+    query(sql: string): Effect.Effect<unknown[], DatabaseError>;
+  }
+>()("app/Database") {
+  static readonly layer = Layer.effect(
+    Database,
+    Effect.gen(function* () {
+      const query = Effect.fn("Database.query")(function* (sql: string) {
+        yield* Effect.log("Executing SQL:", sql);
+        return [{ id: 1, name: "Alice" }];
+      });
+      return Database.of({ query });
+    }),
   );
-```
-
-**Service Pattern (v4)**
-
-```ts
-import { Effect, ServiceMap, Layer } from "effect";
-
-class UserRepo extends ServiceMap.Service<UserRepo>()("app/UserRepo", {
-  make: Effect.gen(function* () {
-    const db = yield* Database;
-    return {
-      find: (id: string) => db.query("SELECT * FROM users WHERE id = ?", [id]),
-    };
-  }),
-}) {
-  // Build layer from make effect
-  static readonly layer = Layer.effect(this, this.make);
 }
 ```
 
-**Resource Management**
+**AI Service with ExecutionPlan**
+
+```ts
+import { Effect, Layer, Schema, ServiceMap, ExecutionPlan } from "effect";
+import { OpenAiLanguageModel } from "@effect/ai-openai";
+import { AnthropicLanguageModel } from "@effect/ai-anthropic";
+import { LanguageModel } from "effect/unstable/ai";
+
+class AiWriterError extends Schema.TaggedErrorClass<AiWriterError>()(
+  "AiWriterError",
+  { reason: Schema.String },
+) {}
+
+export class AiWriter extends ServiceMap.Service<
+  AiWriter,
+  {
+    draftAnnouncement(product: string): Effect.Effect<string, AiWriterError>;
+  }
+>()("docs/AiWriter") {
+  static readonly layer = Layer.effect(
+    AiWriter,
+    Effect.gen(function* () {
+      // Define fallback strategy
+      const DraftPlan = ExecutionPlan.make(
+        { provide: OpenAiLanguageModel.model("gpt-4"), attempts: 3 },
+        { provide: AnthropicLanguageModel.model("claude-opus"), attempts: 2 },
+      );
+
+      const draftModel = yield* DraftPlan.withRequirements;
+
+      const draftAnnouncement = Effect.fn("AiWriter.draftAnnouncement")(
+        function* (product: string) {
+          const model = yield* LanguageModel.LanguageModel;
+          const response = yield* model.generateText({
+            prompt: `Write a launch announcement for ${product}`,
+          });
+          return response.text;
+        },
+        Effect.withExecutionPlan(draftModel),
+        Effect.mapError((error) => new AiWriterError({ reason: error.reason })),
+      );
+
+      return AiWriter.of({ draftAnnouncement });
+    }),
+  ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]));
+}
+```
+
+**PubSub for Event Broadcasting**
+
+```ts
+import { Effect, Layer, PubSub, ServiceMap, Stream } from "effect";
+
+export type OrderEvent =
+  | { readonly _tag: "OrderPlaced"; readonly orderId: string }
+  | { readonly _tag: "PaymentCaptured"; readonly orderId: string };
+
+export class OrderEvents extends ServiceMap.Service<
+  OrderEvents,
+  {
+    publish(event: OrderEvent): Effect.Effect<void>;
+    readonly subscribe: Stream.Stream<OrderEvent>;
+  }
+>()("acme/OrderEvents") {
+  static readonly layer = Layer.effect(
+    OrderEvents,
+    Effect.gen(function* () {
+      const pubsub = yield* PubSub.bounded<OrderEvent>({
+        capacity: 256,
+        replay: 50, // Allow late subscribers to catch up
+      });
+
+      yield* Effect.addFinalizer(() => PubSub.shutdown(pubsub));
+
+      const publish = Effect.fn("OrderEvents.publish")(function* (
+        event: OrderEvent,
+      ) {
+        yield* PubSub.publish(pubsub, event);
+      });
+
+      const subscribe = Stream.fromPubSub(pubsub);
+
+      return OrderEvents.of({ publish, subscribe });
+    }),
+  );
+}
+```
+
+**Resource Management with acquireRelease**
 
 ```ts
 const program = Effect.acquireUseRelease(
@@ -178,6 +268,8 @@ import { Effect } from "effect";
 ```ts
 import { Schema } from "effect/unstable/schema";
 import { HttpClient } from "effect/unstable/http";
+import { LanguageModel } from "effect/unstable/ai";
+import { PubSub } from "effect/unstable/pubsub";
 ```
 
 **Platform-Specific Packages** (separate, matching v4 version)
@@ -185,21 +277,32 @@ import { HttpClient } from "effect/unstable/http";
 ```ts
 import { NodeRuntime } from "@effect/platform-node";
 import { SqlClient } from "@effect/sql-pg";
+import { OpenAiClient } from "@effect/ai-openai";
 ```
 
 ## References
 
-Dive deeper into specific topics:
+Dive deeper into specific topics and patterns:
 
-- **[Core Patterns](references/core-patterns.md)** - Foundational Effect patterns and idioms
-- **[Error Handling](references/error-handling.md)** - Expected/unexpected errors, retries, fallbacks
+- **[Core Patterns](references/core-patterns.md)** - Foundational Effect patterns with Effect.fn
+- **[Error Handling](references/error-handling.md)** - Schema.TaggedErrorClass, catchTags, catchReason
 - **[Services & Layers](references/services-layers.md)** - Dependency injection with ServiceMap
 - **[Concurrency](references/concurrency.md)** - Fibers, racing, interruption, coordination
 - **[Data Types](references/data-types.md)** - Option, Either, Chunk, HashSet, Stream
+- **[Streams](references/streams.md)** - Creating and consuming streams
+- **[PubSub](references/pubsub.md)** - Event broadcasting and subscription
+- **[Schedules](references/schedules.md)** - Retry, repeat, and scheduling patterns
+- **[AI Modules](references/ai-modules.md)** - LLM integration with tools and chat
+- **[HTTP Client/Server](references/http-client-server.md)** - HttpClient and HttpApi
 - **[Resource Management](references/resource-management.md)** - Scope, acquire/release patterns
-- **[Schema](references/schema.md)** - Validation, parsing, serialization (v4 API)
-- **[Observability](references/observability.md)** - Logging, metrics, tracing
-- **[API Comparison](references/api-comparison.md)** - Effect vs Promise, fp-ts, ZIO
+- **[Schema](references/schema.md)** - Validation, parsing, serialization
+- **[Observability](references/observability.md)** - Logging, metrics, tracing with Otlp
+- **[Testing](references/testing.md)** - @effect/vitest patterns
+- **[Integration](references/integration.md)** - ManagedRuntime for non-Effect code
+- **[Batching](references/batching.md)** - RequestResolver for batching
+- **[Child Process](references/child-process.md)** - Process management
+- **[CLI](references/cli.md)** - CLI application building
+- **[Cluster](references/cluster.md)** - Distributed entities
 - **[Migration Guide](references/migration.md)** - Migrating from Effect v3 to v4
 
 ## Anti-Patterns to Avoid
@@ -211,6 +314,7 @@ Dive deeper into specific topics:
 - Running effects at module level (breaks composability)
 - Using global state instead of Services
 - Overusing Effect for simple synchronous operations
+- Using Effect.gen alone instead of Effect.fn for functions
 
 ## Troubleshooting
 
@@ -233,8 +337,8 @@ Dive deeper into specific topics:
 
 ## Learn More
 
-- Official Docs: https://effect.website
-- API Reference: https://effect-ts.github.io/effect
-- Discord Community: https://discord.gg/effect-ts
-- GitHub: https://github.com/Effect-TS/effect
+- Official Docs: <https://effect.website>
+- API Reference: <https://effect-ts.github.io/effect>
+- Discord Community: <https://discord.gg/effect-ts>
+- GitHub: <https://github.com/Effect-TS/effect>
 - Migration Guide: [references/migration.md](references/migration.md)

@@ -2,7 +2,55 @@
 
 Essential patterns for Effect v4 development.
 
-> **Migrating from v3?** Types like `Ref`, `Deferred`, and `Fiber` are no longer Effect subtypes. Use explicit methods like `Ref.get`, `Deferred.await`, and `Fiber.join`. See [migration.md](migration.md) for details.
+## Effect.fn (Recommended)
+
+The primary way to write functions that return Effects. `Effect.fn` provides:
+
+- Automatic tracing spans
+- Composable behavior via additional arguments
+- Better stack traces
+
+**Basic Usage**
+
+```ts
+import { Effect, Schema } from "effect";
+
+class FileProcessingError extends Schema.TaggedErrorClass<FileProcessingError>()(
+  "FileProcessingError",
+  { message: Schema.String },
+) {}
+
+export const processFile = Effect.fn("processFile")(
+  function* (path: string) {
+    yield* Effect.log("Starting file processing...");
+
+    // Always return when raising an error
+    return yield* new FileProcessingError({ message: "Failed to process" });
+  },
+  // Add combinators as additional arguments (no .pipe needed)
+  Effect.catch((error) => Effect.logError(`Error: ${error}`)),
+  Effect.withSpan("processFile", { attributes: { method: "Effect.fn" } }),
+);
+```
+
+**With Return Type Annotation**
+
+```ts
+import { Effect, Schema } from "effect";
+
+class SomeError extends Schema.TaggedErrorClass<SomeError>()("SomeError", {
+  message: Schema.String,
+}) {}
+
+export const effectFunction = Effect.fn("effectFunction")(
+  function* (n: number): Effect.fn.Return<string, SomeError> {
+    yield* Effect.logInfo("Received number:", n);
+    return yield* new SomeError({ message: "Failed" });
+  },
+  Effect.catch((error) => Effect.logError(`Error: ${error}`)),
+  Effect.annotateLogs({ method: "effectFunction" }),
+);
+```
 
 ## Effect Creation
 
@@ -22,19 +70,57 @@ Effect.die(defect); // Unexpected error (defect)
 Effect.failCause(cause); // Full cause chain
 ```
 
-**Conditional**
+**From common sources**
 
 ```ts
-Effect.if(condition, {
-  onTrue: () => Effect.succeed("yes"),
-  onFalse: () => Effect.succeed("no"),
-});
+import { Effect, Schema } from "effect";
 
-// Or simpler
-condition ? effect1 : effect2;
+class InvalidPayload extends Schema.TaggedErrorClass<InvalidPayload>()(
+  "InvalidPayload",
+  { input: Schema.String, cause: Schema.Defect },
+) {}
+
+// From sync code that may throw
+export const parsePayload = Effect.fn("parsePayload")((input: string) =>
+  Effect.try({
+    try: () => JSON.parse(input),
+    catch: (cause) => new InvalidPayload({ input, cause }),
+  }),
+);
+
+// From Promise-based APIs
+class UserLookupError extends Schema.TaggedErrorClass<UserLookupError>()(
+  "UserLookupError",
+  { userId: Schema.Number, cause: Schema.Defect },
+) {}
+
+export const fetchUser = Effect.fn("fetchUser")((userId: number) =>
+  Effect.tryPromise({
+    async try() {
+      const user = await fetchUserFromApi(userId);
+      return user;
+    },
+    catch: (cause) => new UserLookupError({ userId, cause }),
+  }),
+);
+
+// From nullable values
+const fromNullish = Effect.fromNullishOr(maybeValue).pipe(
+  Effect.mapError(() => new MissingValueError()),
+);
+
+// From callback-style APIs
+export const fromCallback = Effect.callback<number>((resume) => {
+  const timeoutId = setTimeout(() => {
+    resume(Effect.succeed(200));
+  }, 10);
+
+  // Return finalizer for interruption
+  return Effect.sync(() => clearTimeout(timeoutId));
+});
 ```
 
-## Generator Pattern (Preferred)
+## Generator Pattern
 
 **Sequential composition**
 
@@ -65,53 +151,6 @@ Effect.gen(function* () {
     Effect.catchTag("NotFound", () => Effect.succeed(null)),
   );
   return result;
-});
-```
-
-## Yieldable Trait (v4)
-
-In v4, many types implement the `Yieldable` trait, allowing them to be used with `yield*` in generators, but they are **not** Effect subtypes.
-
-**Types that are Yieldable:**
-- `Effect` itself
-- `Option` - yields value or fails with `NoSuchElementError`
-- `Either` (now `Result` in v4) - yields success or fails with error
-- `Config` - yields config value or fails with `ConfigError`
-- `ServiceMap.Service` - yields the service from environment
-
-**Using Yieldable types:**
-
-```ts
-import { Effect, Option } from "effect";
-
-// Works in generators - same as v3
-const program = Effect.gen(function* () {
-  const value = yield* Option.some(42);
-  return value; // 42
-});
-
-// Option.none() fails with NoSuchElementError
-const failing = Effect.gen(function* () {
-  const value = yield* Option.none<number>();
-  return value;
-});
-```
-
-**Important v4 change:** For Effect combinators, you must convert Yieldable types explicitly:
-
-```ts
-import { Effect, Option } from "effect";
-
-// v4: Must use .asEffect() for combinators
-const program = Effect.map(
-  Option.some(42).asEffect(), 
-  (n) => n + 1
-);
-
-// Or use a generator (recommended)
-const program2 = Effect.gen(function* () {
-  const n = yield* Option.some(42);
-  return n + 1;
 });
 ```
 
@@ -201,61 +240,14 @@ const maybeLog = Effect.when(shouldLog, () => Effect.log("Logging enabled"));
 const skipIfZero = Effect.unless(value === 0, () => process(value));
 ```
 
-## Do Notation (Avoid Nesting)
-
-**Simplifying nested flatMaps**
-
-```ts
-// Without Do
-Effect.succeed(1).pipe(
-  Effect.flatMap((a) =>
-    Effect.succeed(2).pipe(
-      Effect.flatMap((b) =>
-        Effect.succeed(3).pipe(Effect.map((c) => a + b + c)),
-      ),
-    ),
-  ),
-);
-
-// With Do (alternative to generators)
-Effect.Do.pipe(
-  Effect.bind("a", () => Effect.succeed(1)),
-  Effect.bind("b", () => Effect.succeed(2)),
-  Effect.bind("c", () => Effect.succeed(3)),
-  Effect.map(({ a, b, c }) => a + b + c),
-);
-
-// Best: Use generators
-Effect.gen(function* () {
-  const a = yield* Effect.succeed(1);
-  const b = yield* Effect.succeed(2);
-  const c = yield* Effect.succeed(3);
-  return a + b + c;
-});
-```
-
-## Dual APIs
-
-Many Effect functions support both data-first and data-last:
-
-```ts
-// Data-last (pipe-friendly)
-effect.pipe(Effect.map(fn));
-
-// Data-first
-Effect.map(effect, fn);
-
-// Both work identically
-```
-
 ## Resource Safety
 
 **Basic pattern**
 
 ```ts
 Effect.acquireRelease(
-  acquire,   // Effect that gets resource
-  release    // Cleanup (runs even if interrupted)
+  acquire, // Effect that gets resource
+  release, // Cleanup (runs even if interrupted)
 );
 ```
 
@@ -284,139 +276,185 @@ const program = Effect.scoped(
 );
 ```
 
-## Scope (v4: `extend` renamed to `provide`)
+## Error Handling
 
-**Provide scope to effect**
-
-```ts
-import { Effect, Scope } from "effect";
-
-const program = Effect.gen(function* () {
-  const scope = yield* Scope.make();
-  yield* Scope.provide(scope)(myEffect);
-});
-
-// Or data-first
-Scope.provide(myEffect, scope);
-```
-
-## Testing Patterns
-
-**Mock services (v4: ServiceMap pattern)**
+**catchTag for specific errors**
 
 ```ts
-import { Layer, ServiceMap } from "effect";
+import { Effect, Schema } from "effect";
 
-const MockUserRepo = Layer.succeed(
-  UserRepo,
-  ServiceMap.make(UserRepo, {
-    find: (id) => Effect.succeed({ id, name: "Test" }),
-  })
+class ParseError extends Schema.TaggedErrorClass<ParseError>()("ParseError", {
+  input: Schema.String,
+  message: Schema.String,
+}) {}
+
+class ReservedPortError extends Schema.TaggedErrorClass<ReservedPortError>()(
+  "ReservedPortError",
+  { port: Schema.Number },
+) {}
+
+declare const loadPort: (
+  input: string,
+) => Effect.Effect<number, ParseError | ReservedPortError>;
+
+export const recovered = loadPort("80").pipe(
+  // Catch multiple errors
+  Effect.catchTag(["ParseError", "ReservedPortError"], () =>
+    Effect.succeed(3000),
+  ),
 );
 
-const test = program.pipe(Effect.provide(MockUserRepo));
+export const withFinalFallback = loadPort("invalid").pipe(
+  Effect.catchTag("ReservedPortError", () => Effect.succeed(3000)),
+  Effect.catch(() => Effect.succeed(3000)),
+);
 ```
 
-**TestContext**
+**catchTags for multiple handlers**
 
 ```ts
-import { TestClock, TestRandom } from "effect";
+import { Effect, Schema } from "effect";
 
-const test = Effect.gen(function* () {
-  yield* TestClock.adjust("1 hour");
-  const value = yield* Effect.sleep("30 minutes").pipe(Effect.as(42));
-});
+class ValidationError extends Schema.TaggedErrorClass<ValidationError>()(
+  "ValidationError",
+  { message: Schema.String },
+) {}
+
+class NetworkError extends Schema.TaggedErrorClass<NetworkError>()(
+  "NetworkError",
+  { statusCode: Schema.Number },
+) {}
+
+declare const fetchUser: (
+  id: string,
+) => Effect.Effect<string, ValidationError | NetworkError>;
+
+export const userOrFallback = fetchUser("123").pipe(
+  Effect.catchTags({
+    ValidationError: (error) =>
+      Effect.succeed(`Validation failed: ${error.message}`),
+    NetworkError: (error) =>
+      Effect.succeed(`Network failed: ${error.statusCode}`),
+  }),
+);
 ```
 
-## Common Idioms
-
-**Optional chaining**
+**catchReason for errors with reasons**
 
 ```ts
-const user =
-  yield *
-  fetchUser(id).pipe(
-    Effect.flatMap((u) =>
-      u.email ? sendEmail(u.email) : Effect.succeed(null),
-    ),
-  );
+import { Effect, Schema } from "effect";
+
+class RateLimitError extends Schema.TaggedErrorClass<RateLimitError>()(
+  "RateLimitError",
+  { retryAfter: Schema.Number },
+) {}
+
+class QuotaExceededError extends Schema.TaggedErrorClass<QuotaExceededError>()(
+  "QuotaExceededError",
+  { limit: Schema.Number },
+) {}
+
+class AiError extends Schema.TaggedErrorClass<AiError>()("AiError", {
+  reason: Schema.Union(RateLimitError, QuotaExceededError),
+}) {}
+
+export const handleOneReason = callModel.pipe(
+  Effect.catchReason(
+    "AiError", // Parent error tag
+    "RateLimitError", // Reason tag to catch
+    (reason) => Effect.succeed(`Retry after ${reason.retryAfter}s`),
+    (reason) => Effect.succeed(`Other reason: ${reason._tag}`),
+  ),
+);
+
+export const handleMultipleReasons = callModel.pipe(
+  Effect.catchReasons("AiError", {
+    RateLimitError: (reason) =>
+      Effect.succeed(`Retry after ${reason.retryAfter}s`),
+    QuotaExceededError: (reason) =>
+      Effect.succeed(`Quota exceeded at ${reason.limit}`),
+  }),
+);
 ```
 
-**Fallback chain**
+## Running Effects
 
-```ts
-const data =
-  yield *
-  primary.pipe(
-    Effect.orElse(() => secondary),
-    Effect.orElse(() => tertiary),
-    Effect.orElse(() => Effect.succeed(defaultValue)),
-  );
-```
-
-**Racing effects**
-
-```ts
-const fastest = yield * Effect.race(slow, fast);
-const all = yield * Effect.raceAll([e1, e2, e3]);
-```
-
-**Timeout**
-
-```ts
-const result =
-  yield *
-  longOperation.pipe(
-    Effect.timeout("30 seconds"),
-    Effect.catchTag("TimeoutError", () => Effect.succeed("timeout")),
-  );
-```
-
-## Runtime (v4: `Runtime<R>` removed)
-
-In v4, the `Runtime<R>` type no longer exists. Use `ServiceMap<R>` instead:
-
-```ts
-// v4: No Runtime type
-// Run functions live directly on Effect
-Effect.runPromise(program);
-Effect.runSync(program);
-Effect.runFork(program);
-```
-
-**Automatic fiber keep-alive (v4)**
-
-In v4, the Effect fiber runtime automatically manages process lifetime. No need for `runMain` in most cases:
-
-```ts
-import { Deferred, Effect } from "effect";
-
-const program = Effect.gen(function* () {
-  const deferred = yield* Deferred.make<string>();
-  
-  // Process stays alive while waiting - no runMain needed
-  yield* Deferred.await(deferred);
-});
-
-Effect.runPromise(program);
-```
-
-**Signal handling with platform runMain (still recommended)**
+**With NodeRuntime**
 
 ```ts
 import { NodeRuntime } from "@effect/platform-node";
+import { Effect, Layer } from "effect";
 
-NodeRuntime.runMain(program);
-// Provides: signal handling, exit codes, error reporting
+const Worker = Layer.effectDiscard(
+  Effect.gen(function* () {
+    yield* Effect.logInfo("Starting worker...");
+    yield* Effect.forkScoped(
+      Effect.gen(function* () {
+        while (true) {
+          yield* Effect.logInfo("Working...");
+          yield* Effect.sleep("1 second");
+        }
+      }),
+    );
+  }),
+);
+
+const program = Layer.launch(Worker);
+
+// runMain installs SIGINT/SIGTERM handlers
+NodeRuntime.runMain(program, {
+  disableErrorReporting: true,
+});
+```
+
+**Using Layer.launch**
+
+```ts
+import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
+import { Effect, Layer } from "effect";
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
+import { createServer } from "node:http";
+
+const HealthRoutes = HttpRouter.use(
+  Effect.fn(function* (router) {
+    yield* router.add(
+      "GET",
+      "/health",
+      Effect.succeed(HttpServerResponse.text("ok")),
+    );
+  }),
+);
+
+const HttpServerLive = HttpRouter.serve(HealthRoutes).pipe(
+  Layer.provide(NodeHttpServer.layer(createServer, { port: 3000 })),
+);
+
+// Layer.launch converts layer to long-running Effect
+const main = Layer.launch(HttpServerLive);
+NodeRuntime.runMain(main);
+```
+
+## Dual APIs
+
+Many Effect functions support both data-first and data-last:
+
+```ts
+// Data-last (pipe-friendly)
+effect.pipe(Effect.map(fn));
+
+// Data-first
+Effect.map(effect, fn);
+
+// Both work identically
 ```
 
 ## Performance Tips
 
-Use `Effect.cached` for expensive reusable computations
-Prefer `Effect.suspend` over `Effect.sync` for heavy lazy work  
-Use `Effect.withConcurrency` to limit parallel operations
-Batch operations with `Effect.forEach(..., { batching: true })`
-Consider `Micro` module for bundle-sensitive scenarios
+- Use `Effect.cached` for expensive reusable computations
+- Prefer `Effect.suspend` over `Effect.sync` for heavy lazy work
+- Use `Effect.withConcurrency` to limit parallel operations
+- Batch operations with `Effect.forEach(..., { batching: true })`
+- Consider `Micro` module for bundle-size sensitive apps
 
 ## Migration from v3
 
@@ -424,60 +462,49 @@ Consider `Micro` module for bundle-sensitive scenarios
 
 In v4, these types are no longer Effect subtypes:
 
-| v3 (yieldable) | v4 (use explicit methods) |
-|----------------|---------------------------|
-| `yield* ref` | `yield* Ref.get(ref)` |
+| v3 (yieldable)    | v4 (use explicit methods)         |
+| ----------------- | --------------------------------- |
+| `yield* ref`      | `yield* Ref.get(ref)`             |
 | `yield* deferred` | `yield* Deferred.await(deferred)` |
-| `yield* fiber` | `yield* Fiber.join(fiber)` |
+| `yield* fiber`    | `yield* Fiber.join(fiber)`        |
 
-**v3:**
+### Using Effect.fn instead of Effect.gen alone
+
+**v3 (not recommended):**
+
 ```ts
-const ref = yield* Ref.make(0);
-const value = yield* ref;  // Ref was an Effect
-
-const deferred = yield* Deferred.make<string>();
-const value = yield* deferred;  // Deferred was an Effect
+const myFunction = (id: string) =>
+  Effect.gen(function* () {
+    // ...
+  });
 ```
 
-**v4:**
+**v4 (recommended):**
+
 ```ts
-const ref = yield* Ref.make(0);
-const value = yield* Ref.get(ref);  // Use Ref.get
-
-const deferred = yield* Deferred.make<string>();
-const value = yield* Deferred.await(deferred);  // Use Deferred.await
-```
-
-### Runtime Changes
-
-| v3 | v4 |
-|----|-----|
-| `Runtime<R>` | Removed - use `ServiceMap<R>` |
-| `Runtime.runPromise(runtime, effect)` | `Effect.runPromise(effect)` |
-| `Runtime.runSync(runtime, effect)` | `Effect.runSync(effect)` |
-
-### Scope Changes
-
-| v3 | v4 |
-|----|-----|
-| `Scope.extend(effect, scope)` | `Scope.provide(scope)(effect)` |
-
-### Yieldable in Combinators
-
-**v3:**
-```ts
-// Option was Effect subtype
-Effect.map(Option.some(42), (n) => n + 1);
-```
-
-**v4:**
-```ts
-// Must convert explicitly
-Effect.map(Option.some(42).asEffect(), (n) => n + 1);
-
-// Or use generator
-Effect.gen(function* () {
-  const n = yield* Option.some(42);
-  return n + 1;
+const myFunction = Effect.fn("myFunction")(function* (id: string) {
+  // ...
 });
+```
+
+### Error Definition
+
+**v3:**
+
+```ts
+import { Data } from "effect";
+
+class MyError extends Data.TaggedError("MyError")<{
+  message: string;
+}> {}
+```
+
+**v4:**
+
+```ts
+import { Schema } from "effect";
+
+class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
+  message: Schema.String,
+}) {}
 ```

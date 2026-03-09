@@ -1,432 +1,495 @@
-# Error Handling Patterns
+# Error Handling
 
-Type-safe error management in Effect v4.
+Error management strategies with Effect v4 using Schema.TaggedErrorClass.
 
-> **Migrating from v3?** Error handling combinators have been renamed: `catchAll` → `catch`, `catchAllCause` → `catchCause`, `catchSome` → `catchFilter`. See [migration.md](migration.md) for complete details.
+## Overview
 
-## Error Types
+In Effect v4, errors are defined using `Schema.TaggedErrorClass` which provides:
 
-**Expected errors** - Typed in error channel
+- Type-safe error definitions
+- Automatic `_tag` field for error identification
+- Schema validation for error properties
+- Better error serialization
+
+## Defining Errors
+
+### TaggedErrorClass
+
 ```ts
-Effect<Success, Error, Requirements>
+import { Effect, Schema } from "effect";
+
+// Define custom errors using Schema.TaggedErrorClass
+export class ParseError extends Schema.TaggedErrorClass<ParseError>()(
+  "ParseError",
+  {
+    input: Schema.String,
+    message: Schema.String,
+  },
+) {}
+
+export class ReservedPortError extends Schema.TaggedErrorClass<ReservedPortError>()(
+  "ReservedPortError",
+  { port: Schema.Number },
+) {}
+
+export class NetworkError extends Schema.TaggedErrorClass<NetworkError>()(
+  "NetworkError",
+  { statusCode: Schema.Number },
+) {}
+
+// Error without additional fields
+export class MissingValueError extends Schema.TaggedErrorClass<MissingValueError>()(
+  "MissingValueError",
+  {},
+) {}
 ```
 
-**Defects** - Uncaught runtime errors (like exceptions)
+### Error with Defect Cause
 
-**Interruptions** - Fiber cancellation
-
-## Creating Errors
-
-**Tagged errors (recommended)**
 ```ts
-import { Data } from "effect";
+export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
+  "DatabaseError",
+  { cause: Schema.Defect },
+) {}
 
-class NetworkError extends Data.TaggedError("NetworkError")<{
-  cause: unknown;
-}> {}
-
-class ValidationError extends Data.TaggedError("ValidationError")<{
-  field: string;
-  message: string;
-}> {}
-
-// Usage
-Effect.fail(new NetworkError({ cause: error }));
+// Usage in try/catch
+Effect.try({
+  try: () => riskyOperation(),
+  catch: (cause) => new DatabaseError({ cause }),
+});
 ```
 
-**Simple errors**
+### Error with Union Types (Reasons)
+
 ```ts
-Effect.fail("Something went wrong");
-Effect.fail(new Error("Failed"));
+class RateLimitError extends Schema.TaggedErrorClass<RateLimitError>()(
+  "RateLimitError",
+  { retryAfter: Schema.Number },
+) {}
+
+class QuotaExceededError extends Schema.TaggedErrorClass<QuotaExceededError>()(
+  "QuotaExceededError",
+  { limit: Schema.Number },
+) {}
+
+class SafetyBlockedError extends Schema.TaggedErrorClass<SafetyBlockedError>()(
+  "SafetyBlockedError",
+  { category: Schema.String },
+) {}
+
+// Parent error with union of reasons
+export class AiError extends Schema.TaggedErrorClass<AiError>()("AiError", {
+  reason: Schema.Union(RateLimitError, QuotaExceededError, SafetyBlockedError),
+}) {}
 ```
 
 ## Catching Errors
 
-**Catch all (v4: renamed from `catchAll`)**
-```ts
-effect.pipe(
-  Effect.catch((error) => 
-    Effect.succeed(`Recovered from: ${error}`)
-  )
-);
-```
+### catchTag
 
-**Catch specific tags**
+Handle specific tagged errors:
+
 ```ts
-program.pipe(
-  Effect.catchTag("NetworkError", (e) => 
-    Effect.log(`Network error: ${e.cause}`)
+declare const loadPort: (
+  input: string,
+) => Effect.Effect<number, ParseError | ReservedPortError>;
+
+// Catch multiple errors with one handler
+export const recovered = loadPort("80").pipe(
+  Effect.catchTag(["ParseError", "ReservedPortError"], () =>
+    Effect.succeed(3000),
   ),
-  Effect.catchTag("ValidationError", (e) =>
-    Effect.fail(new BadRequest(e.message))
-  )
+);
+
+// Catch specific error first, then all others
+export const withFinalFallback = loadPort("invalid").pipe(
+  Effect.catchTag("ReservedPortError", () => Effect.succeed(3000)),
+  Effect.catch(() => Effect.succeed(3000)),
 );
 ```
 
-**Catch multiple tags**
+### catchTags
+
+Handle multiple errors with different handlers:
+
 ```ts
-effect.pipe(
+class ValidationError extends Schema.TaggedErrorClass<ValidationError>()(
+  "ValidationError",
+  { message: Schema.String },
+) {}
+
+class NetworkError extends Schema.TaggedErrorClass<NetworkError>()(
+  "NetworkError",
+  { statusCode: Schema.Number },
+) {}
+
+declare const fetchUser: (
+  id: string,
+) => Effect.Effect<string, ValidationError | NetworkError>;
+
+export const userOrFallback = fetchUser("123").pipe(
   Effect.catchTags({
-    NetworkError: (e) => retry(e),
-    TimeoutError: (e) => useCache(e),
-    ParseError: (e) => Effect.fail(new BadRequest())
-  })
+    ValidationError: (error) =>
+      Effect.succeed(`Validation failed: ${error.message}`),
+    NetworkError: (error) =>
+      Effect.succeed(`Network request failed with status ${error.statusCode}`),
+  }),
 );
 ```
 
-**Catch filtered errors (v4: renamed from `catchSome`)**
+### catchReason / catchReasons
+
+Handle errors with nested reason types:
+
 ```ts
-import { Effect, Filter } from "effect";
-
-effect.pipe(
-  Effect.catchFilter(
-    Filter.fromPredicate((error: MyError) => error._tag === "Retryable"),
-    (error) => Effect.succeed("caught")
-  )
-);
-```
-
-**Catch cause (v4: renamed from `catchAllCause`)**
-```ts
-import { Cause, Effect } from "effect";
-
-const program = Effect.die("defect").pipe(
-  Effect.catchCause((cause) => Effect.succeed("recovered"))
-);
-```
-
-**Catch defects (v4: renamed from `catchAllDefect`)**
-```ts
-effect.pipe(
-  Effect.catchDefect((defect) =>
-    Effect.log(`Defect caught: ${defect}`)
-  )
-);
-```
-
-**New in v4: Catch reason**
-```ts
-// Catch specific reason within tagged error
-Effect.catchReason(
-  "AiError",
-  "RateLimitError",
-  (reason) => Effect.succeed("rate limited")
+// Catch a specific reason
+export const handleOneReason = callModel.pipe(
+  Effect.catchReason(
+    "AiError", // Parent error tag
+    "RateLimitError", // Reason tag to catch
+    (reason) => Effect.succeed(`Retry after ${reason.retryAfter} seconds`),
+    (reason) => Effect.succeed(`Model call failed for reason: ${reason._tag}`),
+  ),
 );
 
 // Catch multiple reasons
-Effect.catchReasons("AiError", {
-  RateLimitError: () => Effect.succeed("rate limited"),
-  QuotaExceededError: () => Effect.succeed("quota exceeded")
-});
-```
-
-**New in v4: Catch eager**
-```ts
-// Optimization: evaluates synchronous recovery immediately
-effect.pipe(
-  Effect.catchEager((error) => Effect.succeed("recovered"))
+export const handleMultipleReasons = callModel.pipe(
+  Effect.catchReasons("AiError", {
+    RateLimitError: (reason) =>
+      Effect.succeed(`Retry after ${reason.retryAfter} seconds`),
+    QuotaExceededError: (reason) =>
+      Effect.succeed(`Quota exceeded at ${reason.limit} tokens`),
+  }),
 );
 ```
 
-## Fallback & Recovery
+### unwrapReason
 
-**orElse**
+Move reasons into the error channel for handling with catchTags:
+
 ```ts
-primary.pipe(
+export const unwrapAndHandle = callModel.pipe(
+  Effect.unwrapReason("AiError"),
+  Effect.catchTags({
+    RateLimitError: (reason) =>
+      Effect.succeed(`Back off for ${reason.retryAfter} seconds`),
+    QuotaExceededError: (reason) =>
+      Effect.succeed(`Increase quota beyond ${reason.limit}`),
+    SafetyBlockedError: (reason) =>
+      Effect.succeed(`Blocked by safety category: ${reason.category}`),
+  }),
+);
+```
+
+### catchAll (catch in v4)
+
+Handle all errors:
+
+```ts
+effect.pipe(Effect.catch((error) => Effect.succeed(`recovered: ${error}`)));
+```
+
+### catchAllCause (catchCause in v4)
+
+Handle full cause chain:
+
+```ts
+effect.pipe(
+  Effect.catchCause((cause) => Effect.succeed("recovered from cause")),
+);
+```
+
+## Error Recovery
+
+### orElse / orElseFail
+
+```ts
+// Provide fallback effect
+const withFallback = primary.pipe(
   Effect.orElse(() => secondary),
-  Effect.orElse(() => tertiary)
+  Effect.orElse(() => tertiary),
+  Effect.orElse(() => Effect.succeed(defaultValue)),
 );
+
+// Fail with specific error if primary fails
+const orFail = primary.pipe(Effect.orElseFail(() => new CustomError()));
 ```
 
-**orElseSucceed**
-```ts
-effect.pipe(
-  Effect.orElseSucceed(() => defaultValue)
-);
-```
+### retry
 
-**firstSuccessOf**
-```ts
-Effect.firstSuccessOf([
-  fetchFromCache(),
-  fetchFromDb(),
-  fetchFromApi()
-]);
-```
+Retry with schedule:
 
-## Retrying
-
-**Basic retry**
-```ts
-effect.pipe(
-  Effect.retry({ times: 3 })
-);
-```
-
-**With schedule**
 ```ts
 import { Schedule } from "effect";
 
-effect.pipe(
+const withRetry = fetchUser("123").pipe(
   Effect.retry({
-    times: 5,
-    schedule: Schedule.exponential("100 millis", 2.0)
-  })
+    times: 3,
+    schedule: Schedule.exponential("100 millis"),
+  }),
 );
 ```
 
-**Conditional retry**
+### timeout
+
 ```ts
-effect.pipe(
-  Effect.retry({
-    while: (error) => error._tag === "Transient",
-    times: 10
-  })
+const withTimeout = longOperation.pipe(
+  Effect.timeout("30 seconds"),
+  Effect.catchTag("TimeoutError", () => Effect.succeed("timeout")),
 );
 ```
-
-**Retry with delays**
-```ts
-// Fixed intervals
-Schedule.spaced("1 second");
-
-// Exponential backoff  
-Schedule.exponential("100 millis", 2.0);
-
-// With jitter
-Schedule.exponential("100 millis").pipe(
-  Schedule.jittered
-);
-```
-
-## Cause Analysis (v4)
-
-In v4, `Cause<E>` has been flattened to a wrapper around an array of `Reason` values:
-
-```ts
-interface Cause<E> {
-  readonly reasons: ReadonlyArray<Reason<E>>;
-}
-
-type Reason<E> = Fail<E> | Die | Interrupt;
-```
-
-**Full error context**
-```ts
-Effect.gen(function* () {
-  const result = yield* effect.pipe(
-    Effect.sandbox,
-    Effect.catch((cause) => {
-      // cause.reasons contains all errors
-      for (const reason of cause.reasons) {
-        switch (reason._tag) {
-          case "Fail":
-            console.log("Failure:", reason.error);
-            break;
-          case "Die":
-            console.log("Defect:", reason.defect);
-            break;
-          case "Interrupt":
-            console.log("Interrupted by:", reason.fiberId);
-            break;
-        }
-      }
-      return Effect.succeed(null);
-    })
-  );
-});
-```
-
-**Cause helpers (v4)**
-```ts
-// Check if cause has specific reason types
-Cause.hasFails(cause);        // has any Fail reasons
-Cause.hasDies(cause);         // has any Die reasons  
-Cause.hasInterrupts(cause);   // has any Interrupt reasons
-Cause.hasInterruptsOnly(cause); // only Interrupt reasons
-
-// Extract reasons
-Cause.findErrorOption(cause);      // Option<E>
-Cause.findError(cause);            // Result<E>
-Cause.findDefect(cause);           // Result<unknown>
-Cause.findInterrupt(cause);        // Result<FiberId>
-
-// Filter reasons
-cause.reasons.filter(Cause.isFailReason);
-cause.reasons.filter(Cause.isDieReason);
-cause.reasons.filter(Cause.isInterruptReason);
-
-// Combine causes
-Cause.combine(cause1, cause2);  // replaces sequential/parallel
-```
-
-**Die vs Fail**
-```ts
-// Fail - expected error (in error channel)
-Effect.fail(new ValidationError());
-
-// Die - defect (not in error channel, unrecoverable)
-Effect.die("Impossible state reached");
-```
-
-## Pattern Matching
-
-**Match on result**
-```ts
-import { Match } from "effect";
-
-const result = yield* effect.pipe(
-  Effect.match({
-    onFailure: (error) => `Error: ${error}`,
-    onSuccess: (value) => `Success: ${value}`
-  })
-);
-```
-
-**Exit matching**
-```ts
-const exit = yield* Effect.exit(effect);
-
-if (Exit.isSuccess(exit)) {
-  console.log(exit.value);
-} else if (Exit.isFailure(exit)) {
-  // v4: exit.cause.reasons for flattened structure
-  console.log(Cause.pretty(exit.cause));
-}
-```
-
-## Error Accumulation
-
-**Validate all**
-```ts
-const results = yield* Effect.validateAll(
-  [validate1, validate2, validate3],
-  { concurrency: "unbounded" }
-);
-// Collects ALL errors, not just first
-```
-
-**Partition**
-```ts
-const [errors, successes] = yield* Effect.partition(
-  items,
-  (item) => validate(item)
-);
-```
-
-## Typed Error Unions
-
-**Combining error types**
-```ts
-const program: Effect<
-  string,
-  NetworkError | ValidationError | DatabaseError,
-  Database
-> = Effect.gen(function* () {
-  const data = yield* fetchData();  // NetworkError
-  const validated = yield* validate(data);  // ValidationError  
-  return yield* save(validated);  // DatabaseError
-});
-```
-
-**Widening errors**
-```ts
-const narrow: Effect<string, NetworkError> = fetchData();
-
-const wide: Effect<string, Error> = narrow.pipe(
-  Effect.mapError((e) => new Error(e.message))
-);
-```
-
-## Defect Handling
-
-**Catch defects (use sparingly)**
-```ts
-effect.pipe(
-  Effect.catchDefect((defect) =>
-    Effect.log(`Defect caught: ${defect}`)
-  )
-);
-```
-
-**Refail defects as typed errors**
-```ts
-effect.pipe(
-  Effect.catchDefect((defect) =>
-    Effect.fail(new UnexpectedError({ cause: defect }))
-  )
-);
-```
-
-## Best Practices
-
-Use tagged errors for domain errors
-Keep error types in type signature  
-Catch specific error tags when possible
-Use retry for transient failures
-Log errors with structured data
-Match/pattern match for error handling
-
-Avoid:
-- Catching all errors indiscriminately
-- Losing error type information  
-- Using try/catch (breaks type safety)
-- Ignoring errors silently
-- Retrying non-transient errors
 
 ## Error Transformation
 
-**Map error type**
+### mapError
+
+Transform error type:
+
 ```ts
-effect.pipe(
-  Effect.mapError((e: DbError) => 
-    new ApiError({ status: 500, cause: e })
-  )
+effect.pipe(Effect.mapError((error) => new CustomError(error)));
+```
+
+### mapErrorCause
+
+Transform full cause:
+
+```ts
+effect.pipe(Effect.mapErrorCause((cause) => new CustomError(cause)));
+```
+
+### absorb / absorbWith
+
+```ts
+// Convert all errors to defects
+const absorbed = effect.pipe(Effect.absorb);
+
+// With custom handler
+const absorbedWith = effect.pipe(
+  Effect.absorbWith((error) => new CustomError(error)),
 );
 ```
 
-**Flatten nested errors**
+## Error Inspection
+
+### Cause
+
+In v4, `Cause<E>` has been flattened:
+
 ```ts
-Effect.flatten(effectOfEffect);
+// Structure is now:
+interface Cause<E> {
+  readonly reasons: ReadonlyArray<Reason<E>>;
+}
+type Reason<E> = Fail<E> | Die | Interrupt;
 ```
 
-## Testing Errors
+### Cause Operations
 
 ```ts
-// Expect failure
-const test = Effect.gen(function* () {
-  const result = yield* failingEffect.pipe(
-    Effect.flip  // Swap success/error channels
-  );
-  expect(result).toBeInstanceOf(MyError);
-});
+import { Cause } from "effect";
 
-// Flip back
-effect.pipe(Effect.flip).pipe(Effect.flip);  // identity
+// Check for specific reason types
+Cause.isFailReason(reason);
+Cause.isDieReason(reason);
+Cause.isInterruptReason(reason);
+
+// Check cause contents
+Cause.hasFails(cause);
+Cause.hasDies(cause);
+Cause.hasInterrupts(cause);
+
+// Find specific errors
+Cause.findErrorOption(cause); // Option<E>
+Cause.findError(cause); // Either<E, Cause<never>>
+Cause.findDefect(cause); // Option<unknown>
+Cause.findInterrupt(cause); // Option<unknown>
+```
+
+## Error in Effect.fn
+
+When using `Effect.fn`, handle errors with combinators as additional arguments:
+
+```ts
+export const effectFunction = Effect.fn("effectFunction")(
+  function* (n: number): Effect.fn.Return<string, SomeError> {
+    yield* Effect.logInfo("Received number:", n);
+    return yield* new SomeError({ message: "Failed to read the file" });
+  },
+  // Add error handling as additional arguments
+  Effect.catch((error) => Effect.logError(`Error occurred: ${error}`)),
+  Effect.annotateLogs({ method: "effectFunction" }),
+);
+```
+
+## Common Patterns
+
+### Validation with Multiple Errors
+
+```ts
+import { Effect, Schema } from "effect";
+
+class ValidationError extends Schema.TaggedErrorClass<ValidationError>()(
+  "ValidationError",
+  { field: Schema.String, message: Schema.String },
+) {}
+
+const validateUser = Effect.fn("validateUser")(function* (user: {
+  name: string;
+  age: number;
+}) {
+  const errors: Array<ValidationError> = [];
+
+  if (user.name.length < 2) {
+    errors.push(
+      new ValidationError({
+        field: "name",
+        message: "Name must be at least 2 characters",
+      }),
+    );
+  }
+
+  if (user.age < 18) {
+    errors.push(
+      new ValidationError({
+        field: "age",
+        message: "Must be at least 18 years old",
+      }),
+    );
+  }
+
+  if (errors.length > 0) {
+    return yield* Effect.fail(errors[0]);
+  }
+
+  return user;
+});
+```
+
+### Error Recovery Chain
+
+```ts
+const resilientFetch = (id: string) =>
+  fetchUser(id).pipe(
+    // Try primary source
+    Effect.orElse(() => fetchFromCache(id)),
+    // Retry on network errors
+    Effect.retry({
+      times: 3,
+      schedule: Schedule.exponential("100 millis"),
+    }),
+    // Return null if all fail
+    Effect.orElse(() => Effect.succeed(null)),
+  );
+```
+
+### Converting Between Error Types
+
+```ts
+// In service implementation
+const fetchUser = Effect.fn("UserService.fetchUser")(function* (id: string) {
+  const response = yield* httpClient
+    .get(`/users/${id}`)
+    .pipe(
+      Effect.mapError(
+        (httpError) => new UserServiceError({ cause: httpError }),
+      ),
+    );
+  return response;
+});
 ```
 
 ## Migration from v3
 
-### Renamed Combinators
+### Error Definition
 
-| v3 | v4 |
-|----|-----|
-| `Effect.catchAll` | `Effect.catch` |
-| `Effect.catchAllCause` | `Effect.catchCause` |
-| `Effect.catchAllDefect` | `Effect.catchDefect` |
-| `Effect.catchSome` | `Effect.catchFilter` |
+**v3:**
+
+```ts
+import { Data } from "effect";
+
+class MyError extends Data.TaggedError("MyError")<{
+  message: string;
+}> {}
+```
+
+**v4:**
+
+```ts
+import { Schema } from "effect";
+
+class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
+  message: Schema.String,
+}) {}
+```
+
+### Error Class Names
+
+**v3:**
+
+```ts
+NoSuchElementException;
+TimeoutException;
+IllegalArgumentException;
+ExceededCapacityException;
+UnknownException;
+```
+
+**v4:**
+
+```ts
+NoSuchElementError;
+TimeoutError;
+IllegalArgumentError;
+ExceededCapacityError;
+UnknownError;
+```
+
+### Combinator Renames
+
+| v3                      | v4                        |
+| ----------------------- | ------------------------- |
+| `Effect.catchAll`       | `Effect.catch`            |
+| `Effect.catchAllCause`  | `Effect.catchCause`       |
+| `Effect.catchAllDefect` | `Effect.catchDefect`      |
+| `Effect.catchSome`      | `Effect.catchFilter`      |
 | `Effect.catchSomeCause` | `Effect.catchCauseFilter` |
-| `Cause.isFailType` | `Cause.isFailReason` |
-| `Cause.isDieType` | `Cause.isDieReason` |
-| `Cause.isInterruptType` | `Cause.isInterruptReason` |
-| `Cause.isFailure` | `Cause.hasFails` |
-| `Cause.isDie` | `Cause.hasDies` |
-| `Cause.isInterrupted` | `Cause.hasInterrupts` |
-| `Cause.isInterruptedOnly` | `Cause.hasInterruptsOnly` |
-| `Cause.failureOption` | `Cause.findErrorOption` |
-| `Cause.failureOrCause` | `Cause.findError` |
-| `Cause.dieOption` | `Cause.findDefect` |
-| `Cause.interruptOption` | `Cause.findInterrupt` |
-| `Cause.sequential` | `Cause.combine` |
-| `Cause.parallel` | `Cause.combine` |
-| `*Exception` classes | `*Error` classes (e.g., `NoSuchElementException` → `NoSuchElementError`) |
+
+## Best Practices
+
+1. **Define errors with Schema.TaggedErrorClass** for type safety
+2. **Use descriptive \_tag names** that clearly identify the error type
+3. **Include context in error fields** (e.g., userId, operation name)
+4. **Use catchTags for multiple error types** instead of nested catchTag calls
+5. **Handle errors at appropriate layers** - don't let them bubble too far
+6. **Use reasons for complex error hierarchies** (e.g., AI errors with rate limits, quotas)
+7. **Always return when raising errors** in Effect.fn to ensure type safety
+
+## Quick Reference
+
+```ts
+// Define error
+class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
+  field: Schema.String,
+}) {}
+
+// Catch specific
+Effect.catchTag("MyError", (error) => handler);
+
+// Catch multiple
+Effect.catchTags({
+  Error1: (e) => handler1,
+  Error2: (e) => handler2,
+});
+
+// Catch all
+Effect.catch((error) => handler);
+
+// Retry
+Effect.retry({ times: 3, schedule: Schedule.exponential("100 millis") });
+
+// Timeout
+Effect.timeout("5 seconds");
+
+// Fallback
+Effect.orElse(() => fallback);
+```
