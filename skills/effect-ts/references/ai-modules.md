@@ -2,6 +2,21 @@
 
 Working with Effect's AI modules for LLM integration.
 
+## Contents
+
+- [Overview](#overview) - AI module capabilities
+- [Setup](#setup) - Installing and configuring providers
+- [Basic Text Generation](#basic-text-generation) - Simple generation patterns
+- [Structured Object Generation](#structured-object-generation) - Using Schema
+- [Streaming Responses](#streaming-responses) - Real-time text streaming
+- [Provider Fallback with ExecutionPlan](#provider-fallback-with-executionplan) - Resilience patterns
+- [Tool Calling](#tool-calling) - Implementing custom tools
+- [Chat Sessions](#chat-sessions) - Conversational AI
+- [Provider-Defined Tools](#provider-defined-tools) - Built-in provider tools
+- [Best Practices](#best-practices) - Recommendations
+- [Testing AI Services](#testing-ai-services) - Test patterns
+- [Common Patterns](#common-patterns) - Retry, caching, parallel generation
+
 ## Overview
 
 Effect's AI modules provide a provider-agnostic interface for:

@@ -1,10 +1,24 @@
 # Error Handling
 
-Error management strategies with Effect v4 using Schema.TaggedErrorClass.
+Error management strategies with Effect using Schema.TaggedErrorClass.
+
+## Contents
+
+- [Overview](#overview) - Error handling philosophy
+- [Defining Errors](#defining-errors) - Schema.TaggedErrorClass patterns
+- [Catching Errors](#catching-errors) - catchTag, catchTags, catchReason
+- [Error Recovery](#error-recovery) - orElse, retry, timeout
+- [Error Transformation](#error-transformation) - mapError, absorb
+- [Error Inspection](#error-inspection) - Cause operations
+- [Error in Effect.fn](#error-in-effectfn) - Handling in function definitions
+- [Common Patterns](#common-patterns) - Validation, recovery chains
+- [Migration from v3](#migration-from-v3) - Upgrading error definitions
+- [Best Practices](#best-practices) - Recommendations
+- [Quick Reference](#quick-reference) - Common operations
 
 ## Overview
 
-In Effect v4, errors are defined using `Schema.TaggedErrorClass` which provides:
+In Effect, errors are defined using `Schema.TaggedErrorClass` which provides:
 
 - Type-safe error definitions
 - Automatic `_tag` field for error identification

@@ -1,15 +1,9 @@
 ---
-name: effect-typescript
+name: building-with-effect
 description: Build robust TypeScript programs with Effect - type-safe error handling, dependency injection, concurrency, resource management. Use when writing Effect code, managing services/layers, handling errors, coordinating async operations, or working with Effect data types.
-license: MIT
-compatibility: TypeScript 5.0+, Node.js 18+, Deno, Bun, Browser
-metadata:
-  author: effect-community
-  version: "3.0"
-  effect-version: "4.x"
 ---
 
-# Effect TypeScript (v4)
+# Building with Effect
 
 Effect is a powerful TypeScript library for building complex, type-safe programs with composable abstractions for error handling, dependency injection, concurrency, and resource management.
 
@@ -63,21 +57,36 @@ NodeRuntime.runMain(program);
 Layer.launch(WorkerLayer).pipe(NodeRuntime.runMain);
 ```
 
-## What's New in v4
+## Degrees of Freedom
 
-- **Effect.fn** - Recommended way to write functions that return Effects
-- **Schema.TaggedErrorClass** - Type-safe error definitions with Schema
-- **ServiceMap.Service** - Simplified service definition with class extension
-- **Layer.unwrap** - Dynamic layer creation from Effects/Config
-- **LayerMap** - Dynamic resource management keyed by identifiers
-- **PubSub** - In-process event broadcasting
-- **AI modules** - Provider-agnostic LLM integration (effect/unstable/ai)
-- **ExecutionPlan** - Provider fallback strategies for AI
-- **Unified versioning** - All ecosystem packages share a single version number
-- **Package consolidation** - Platform, RPC, Cluster merged into core `effect`
-- **Automatic fiber keep-alive** - No need for `runMain` in most cases
-- **Layer memoization** - Automatic across `Effect.provide` calls
-- **Unstable modules** - New features under `effect/unstable/*` paths
+Match the level of specificity to the task's fragility:
+
+**Low Freedom** (specific patterns, consistency critical)
+
+These operations have a narrow safe path - follow exactly:
+
+- **Error definition**: Always use `Schema.TaggedErrorClass` with descriptive `_tag`
+- **Service structure**: Extend `ServiceMap.Service` with static `layer` property
+- **Effect.fn usage**: Always use `Effect.fn("name")` for functions returning Effects
+- **Resource cleanup**: Always use `acquireUseRelease` or `Effect.addFinalizer`
+
+**Medium Freedom** (preferred patterns, some variation acceptable)
+
+These have recommended approaches but context matters:
+
+- **Combinator selection**: Choose based on need - `catchTag` for specific errors, `catchTags` for multiple, `catch` for all
+- **Layer composition**: Use `Layer.provide` for dependency injection, order matters for overrides
+- **Concurrency control**: Use `Effect.all` or `Effect.forEach` with appropriate `concurrency` option
+- **Error recovery**: Select retry schedules based on failure characteristics
+
+**High Freedom** (multiple valid approaches, context-dependent)
+
+These depend on application needs:
+
+- **Application architecture**: Service boundaries, layer organization, entry point structure
+- **Testing strategies**: Test at service level, effect level, or integration level based on needs
+- **Performance optimization**: Caching strategies, batching decisions, bundle size tradeoffs
+- **Observability setup**: Logging granularity, tracing scope, metric selection
 
 ## Core Type
 
@@ -100,11 +109,11 @@ Effect<Success, Error, Requirements>;
 
 **Error Handling**
 
-- `catch` - Handle all errors (v4: renamed from `catchAll`)
+- `catch` - Handle all errors (renamed from `catchAll` in earlier versions)
 - `catchTag` - Handle specific error types
 - `catchTags` - Handle multiple tagged errors at once
 - `catchReason` / `catchReasons` - Handle errors with reasons
-- `catchFilter` - Handle filtered errors (v4: renamed from `catchSome`)
+- `catchFilter` - Handle filtered errors (renamed from `catchSome` in earlier versions)
 - `orElse` - Fallback effect
 - `retry` - Retry with policy
 
@@ -126,7 +135,150 @@ Effect<Success, Error, Requirements>;
 7. **Use Layer.launch** as application entry point for long-running apps
 8. **Enable dual APIs** when appropriate (data-first + data-last)
 
+## Workflows
+
+Use these checklists for complex multi-step tasks:
+
+### Creating a New Service
+
+Copy this checklist and track progress:
+
+```
+Service Creation Progress:
+- [ ] Step 1: Define error types with Schema.TaggedErrorClass
+- [ ] Step 2: Create service class extending ServiceMap.Service
+- [ ] Step 3: Implement methods using Effect.fn
+- [ ] Step 4: Build Layer.effect with service implementation
+- [ ] Step 5: Provide dependencies via Layer.provide
+- [ ] Step 6: Test the service layer
+```
+
+**Step 1: Define error types**
+
+```ts
+class ServiceError extends Schema.TaggedErrorClass<ServiceError>()(
+  "ServiceError",
+  { cause: Schema.Defect },
+) {}
+```
+
+**Step 2: Create service class**
+
+```ts
+export class MyService extends ServiceMap.Service<
+  MyService,
+  {
+    method(): Effect.Effect<ReturnType, ServiceError>;
+  }
+>()("namespace/MyService") {}
+```
+
+**Step 3: Implement methods**
+
+```ts
+const method = Effect.fn("MyService.method")(function* () {
+  // Implementation
+});
+```
+
+**Step 4-6: Build and test layer**
+
+See [Services & Layers](references/services-layers.md) for complete examples.
+
+### Setting Up AI Integration
+
+Copy this checklist and track progress:
+
+```
+AI Setup Progress:
+- [ ] Step 1: Install provider packages (@effect/ai-openai, @effect/ai-anthropic)
+- [ ] Step 2: Configure client layers with API keys
+- [ ] Step 3: Define ExecutionPlan for fallback strategy
+- [ ] Step 4: Create AI service with Effect.fn
+- [ ] Step 5: Implement error handling with mapError
+- [ ] Step 6: Provide client layers to service layer
+```
+
+See [AI Modules](references/ai-modules.md) for detailed implementation.
+
+### Error Handling Strategy
+
+Copy this checklist and track progress:
+
+```
+Error Handling Progress:
+- [ ] Step 1: Define all error types with Schema.TaggedErrorClass
+- [ ] Step 2: Use catchTags for multiple specific error handlers
+- [ ] Step 3: Add catch for final fallback if needed
+- [ ] Step 4: Consider retry with Schedule for transient failures
+- [ ] Step 5: Log errors at appropriate layers
+- [ ] Step 6: Test error scenarios
+```
+
+See [Error Handling](references/error-handling.md) for patterns and examples.
+
 ## Common Workflows
+
+These examples show input/output patterns for common scenarios:
+
+### Converting Promise to Effect
+
+**Input**: Existing Promise-based API
+```ts
+const fetchUser = (id: string): Promise<User> => 
+  fetch(`/api/users/${id}`).then(r => r.json());
+```
+
+**Output**: Effect-wrapped version with error handling
+```ts
+class FetchError extends Schema.TaggedErrorClass<FetchError>()(
+  "FetchError",
+  { userId: Schema.String, cause: Schema.Defect },
+) {}
+
+const fetchUser = Effect.fn("fetchUser")((id: string) =>
+  Effect.tryPromise({
+    try: () => fetch(`/api/users/${id}`).then(r => r.json()),
+    catch: (cause) => new FetchError({ userId: id, cause }),
+  }),
+);
+```
+
+### Handling Multiple Error Types
+
+**Input**: Effect with multiple possible errors
+```ts
+const loadConfig = (): Effect.Effect<Config, ParseError | FileError> => ...
+```
+
+**Output**: Error handling with catchTags
+```ts
+const configWithFallback = loadConfig().pipe(
+  Effect.catchTags({
+    ParseError: (e) => Effect.succeed(defaultConfig),
+    FileError: (e) => Effect.succeed(defaultConfig),
+  }),
+);
+```
+
+### Composing Services with Layers
+
+**Input**: Two services with dependency
+```ts
+class Database { /* ... */ }
+class UserService { /* needs Database */ }
+```
+
+**Output**: Layer composition
+```ts
+const DatabaseLive = Layer.effect(Database, ...);
+const UserServiceLive = Layer.effect(UserService, ...).pipe(
+  Layer.provide(DatabaseLive),
+);
+
+// Usage
+program.pipe(Effect.provide(UserServiceLive));
+```
 
 **Service with Effect.fn**
 
@@ -255,7 +407,7 @@ const program = Effect.acquireUseRelease(
 );
 ```
 
-## Package Structure (v4)
+## Package Structure
 
 **Core Package**
 
@@ -272,7 +424,7 @@ import { LanguageModel } from "effect/unstable/ai";
 import { PubSub } from "effect/unstable/pubsub";
 ```
 
-**Platform-Specific Packages** (separate, matching v4 version)
+**Platform-Specific Packages** (separate packages)
 
 ```ts
 import { NodeRuntime } from "@effect/platform-node";

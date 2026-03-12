@@ -1,6 +1,21 @@
 # Core Effect Patterns
 
-Essential patterns for Effect v4 development.
+Essential patterns for Effect development.
+
+## Contents
+
+- [Effect.fn (Recommended)](#effectfn-recommended) - Primary way to write functions that return Effects
+- [Effect Creation](#effect-creation) - Creating effects from various sources
+- [Generator Pattern](#generator-pattern) - Sequential composition with Effect.gen
+- [Pipe Composition](#pipe-composition) - Chaining transformations
+- [Combining Effects](#combining-effects) - Running multiple effects together
+- [Conditional Execution](#conditional-execution) - Control flow patterns
+- [Resource Safety](#resource-safety) - Managing resources with acquireRelease
+- [Error Handling](#error-handling) - Catching and recovering from errors
+- [Running Effects](#running-effects) - Executing effects with runtimes
+- [Dual APIs](#dual-apis) - Data-first and data-last styles
+- [Performance Tips](#performance-tips) - Optimization recommendations
+- [Migration from v3](#migration-from-v3) - Upgrading from previous versions
 
 ## Effect.fn (Recommended)
 
