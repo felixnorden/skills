@@ -1,5 +1,28 @@
 # Access Control Patterns
 
+## Contents
+
+- [Access Control Hierarchy](#access-control-hierarchy)
+- [Single Administrator: Ownable](#single-administrator-ownable)
+  - [Basic Ownable Pattern](#basic-ownable-pattern)
+  - [Ownable2Step: Safe Ownership Transfer](#ownable2step-safe-ownership-transfer)
+- [Multi-Role Systems: AccessControl](#multi-role-systems-accesscontrol)
+  - [Basic AccessControl Implementation](#basic-accesscontrol-implementation)
+  - [Role Hierarchies](#role-hierarchies)
+  - [Multi-Role Requirements](#multi-role-requirements)
+  - [Time-Delayed Admin Actions](#time-delayed-admin-actions)
+- [Gas-Optimized: OwnableRoles (Solady)](#gas-optimized-ownableroles-solady)
+  - [Bitmap Operations](#bitmap-operations)
+  - [Gas Comparison: AccessControl vs OwnableRoles](#gas-comparison-accesscontrol-vs-ownableroles)
+- [Advanced Patterns](#advanced-patterns)
+  - [Pausable with Emergency Admin](#pausable-with-emergency-admin)
+  - [Per-Function Access Control](#per-function-access-control)
+  - [Delegated Authority with Limits](#delegated-authority-with-limits)
+- [Testing Access Control](#testing-access-control)
+- [Best Practices Summary](#best-practices-summary)
+- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+- [References](#references)
+
 Access control determines who can execute specific functions in a smart contract. Proper access control is critical for preventing unauthorized actions, protecting funds, and maintaining protocol integrity.
 
 ## Access Control Hierarchy

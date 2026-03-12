@@ -1,5 +1,40 @@
 # NatSpec Documentation Standards
 
+## Contents
+
+- [NatSpec Tags Overview](#natspec-tags-overview)
+- [Contract-Level Documentation](#contract-level-documentation)
+  - [Complete Contract Example](#complete-contract-example)
+  - [Custom Tags (OpenZeppelin Conventions)](#custom-tags-openzeppelin-conventions)
+- [Function Documentation](#function-documentation)
+  - [Standard Function Pattern](#standard-function-pattern)
+  - [Multiple Return Values](#multiple-return-values)
+  - [Complex Parameters](#complex-parameters)
+- [Events Documentation](#events-documentation)
+- [Errors Documentation](#errors-documentation)
+- [State Variables Documentation](#state-variables-documentation)
+- [Modifier Documentation](#modifier-documentation)
+- [Inheritance Documentation](#inheritance-documentation)
+  - [Inheriting Interface Documentation](#inheriting-interface-documentation)
+  - [Extending Inherited Documentation](#extending-inherited-documentation)
+- [Warning and Note Patterns](#warning-and-note-patterns)
+  - [Warning Documentation](#warning-documentation)
+  - [Important Notes](#important-notes)
+  - [Tips and Recommendations](#tips-and-recommendations)
+- [Section Organization](#section-organization)
+  - [Solady Style (ASCII Art Separators)](#solady-style-ascii-art-separators)
+  - [OpenZeppelin Style (Comment Headers)](#openzeppelin-style-comment-headers)
+- [Upgradeable Contracts Documentation](#upgradeable-contracts-documentation)
+- [Assembly Documentation](#assembly-documentation)
+- [Security Considerations Section](#security-considerations-section)
+- [Testing Documentation](#testing-documentation)
+- [Documentation Generation](#documentation-generation)
+  - [Generate NatSpec JSON](#generate-natspec-json)
+  - [Integration with Tools](#integration-with-tools)
+- [Best Practices Summary](#best-practices-summary)
+- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+- [References](#references)
+
 NatSpec (Natural Specification) provides structured documentation for Solidity smart contracts. Proper documentation enables audits, integrations, and maintenance while serving as a contract specification.
 
 ## NatSpec Tags Overview

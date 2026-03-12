@@ -1,5 +1,33 @@
 # Upgradeable Contract Security
 
+## Contents
+
+- [Understanding Proxy Patterns](#understanding-proxy-patterns)
+  - [How Proxies Work](#how-proxies-work)
+  - [Common Proxy Patterns](#common-proxy-patterns)
+- [UUPS (Universal Upgradeable Proxy Standard)](#uups-universal-upgradeable-proxy-standard)
+  - [Basic UUPS Implementation](#basic-uups-implementation)
+  - [Deployment Pattern](#deployment-pattern)
+- [Critical Security Requirements](#critical-security-requirements)
+  - [1. Disable Implementation Initializers](#1-disable-implementation-initializers)
+  - [2. Implement _authorizeUpgrade](#2-implement-_authorizeupgrade)
+  - [3. Storage Layout Preservation](#3-storage-layout-preservation)
+  - [4. ERC-7201 Namespaced Storage](#4-erc-7201-namespaced-storage)
+- [Initialization Patterns](#initialization-patterns)
+  - [Single Initialization](#single-initialization)
+  - [Reinitializer for Upgrades](#reinitializer-for-upgrades)
+  - [Initializer Chain](#initializer-chain)
+- [Transparent Proxy Pattern](#transparent-proxy-pattern)
+- [Advanced Patterns](#advanced-patterns)
+  - [Multi-Step Upgrades](#multi-step-upgrades)
+  - [Version Tracking](#version-tracking)
+  - [Emergency Pause on Upgrade](#emergency-pause-on-upgrade)
+- [Testing Upgradeable Contracts](#testing-upgradeable-contracts)
+- [Common Pitfalls & Solutions](#common-pitfalls--solutions)
+- [Best Practices Summary](#best-practices-summary)
+- [Upgrade Checklist](#upgrade-checklist)
+- [References](#references)
+
 Upgradeable contracts enable bug fixes and feature additions without migrating state to new contracts. However, they introduce complex security considerations around initialization, storage layout, and upgrade authorization.
 
 ## Understanding Proxy Patterns

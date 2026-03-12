@@ -1,5 +1,45 @@
 # Gas Optimization Techniques
 
+## Contents
+
+- [Gas Cost Fundamentals](#gas-cost-fundamentals)
+  - [EVM Operation Costs](#evm-operation-costs)
+- [Custom Errors (Mandatory 2025)](#custom-errors-mandatory-2025)
+  - [Gas Comparison](#gas-comparison)
+  - [Best Practices](#best-practices)
+- [Storage Optimization](#storage-optimization)
+  - [Variable Packing](#variable-packing)
+  - [Struct Packing](#struct-packing)
+  - [Storage vs Memory vs Calldata](#storage-vs-memory-vs-calldata)
+- [Loop Optimization](#loop-optimization)
+  - [Unchecked Arithmetic](#unchecked-arithmetic)
+  - [Loop Patterns](#loop-patterns)
+- [Function Optimization](#function-optimization)
+  - [Function Selector Optimization](#function-selector-optimization)
+  - [Visibility Modifiers](#visibility-modifiers)
+  - [Short-Circuit Evaluation](#short-circuit-evaluation)
+- [Mapping Optimizations](#mapping-optimizations)
+  - [Nested Mappings vs Structs](#nested-mappings-vs-structs)
+  - [Existence Checks](#existence-checks)
+- [Assembly Optimization](#assembly-optimization)
+  - [Safe Assembly Patterns](#safe-assembly-patterns)
+  - [Common Assembly Optimizations](#common-assembly-optimizations)
+- [Advanced Techniques](#advanced-techniques)
+  - [Transient Storage (EIP-1153)](#transient-storage-eip-1153)
+  - [Bitmap Storage](#bitmap-storage)
+  - [Batch Operations](#batch-operations)
+  - [Immutable Variables](#immutable-variables)
+- [Real-World Gas Benchmarks](#real-world-gas-benchmarks)
+  - [ERC20 Comparisons](#erc20-comparisons)
+  - [Common Operations](#common-operations)
+- [Optimization Checklist](#optimization-checklist)
+- [Best Practices](#best-practices)
+- [Testing Gas Costs](#testing-gas-costs)
+  - [Foundry Gas Snapshots](#foundry-gas-snapshots)
+  - [Gas Profiling](#gas-profiling)
+- [When NOT to Optimize](#when-not-to-optimize)
+- [References](#references)
+
 Gas optimization reduces transaction costs for users and enables more complex operations within block gas limits. This guide provides quantified strategies based on production measurements from OpenZeppelin and Solady.
 
 ## Gas Cost Fundamentals

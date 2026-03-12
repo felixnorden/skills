@@ -1,5 +1,34 @@
 # Solady Optimization Patterns
 
+## Contents
+
+- [Philosophy: Optimization Without Compromise](#philosophy-optimization-without-compromise)
+- [SafeTransferLib: Assembly Token Transfers](#safetransferlib-assembly-token-transfers)
+  - [Basic Usage](#basic-usage)
+  - [Implementation Analysis](#implementation-analysis)
+- [ERC20: Minimal Token Implementation](#erc20-minimal-token-implementation)
+  - [Complete Implementation](#complete-implementation)
+  - [Gas Comparison](#gas-comparison)
+- [OwnableRoles: Bitmap Access Control](#ownableroles-bitmap-access-control)
+  - [Implementation](#implementation)
+  - [Bitmap Operations](#bitmap-operations)
+  - [Gas Savings](#gas-savings)
+- [ReentrancyGuard: Transient Storage](#reentrancyguard-transient-storage)
+- [FixedPointMathLib: Mathematical Operations](#fixedpointmathlib-mathematical-operations)
+  - [Common Operations](#common-operations)
+  - [Gas Benchmarks](#gas-benchmarks)
+- [LibString: String Operations](#libstring-string-operations)
+- [MerkleProofLib: Efficient Verification](#merkleprooflib-efficient-verification)
+- [SignatureCheckerLib: Signature Validation](#signaturecheckerlib-signature-validation)
+- [ECDSA: Signature Recovery](#ecdsa-signature-recovery)
+- [ERC1967Factory: Efficient Proxy Deployment](#erc1967factory-efficient-proxy-deployment)
+- [Best Practices](#best-practices)
+  - [When to Use Assembly](#when-to-use-assembly)
+  - [Safety Patterns](#safety-patterns)
+  - [Migration Strategy](#migration-strategy)
+- [Testing Solady Integrations](#testing-solady-integrations)
+- [Resources](#resources)
+
 Solady (Solidity Library for Advanced DeFi Yield) represents the cutting edge of gas optimization in Solidity. This guide covers Solady-specific patterns that achieve extreme gas efficiency through pure assembly implementation.
 
 ## Philosophy: Optimization Without Compromise

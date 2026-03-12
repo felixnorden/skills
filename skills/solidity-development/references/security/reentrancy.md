@@ -1,5 +1,30 @@
 # Reentrancy Protection Patterns
 
+## Contents
+
+- [Understanding Reentrancy](#understanding-reentrancy)
+  - [How Reentrancy Works](#how-reentrancy-works)
+- [Primary Defense: Checks-Effects-Interactions](#primary-defense-checks-effects-interactions)
+  - [Correct Implementation](#correct-implementation)
+- [Secondary Defense: ReentrancyGuard](#secondary-defense-reentrancyguard)
+  - [OpenZeppelin Implementation](#openzeppelin-implementation)
+  - [How ReentrancyGuard Works](#how-reentrancyguard-works)
+- [Modern Optimization: Transient Storage](#modern-optimization-transient-storage)
+  - [Transient ReentrancyGuard](#transient-reentrancyguard)
+  - [Gas Comparison](#gas-comparison)
+- [Cross-Function Reentrancy](#cross-function-reentrancy)
+- [Cross-Contract Reentrancy](#cross-contract-reentrancy)
+- [Read-Only Reentrancy](#read-only-reentrancy)
+  - [Vulnerable Pattern](#vulnerable-pattern)
+  - [Protection Pattern](#protection-pattern)
+- [Pull Over Push Pattern](#pull-over-push-pattern)
+  - [Push Pattern (Vulnerable)](#push-pattern-vulnerable)
+  - [Pull Pattern (Secure)](#pull-pattern-secure)
+- [Testing for Reentrancy](#testing-for-reentrancy)
+- [Best Practices Summary](#best-practices-summary)
+- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
+- [References](#references)
+
 Reentrancy attacks occur when an external contract call allows malicious code to re-enter the calling contract before the first invocation completes. This can lead to state manipulation and fund drainage.
 
 ## Understanding Reentrancy
