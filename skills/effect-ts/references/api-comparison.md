@@ -2,6 +2,8 @@
 
 Effect v4 vs Promise, fp-ts, and ZIO.
 
+See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
+
 > **Migrating from v3?** Service patterns have changed significantly. See [migration.md](migration.md) for details.
 
 ## Effect vs Promise

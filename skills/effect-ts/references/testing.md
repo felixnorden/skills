@@ -2,6 +2,10 @@
 
 Testing Effect programs with @effect/vitest.
 
+See full examples:
+- [Effect Tests](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/09_testing/10_effect-tests.ts)
+- [Layer Tests](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/09_testing/20_layer-tests.ts)
+
 ## Setup
 
 ### Install

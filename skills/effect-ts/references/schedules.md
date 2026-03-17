@@ -2,6 +2,8 @@
 
 Working with Effect Schedules for retries, repeats, and polling.
 
+See related examples in [effect-smol/ai-docs/src/06_schedule/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/06_schedule/)
+
 ## Overview
 
 Schedules define recurring patterns for:

@@ -50,6 +50,9 @@ export class Database extends ServiceMap.Service<
     }),
   );
 }
+
+// If you ever need to access the service type, use `Database["Service"]`
+export type DatabaseService = Database["Service"]
 ```
 
 **With dependencies**
@@ -599,3 +602,10 @@ class Logger extends ServiceMap.Service<Logger>()("Logger", {
 | `Effect.provide(layer)`               | `Effect.provide(layer)` (memoization now automatic) |
 | `Layer.unwrap`                        | `Layer.unwrap` (dynamic layers)                     |
 | `LayerMap`                            | New in v4                                           |
+
+## External Examples
+
+See full examples:
+- [ServiceMap.Reference](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/10_reference.ts)
+- [Layer Composition](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/20_layer-composition.ts)
+- [Layer Unwrap](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/20_layer-unwrap.ts)

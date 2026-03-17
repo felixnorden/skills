@@ -37,6 +37,7 @@ const samples = Stream.fromEffectSchedule(
 
 ```ts
 import { Effect, Stream } from "effect";
+import * as Option from "effect/Option";
 
 // Single value
 const single = Stream.fromEffect(Effect.succeed(42));
@@ -335,6 +336,13 @@ const filterAndReencode = Stream.make(
   Stream.runCollect,
 );
 ```
+
+## External Examples
+
+See full examples:
+- [Creating Streams](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/02_stream/10_creating-streams.ts)
+- [Consuming Streams](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/02_stream/20_consuming-streams.ts)
+- [Encoding](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/02_stream/30_encoding.ts)
 
 ## Best Practices
 

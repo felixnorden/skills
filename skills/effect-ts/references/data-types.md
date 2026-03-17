@@ -2,6 +2,8 @@
 
 Common data structures in Effect v4 ecosystem.
 
+See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
+
 > **Migrating from v3?** `Cause<E>` has been flattened to a wrapper around `reasons: ReadonlyArray<Reason<E>>`. Error classes renamed from `*Exception` to `*Error`. See [migration.md](migration.md) for details.
 
 ## Option

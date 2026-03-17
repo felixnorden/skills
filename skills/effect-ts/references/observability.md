@@ -2,6 +2,8 @@
 
 Built-in observability primitives in Effect v4.
 
+See related examples in [effect-smol/ai-docs/src/08_observability/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/08_observability/)
+
 > **Migrating from v3?** `FiberRef` has been replaced by `ServiceMap.Reference`. Built-in refs moved to `References` module. See [migration.md](migration.md) for details.
 
 ## Logging

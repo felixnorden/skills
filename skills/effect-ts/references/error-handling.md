@@ -75,26 +75,30 @@ Effect.try({
 
 ### Error with Union Types (Reasons)
 
+Define nested error hierarchies for granular error handling:
+
 ```ts
 class RateLimitError extends Schema.TaggedErrorClass<RateLimitError>()(
   "RateLimitError",
-  { retryAfter: Schema.Number },
+  { retryAfter: Schema.Number }
 ) {}
 
 class QuotaExceededError extends Schema.TaggedErrorClass<QuotaExceededError>()(
   "QuotaExceededError",
-  { limit: Schema.Number },
+  { limit: Schema.Number }
 ) {}
 
 class SafetyBlockedError extends Schema.TaggedErrorClass<SafetyBlockedError>()(
   "SafetyBlockedError",
-  { category: Schema.String },
+  { category: Schema.String }
 ) {}
 
-// Parent error with union of reasons
-export class AiError extends Schema.TaggedErrorClass<AiError>()("AiError", {
-  reason: Schema.Union(RateLimitError, QuotaExceededError, SafetyBlockedError),
-}) {}
+export class AiError extends Schema.TaggedErrorClass<AiError>()(
+  "AiError",
+  {
+    reason: Schema.Union(RateLimitError, QuotaExceededError, SafetyBlockedError)
+  }
+) {}
 ```
 
 ## Catching Errors
@@ -467,6 +471,12 @@ UnknownError;
 | `Effect.catchAllDefect` | `Effect.catchDefect`      |
 | `Effect.catchSome`      | `Effect.catchFilter`      |
 | `Effect.catchSomeCause` | `Effect.catchCauseFilter` |
+
+## External Examples
+
+See full examples:
+- [Catch Tags](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/03_errors/10_catch-tags.ts)
+- [Reason Errors](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/03_errors/20_reason-errors.ts)
 
 ## Best Practices
 

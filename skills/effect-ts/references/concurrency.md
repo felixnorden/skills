@@ -2,6 +2,8 @@
 
 Fibers, parallelism, racing, and coordination in Effect v4.
 
+See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
+
 > **Migrating from v3?** Forking combinators have been renamed: `fork` → `forkChild`, `forkDaemon` → `forkDetach`. `FiberRef` has been replaced by `ServiceMap.Reference`. See [migration.md](migration.md) for details.
 
 ## Basic Concurrency

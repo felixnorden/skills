@@ -2,6 +2,8 @@
 
 Safe resource acquisition and cleanup in Effect v4.
 
+See related examples in [effect-smol/ai-docs/src/01_effect/04_resources/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/04_resources/)
+
 > **Migrating from v3?** `Scope.extend` has been renamed to `Scope.provide`. Service patterns use `ServiceMap.Service`. See [migration.md](migration.md) for details.
 
 ## Basic Pattern

@@ -2,6 +2,8 @@
 
 Batching multiple requests into fewer external calls with RequestResolver.
 
+See related examples in [effect-smol/ai-docs/src/05_batching/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/05_batching/)
+
 ## Overview
 
 RequestResolver allows you to:

@@ -2,6 +2,8 @@
 
 This guide helps you migrate your Effect applications from v3 to v4.
 
+See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
+
 ## Overview
 
 Effect v4 is a major release with structural and organizational changes. The core programming model — `Effect`, `Layer`, `Schema`, `Stream`, etc. — remains the same, but how packages are organized, versioned, and imported has changed significantly.

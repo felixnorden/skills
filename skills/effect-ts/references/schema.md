@@ -2,6 +2,8 @@
 
 Type-safe parsing, validation, and transformation with Effect Schema v4.
 
+See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
+
 > **Important:** In v4, Schema is in `effect/unstable/schema`. APIs may change in minor releases until stabilized. See [migration.md](migration.md) for v3→v4 migration details.
 
 ## Installation & Import

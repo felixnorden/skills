@@ -2,6 +2,8 @@
 
 Building command-line applications with Effect CLI.
 
+See related examples in [effect-smol/ai-docs/src/70_cli/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/70_cli/)
+
 ## Overview
 
 The `effect/unstable/cli` module provides utilities for:

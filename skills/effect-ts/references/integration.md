@@ -2,6 +2,8 @@
 
 Integrating Effect with non-Effect code using ManagedRuntime.
 
+See related examples in [effect-smol/ai-docs/src/03_integration/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/03_integration/)
+
 ## Overview
 
 `ManagedRuntime` bridges Effect programs with non-Effect code. Use it when:

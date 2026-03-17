@@ -66,19 +66,24 @@ const AnthropicClientLayer = AnthropicClient.layerConfig({
 import { Effect, Layer, Schema, ServiceMap } from "effect";
 import { LanguageModel } from "effect/unstable/ai";
 
+import { AiError } from "effect/unstable/ai"
+
 export class AiWriterError extends Schema.TaggedErrorClass<AiWriterError>()(
   "AiWriterError",
-  { reason: Schema.String },
+  { reason: AiError.AiErrorReason }
 ) {
-  static fromAiError(error: any) {
-    return new AiWriterError({ reason: error.reason });
+  static fromAiError(error: AiError.AiError) {
+    return new AiWriterError({ reason: error.reason })
   }
 }
 
 export class AiWriter extends ServiceMap.Service<
   AiWriter,
   {
-    draftAnnouncement(product: string): Effect.Effect<string, AiWriterError>;
+    draftAnnouncement(product: string): Effect.Effect<
+      { readonly provider: string; readonly text: string },
+      AiWriterError
+    >;
   }
 >()("docs/AiWriter") {
   static readonly layer = Layer.effect(
@@ -97,28 +102,28 @@ export class AiWriter extends ServiceMap.Service<
             `Model finished with ${response.finishReason}. Tokens: ${response.usage.outputTokens.total}`,
           );
 
-          return response.text;
+          return { provider: response.provider, text: response.text };
         },
         Effect.mapError((error) => AiWriterError.fromAiError(error)),
       );
 
       return AiWriter.of({ draftAnnouncement });
     }),
-  ).pipe(Layer.provide(OpenAiLanguageModel.model("gpt-4")));
+  ).pipe(Layer.provide(OpenAiLanguageModel.model("gpt-5.2")));
 }
 ```
 
 ### Generation with Specific Model
 
 ```ts
-const modelLayer = OpenAiLanguageModel.model("gpt-4");
+const modelLayer = OpenAiLanguageModel.model("gpt-5.2");
 
 const generateWithModel = Effect.fn("generateWithModel")(function* (
   prompt: string,
 ) {
   const model = yield* LanguageModel.LanguageModel;
   const response = yield* model.generateText({ prompt });
-  return response.text;
+  return { provider: response.provider, text: response.text };
 }, Effect.provide(modelLayer));
 ```
 
@@ -179,23 +184,26 @@ const streamReleaseHighlights = (version: string) =>
 ```ts
 import { ExecutionPlan } from "effect";
 
-// Try cheaper model first, fall back to expensive one
+// Try primary model first, fall back to alternative
 const DraftPlan = ExecutionPlan.make(
-  { provide: OpenAiLanguageModel.model("gpt-3.5"), attempts: 3 },
-  { provide: AnthropicLanguageModel.model("claude-opus"), attempts: 2 },
-);
+  { provide: OpenAiLanguageModel.model("gpt-5.2"), attempts: 3 },
+  { provide: AnthropicLanguageModel.model("claude-opus-4-6"), attempts: 2 }
+)
 
 export class AiWriter extends ServiceMap.Service<
   AiWriter,
   {
-    draftAnnouncement(product: string): Effect.Effect<string, AiWriterError>;
+    draftAnnouncement(product: string): Effect.Effect<
+      { readonly provider: string; readonly text: string },
+      AiWriterError
+    >;
   }
 >()("docs/AiWriter") {
   static readonly layer = Layer.effect(
     AiWriter,
     Effect.gen(function* () {
       // Get model with requirements moved to layer
-      const draftsModel = yield* DraftPlan.withRequirements;
+      const draftsModel = yield* DraftPlan.withRequirements
 
       const draftAnnouncement = Effect.fn("AiWriter.draftAnnouncement")(
         function* (product: string) {
@@ -203,7 +211,7 @@ export class AiWriter extends ServiceMap.Service<
           const response = yield* model.generateText({
             prompt: `Write a launch announcement for ${product}`,
           });
-          return response.text;
+          return { provider: response.provider, text: response.text };
         },
         Effect.withExecutionPlan(draftsModel),
         Effect.mapError((error) => AiWriterError.fromAiError(error)),
@@ -214,6 +222,8 @@ export class AiWriter extends ServiceMap.Service<
   ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]));
 }
 ```
+
+See full example: [ai-docs/src/71_ai/10_language-model.ts](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/71_ai/10_language-model.ts)
 
 ## Tool Calling
 
@@ -355,7 +365,7 @@ const chatExample = Effect.gen(function* () {
 ```ts
 const agentExample = Effect.gen(function* () {
   const tools = yield* ProductToolkit;
-  const model = yield* OpenAiLanguageModel.model("gpt-4");
+  const model = yield* OpenAiLanguageModel.model("gpt-5.2");
 
   // Start agent with system prompt
   const session = yield* Chat.fromPrompt([

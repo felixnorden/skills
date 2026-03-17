@@ -2,6 +2,10 @@
 
 Building HTTP clients and servers with Effect.
 
+See related examples:
+- [HTTP Client](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/50_http-client/)
+- [HTTP Server](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/51_http-server/)
+
 ## HTTP Client
 
 ### Basic Setup

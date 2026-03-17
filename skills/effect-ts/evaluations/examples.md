@@ -113,45 +113,59 @@ const resilientFetch = (url: string) =>
 - [ ] Maps AI errors to domain-specific error types
 - [ ] Provides both client layers to the service layer via Layer.provide
 - [ ] Includes proper error handling for rate limits and quota exceeded
+- [ ] Uses AiError.AiErrorReason for error reasons
+- [ ] Implements fromAiError static method
+- [ ] Returns provider info alongside generated text
 
 **Example Solution Pattern**:
 
 ```ts
+import { AiError } from "effect/unstable/ai"
+
 class AiGenerationError extends Schema.TaggedErrorClass<AiGenerationError>()(
   "AiGenerationError",
-  { reason: Schema.String },
-) {}
+  { reason: AiError.AiErrorReason }
+) {
+  static fromAiError(error: AiError.AiError) {
+    return new AiGenerationError({ reason: error.reason })
+  }
+}
 
 export class AiService extends ServiceMap.Service<
   AiService,
   {
-    generate: (prompt: string) => Effect.Effect<string, AiGenerationError>;
+    generate: (prompt: string) => Effect.Effect<
+      { readonly provider: string; readonly text: string },
+      AiGenerationError
+    >;
   }
 >()("app/AiService") {
   static readonly layer = Layer.effect(
     AiService,
     Effect.gen(function* () {
       const FallbackPlan = ExecutionPlan.make(
-        { provide: OpenAiLanguageModel.model("gpt-4"), attempts: 3 },
-        { provide: AnthropicLanguageModel.model("claude-opus"), attempts: 2 },
-      );
+        { provide: OpenAiLanguageModel.model("gpt-5.2"), attempts: 3 },
+        { provide: AnthropicLanguageModel.model("claude-opus-4-6"), attempts: 2 }
+      )
 
-      const model = yield* FallbackPlan.withRequirements;
+      const draftsModel = yield* FallbackPlan.withRequirements
 
       const generate = Effect.fn("AiService.generate")(
         function* (prompt: string) {
-          const response = yield* LanguageModel.generateText({ prompt });
-          return response.text;
+          const response = yield* LanguageModel.generateText({ prompt })
+          return { provider: response.provider, text: response.text }
         },
-        Effect.withExecutionPlan(model),
-        Effect.mapError((e) => new AiGenerationError({ reason: e.reason })),
-      );
+        Effect.withExecutionPlan(draftsModel),
+        Effect.mapError((error) => AiGenerationError.fromAiError(error))
+      )
 
-      return AiService.of({ generate });
+      return AiService.of({ generate })
     }),
-  ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]));
+  ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]))
 }
 ```
+
+See working example: [ai-docs/src/71_ai/10_language-model.ts](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/71_ai/10_language-model.ts)
 
 ## Testing Your Usage
 

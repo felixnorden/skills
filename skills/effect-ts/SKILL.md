@@ -217,70 +217,9 @@ Error Handling Progress:
 
 See [Error Handling](references/error-handling.md) for patterns and examples.
 
-## Common Workflows
+## Common Patterns
 
-These examples show input/output patterns for common scenarios:
-
-### Converting Promise to Effect
-
-**Input**: Existing Promise-based API
-```ts
-const fetchUser = (id: string): Promise<User> => 
-  fetch(`/api/users/${id}`).then(r => r.json());
-```
-
-**Output**: Effect-wrapped version with error handling
-```ts
-class FetchError extends Schema.TaggedErrorClass<FetchError>()(
-  "FetchError",
-  { userId: Schema.String, cause: Schema.Defect },
-) {}
-
-const fetchUser = Effect.fn("fetchUser")((id: string) =>
-  Effect.tryPromise({
-    try: () => fetch(`/api/users/${id}`).then(r => r.json()),
-    catch: (cause) => new FetchError({ userId: id, cause }),
-  }),
-);
-```
-
-### Handling Multiple Error Types
-
-**Input**: Effect with multiple possible errors
-```ts
-const loadConfig = (): Effect.Effect<Config, ParseError | FileError> => ...
-```
-
-**Output**: Error handling with catchTags
-```ts
-const configWithFallback = loadConfig().pipe(
-  Effect.catchTags({
-    ParseError: (e) => Effect.succeed(defaultConfig),
-    FileError: (e) => Effect.succeed(defaultConfig),
-  }),
-);
-```
-
-### Composing Services with Layers
-
-**Input**: Two services with dependency
-```ts
-class Database { /* ... */ }
-class UserService { /* needs Database */ }
-```
-
-**Output**: Layer composition
-```ts
-const DatabaseLive = Layer.effect(Database, ...);
-const UserServiceLive = Layer.effect(UserService, ...).pipe(
-  Layer.provide(DatabaseLive),
-);
-
-// Usage
-program.pipe(Effect.provide(UserServiceLive));
-```
-
-**Service with Effect.fn**
+### Service with Effect.fn
 
 ```ts
 import { Effect, ServiceMap, Layer, Schema } from "effect";
@@ -309,95 +248,18 @@ export class Database extends ServiceMap.Service<
 }
 ```
 
-**AI Service with ExecutionPlan**
+### Error Handling with catchTags
 
 ```ts
-import { Effect, Layer, Schema, ServiceMap, ExecutionPlan } from "effect";
-import { OpenAiLanguageModel } from "@effect/ai-openai";
-import { AnthropicLanguageModel } from "@effect/ai-anthropic";
-import { LanguageModel } from "effect/unstable/ai";
-
-class AiWriterError extends Schema.TaggedErrorClass<AiWriterError>()(
-  "AiWriterError",
-  { reason: Schema.String },
-) {}
-
-export class AiWriter extends ServiceMap.Service<
-  AiWriter,
-  {
-    draftAnnouncement(product: string): Effect.Effect<string, AiWriterError>;
-  }
->()("docs/AiWriter") {
-  static readonly layer = Layer.effect(
-    AiWriter,
-    Effect.gen(function* () {
-      // Define fallback strategy
-      const DraftPlan = ExecutionPlan.make(
-        { provide: OpenAiLanguageModel.model("gpt-4"), attempts: 3 },
-        { provide: AnthropicLanguageModel.model("claude-opus"), attempts: 2 },
-      );
-
-      const draftModel = yield* DraftPlan.withRequirements;
-
-      const draftAnnouncement = Effect.fn("AiWriter.draftAnnouncement")(
-        function* (product: string) {
-          const model = yield* LanguageModel.LanguageModel;
-          const response = yield* model.generateText({
-            prompt: `Write a launch announcement for ${product}`,
-          });
-          return response.text;
-        },
-        Effect.withExecutionPlan(draftModel),
-        Effect.mapError((error) => new AiWriterError({ reason: error.reason })),
-      );
-
-      return AiWriter.of({ draftAnnouncement });
-    }),
-  ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]));
-}
+const configWithFallback = loadConfig().pipe(
+  Effect.catchTags({
+    ParseError: () => Effect.succeed(defaultConfig),
+    FileError: () => Effect.succeed(defaultConfig),
+  }),
+);
 ```
 
-**PubSub for Event Broadcasting**
-
-```ts
-import { Effect, Layer, PubSub, ServiceMap, Stream } from "effect";
-
-export type OrderEvent =
-  | { readonly _tag: "OrderPlaced"; readonly orderId: string }
-  | { readonly _tag: "PaymentCaptured"; readonly orderId: string };
-
-export class OrderEvents extends ServiceMap.Service<
-  OrderEvents,
-  {
-    publish(event: OrderEvent): Effect.Effect<void>;
-    readonly subscribe: Stream.Stream<OrderEvent>;
-  }
->()("acme/OrderEvents") {
-  static readonly layer = Layer.effect(
-    OrderEvents,
-    Effect.gen(function* () {
-      const pubsub = yield* PubSub.bounded<OrderEvent>({
-        capacity: 256,
-        replay: 50, // Allow late subscribers to catch up
-      });
-
-      yield* Effect.addFinalizer(() => PubSub.shutdown(pubsub));
-
-      const publish = Effect.fn("OrderEvents.publish")(function* (
-        event: OrderEvent,
-      ) {
-        yield* PubSub.publish(pubsub, event);
-      });
-
-      const subscribe = Stream.fromPubSub(pubsub);
-
-      return OrderEvents.of({ publish, subscribe });
-    }),
-  );
-}
-```
-
-**Resource Management with acquireRelease**
+### Resource Safety
 
 ```ts
 const program = Effect.acquireUseRelease(
@@ -486,6 +348,27 @@ Dive deeper into specific topics and patterns:
 - Avoid excessive allocations in hot loops
 - Use `Effect.cached` for expensive computations
 - Consider `Micro` module for bundle-size sensitive apps
+
+## Example Files
+
+Browse detailed examples in the [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/) directory:
+
+- **[Effect Basics](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/01_basics/)** - Creating effects, pipe composition
+- **[Services](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/02_services/)** - ServiceMap.Service, Layer composition
+- **[Error Handling](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/03_errors/)** - catchTags, catchReason, error hierarchies
+- **[Resources](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/04_resources/)** - acquireRelease, Scope
+- **[PubSub](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/06_pubsub/)** - Event broadcasting
+- **[Streams](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/02_stream/)** - Creating, consuming, encoding
+- **[Integration](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/03_integration/)** - ManagedRuntime for non-Effect code
+- **[Batching](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/05_batching/)** - RequestResolver patterns
+- **[Schedules](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/06_schedule/)** - Retry and repeat strategies
+- **[Observability](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/08_observability/)** - Logging, tracing, metrics
+- **[Testing](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/09_testing/)** - @effect/vitest patterns
+- **[HTTP](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/50_http-client/)** - HttpClient and HttpApi
+- **[Child Process](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/60_child-process/)** - Process management
+- **[CLI](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/70_cli/)** - CLI application building
+- **[AI](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/71_ai/)** - Language models, tools, chat
+- **[Cluster](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/80_cluster/)** - Distributed entities
 
 ## Learn More
 

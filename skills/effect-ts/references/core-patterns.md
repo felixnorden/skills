@@ -2,6 +2,8 @@
 
 Essential patterns for Effect development.
 
+See full example: [Creating Effects](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/01_basics/10_creating-effects.ts)
+
 ## Contents
 
 - [Effect.fn (Recommended)](#effectfn-recommended) - Primary way to write functions that return Effects

@@ -2,6 +2,8 @@
 
 Working with child processes in Effect.
 
+See related examples in [effect-smol/ai-docs/src/60_child-process/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/60_child-process/)
+
 ## Overview
 
 The `effect/unstable/process` module provides utilities for:

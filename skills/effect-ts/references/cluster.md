@@ -2,6 +2,8 @@
 
 Building distributed applications with Effect Cluster.
 
+See related examples in [effect-smol/ai-docs/src/80_cluster/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/80_cluster/)
+
 ## Overview
 
 Effect Cluster provides:

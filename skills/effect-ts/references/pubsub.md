@@ -2,6 +2,8 @@
 
 Event broadcasting and subscription with PubSub.
 
+See full example: [PubSub Service](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/06_pubsub/10_pubsub.ts)
+
 ## Overview
 
 PubSub provides an in-process event bus for broadcasting messages to multiple subscribers. It's useful for:
