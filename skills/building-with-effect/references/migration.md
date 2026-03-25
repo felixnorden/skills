@@ -646,6 +646,14 @@ Equal.equals(obj, { a: 1 }); // false
 
 ## Schema Migration
 
+> **See also**: The [Schema Quick Start & Index](schema.md) provides a comprehensive topic index for all Schema documentation.
+>
+> For detailed API reference, see:
+> - [schema-validation.md](schema-validation.md) - refinement→check changes
+> - [schema-composite.md](schema-composite.md) - propertySignature changes  
+> - [schema-transformations.md](schema-transformations.md) - transformation changes
+> - [schema-classes.md](schema-classes.md) - brand/class changes
+
 ### Import Changes
 
 **v3:**

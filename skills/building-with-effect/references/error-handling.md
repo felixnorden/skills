@@ -27,6 +27,8 @@ In Effect, errors are defined using `Schema.TaggedErrorClass` which provides:
 
 ## Defining Errors
 
+> **See also**: [schema-classes.md](schema-classes.md) for Schema.Class, Schema.TaggedClass, and Schema.TaggedErrorClass definitions.
+
 ### TaggedErrorClass
 
 ```ts
@@ -80,25 +82,22 @@ Define nested error hierarchies for granular error handling:
 ```ts
 class RateLimitError extends Schema.TaggedErrorClass<RateLimitError>()(
   "RateLimitError",
-  { retryAfter: Schema.Number }
+  { retryAfter: Schema.Number },
 ) {}
 
 class QuotaExceededError extends Schema.TaggedErrorClass<QuotaExceededError>()(
   "QuotaExceededError",
-  { limit: Schema.Number }
+  { limit: Schema.Number },
 ) {}
 
 class SafetyBlockedError extends Schema.TaggedErrorClass<SafetyBlockedError>()(
   "SafetyBlockedError",
-  { category: Schema.String }
+  { category: Schema.String },
 ) {}
 
-export class AiError extends Schema.TaggedErrorClass<AiError>()(
-  "AiError",
-  {
-    reason: Schema.Union(RateLimitError, QuotaExceededError, SafetyBlockedError)
-  }
-) {}
+export class AiError extends Schema.TaggedErrorClass<AiError>()("AiError", {
+  reason: Schema.Union(RateLimitError, QuotaExceededError, SafetyBlockedError),
+}) {}
 ```
 
 ## Catching Errors
@@ -199,7 +198,7 @@ export const unwrapAndHandle = callModel.pipe(
 );
 ```
 
-### catchAll (catch in v4)
+### catch
 
 Handle all errors:
 
@@ -207,7 +206,7 @@ Handle all errors:
 effect.pipe(Effect.catch((error) => Effect.succeed(`recovered: ${error}`)));
 ```
 
-### catchAllCause (catchCause in v4)
+### catchCause
 
 Handle full cause chain:
 
@@ -475,6 +474,7 @@ UnknownError;
 ## External Examples
 
 See full examples:
+
 - [Catch Tags](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/03_errors/10_catch-tags.ts)
 - [Reason Errors](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/03_errors/20_reason-errors.ts)
 
