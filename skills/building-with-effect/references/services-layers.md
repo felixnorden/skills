@@ -4,15 +4,7 @@ Dependency injection and context management with ServiceMap (v4).
 
 ## Overview
 
-In Effect v4, the dependency injection system uses **ServiceMap** instead of Context. Services are defined using `ServiceMap.Service` and provided via Layers.
-
-Key changes from v3:
-
-- `Context.Tag` → `ServiceMap.Service`
-- `Effect.Service` → `ServiceMap.Service` with explicit layer building
-- `Effect.Tag` → `ServiceMap.Service` (accessors removed, use `Service.use` or `yield*`)
-- `Context.Reference` → `ServiceMap.Reference`
-- No auto-generated `.Default` layer - build layers explicitly with `Layer.effect`
+In Effect v4, the dependency injection system uses **ServiceMap** for dependency management. Services are defined using `ServiceMap.Service` and provided via Layers.
 
 ## Services
 
@@ -543,65 +535,6 @@ Avoid:
 - Putting business logic in layers
 - Over-layering simple values
 - Using `Service.use` when `yield*` is clearer
-
-## Migration from v3
-
-### Context.Tag → ServiceMap.Service
-
-**v3:**
-
-```ts
-class Database extends Context.Tag("Database")<
-  Database,
-  { readonly query: (sql: string) => Effect.Effect<unknown[]> }
->() {}
-```
-
-**v4:**
-
-```ts
-class Database extends ServiceMap.Service<Database>()("Database", {
-  query: (sql: string) => Effect.Effect<unknown[]>,
-})() {}
-```
-
-### Effect.Service → ServiceMap.Service
-
-**v3:**
-
-```ts
-class Logger extends Effect.Service<Logger>()("Logger", {
-  effect: Effect.succeed({ log: (msg: string) => Effect.log(msg) }),
-  dependencies: [Config.Default],
-}) {}
-// Logger.Default auto-generated
-```
-
-**v4:**
-
-```ts
-class Logger extends ServiceMap.Service<Logger>()("Logger", {
-  make: Effect.succeed({ log: (msg: string) => Effect.log(msg) }),
-}) {
-  static readonly layer = Layer.effect(this, this.make).pipe(
-    Layer.provide(Config.layer),
-  );
-}
-```
-
-## Quick Reference
-
-| v3                                    | v4                                                  |
-| ------------------------------------- | --------------------------------------------------- |
-| `Context.GenericTag<T>(id)`           | `ServiceMap.Service<T>(id)`                         |
-| `Context.Tag(id)<Self, Shape>()`      | `ServiceMap.Service<Self, Shape>()(id)`             |
-| `Effect.Tag(id)<Self, Shape>()`       | `ServiceMap.Service<Self, Shape>()(id)`             |
-| `Effect.Service<Self>()(id, opts)`    | `ServiceMap.Service<Self>()(id, { make })`          |
-| `Context.Reference<Self>()(id, opts)` | `ServiceMap.Reference<T>(id, opts)`                 |
-| `Service.Default`                     | `Service.layer` (explicit)                          |
-| `Effect.provide(layer)`               | `Effect.provide(layer)` (memoization now automatic) |
-| `Layer.unwrap`                        | `Layer.unwrap` (dynamic layers)                     |
-| `LayerMap`                            | New in v4                                           |
 
 ## External Examples
 

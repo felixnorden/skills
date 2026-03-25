@@ -9,14 +9,13 @@ Type-safe parsing, validation, and transformation with Effect Schema v4.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
 
-> **Important:** In v4, Schema is in `effect/unstable/schema`. APIs may change in minor releases until stabilized. See [migration.md](migration.md) for v3→v4 migration details.
+> **Important:** Schema is in `effect/unstable/schema`. APIs may change in minor releases until stabilized.
 
 ## Table of Contents
 
 - [Quick Start](#quick-start)
 - [Topic Index](#topic-index)
 - [See Also](#see-also)
-- [Migration from v3](#migration-from-v3)
 
 ## Quick Start
 
@@ -90,6 +89,92 @@ class UserId extends Schema.Opaque<UserId>()(
 const id = UserId.make("550e8400-e29b-41d4-a716-446655440000");
 ```
 
+## Schema API Cheat Sheet
+
+Choose the right Schema API based on your use case:
+
+| Scenario | API | Returns |
+|----------|-----|---------|
+| Validate unknown input (API boundary) | `Schema.decodeUnknownEffect(schema)(data)` | `Effect<A, ParseError>` |
+| Transform typed input | `Schema.encodeEffect(schema)(data)` | `Effect<A, ParseError>` |
+| Validate typed input (internal) | `Schema.decode(schema)(data)` | `A` (throws on error) |
+| Validate and transform | `Schema.transformResult` | `Either<A, ParseError>` |
+
+### When to Use Each API
+
+**For unknown input at API boundaries:**
+
+```ts
+// Good — handle unknown data from external source
+const parseRequest = (data: unknown) =>
+  Schema.decodeUnknownEffect(UserSchema)(data);
+
+// Input: unknown (from JSON.parse, API response, etc.)
+// Output: Effect<User, Schema.ParseError>
+```
+
+**For typed input transformation:**
+
+```ts
+// Good — transform typed data to another schema
+const encodeForStorage = (user: User) =>
+  Schema.encodeEffect(StoredUserSchema)(user);
+
+// Input: User (typed)
+// Output: Effect<StoredUser, Schema.ParseError>
+```
+
+**For internal validation (rarely needed):**
+
+```ts
+// ⚠️ Use only when you know the input is already typed
+const validate = (data: User) => Schema.decode(UserSchema)(data);
+// Throws on failure, returns User directly
+```
+
+### Effect-based vs Direct APIs
+
+| API | Failure Mode | Use Case |
+|-----|--------------|----------|
+| `decodeUnknownEffect` | Returns `Effect.fail(ParseError)` | Composable, works with `catchTags` |
+| `decodeUnknown` | Returns `Either` | Synchronous, no Effect context needed |
+| `decode` | Throws | Quick scripts, internal guards |
+| `encodeEffect` | Returns `Effect.fail(ParseError)` | Composable encoding with error handling |
+
+### Common Pattern: API Boundary
+
+```ts
+class ValidationError extends Schema.TaggedErrorClass<ValidationError>()(
+  "ValidationError",
+  { message: Schema.String },
+) {}
+
+// Handle unknown input from API
+export const processApiRequest = Effect.fn("processApiRequest")(
+  function* (rawData: unknown) {
+    const data = yield* Schema.decodeUnknownEffect(RequestSchema)(rawData).pipe(
+      Effect.mapError((e) => new ValidationError({ message: String(e) })),
+    );
+    // Use validated data...
+    return process(data);
+  },
+);
+```
+
+### v4 API Changes
+
+In Effect v4, the Schema API has been streamlined:
+
+```ts
+// v4 style - effect-based
+const result = yield* Schema.decodeUnknownEffect(schema)(data);
+
+// v4 style - encode to different schema
+const encoded = yield* Schema.encodeEffect(OutputSchema)(input);
+```
+
+---
+
 ## Topic Index
 
 | Topic | File |
@@ -115,49 +200,4 @@ const id = UserId.make("550e8400-e29b-41d4-a716-446655440000");
 
 - [error-handling.md](error-handling.md) - Schema.TaggedErrorClass for error definitions
 - [core-patterns.md](core-patterns.md) - Effect+Schema patterns
-- [migration.md](migration.md) - v3→v4 API migration
 
-## Migration from v3
-
-### Import Changes
-
-| v3               | v4                                          |
-| ---------------- | ------------------------------------------- |
-| `@effect/schema` | `effect/unstable/schema` or `effect/schema` |
-
-### Refinements → Checks
-
-| v3                                   | v4                                                                   |
-| ------------------------------------ | -------------------------------------------------------------------- |
-| `Schema.pipe(Schema.minLength(5))`   | `Schema.String.check(Schema.isMinLength(5))`                         |
-| `Schema.pipe(Schema.maxLength(5))`   | `Schema.String.check(Schema.isMaxLength(5))`                         |
-| `Schema.pipe(Schema.pattern(/.../))` | `Schema.String.check(Schema.isPattern(/.../))`                       |
-| `Schema.pipe(Schema.positive())`     | `Schema.Number.check(Schema.isPositive())`                           |
-| `Schema.pipe(Schema.int())`          | `Schema.Number.check(Schema.isInt())`                                |
-| `Schema.pipe(Schema.between(1, 10))` | `Schema.Number.check(Schema.isBetween({ minimum: 1, maximum: 10 }))` |
-
-### Transformations
-
-| v3                                               | v4                                            |
-| ------------------------------------------------ | --------------------------------------------- |
-| `Schema.transform(from, to, { decode, encode })` | `Schema.decodeTo(target, { decode, encode })` |
-| `Schema.parseJson(schema)`                       | Use transformation with JSON parsing          |
-
-### Struct Fields
-
-| v3                              | v4                                                                                        |
-| ------------------------------- | ----------------------------------------------------------------------------------------- |
-| `Schema.optional(field)`        | `Schema.optionalKey(field)` (exact optional) or `Schema.optional(field)` (with undefined) |
-| `Schema.mutable(field)`         | `Schema.mutableKey(field)`                                                                |
-| `Schema.propertySignature`      | Removed - use `Schema.optional`                                                           |
-| `Schema.withConstructorDefault` | `Schema.withDecodingDefault`                                                              |
-
-### Other Changes
-
-| v3                         | v4                                         |
-| -------------------------- | ------------------------------------------ |
-| `Schema.partial(struct)`   | Use `Schema.optional` on fields            |
-| `Schema.required(partial)` | Use field spreading                        |
-| `Schema.brand`             | Use `Schema.Opaque` for distinct types     |
-| `Schema.message`           | Use `annotateKey` or custom error handling |
-| `Schema.Class`             | `Schema.Opaque`                            |

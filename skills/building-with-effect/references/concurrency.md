@@ -4,8 +4,6 @@ Fibers, parallelism, racing, and coordination in Effect v4.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
 
-> **Migrating from v3?** Forking combinators have been renamed: `fork` → `forkChild`, `forkDaemon` → `forkDetach`. `FiberRef` has been replaced by `ServiceMap.Reference`. See [migration.md](migration.md) for details.
-
 ## Basic Concurrency
 
 **Parallel execution**
@@ -487,6 +485,119 @@ class CircuitBreaker {
 }
 ```
 
+## Anti-Patterns to Avoid
+
+### For-Loop with forkChild
+
+**// Bad** — Sequential fork in a loop:
+
+```ts
+// This is an anti-pattern - forks are sequential, not concurrent
+const fibers: Fiber.Fiber<void>[] = [];
+for (const task of items) {
+  const fiber = yield* Effect.forkChild(process(task));
+  fibers.push(fiber);
+}
+// This runs ONE at a time, not in parallel!
+```
+
+**// Good** — Use Effect.forEach with concurrency:
+
+```ts
+// All items processed concurrently with unbounded concurrency
+const results = yield* Effect.forEach(items, process, {
+  concurrency: "unbounded",
+});
+```
+
+**// Good** — Use Effect.forEach with limited concurrency:
+
+```ts
+// Process up to 10 items concurrently
+const results = yield* Effect.forEach(items, process, {
+  concurrency: 10,
+});
+```
+
+### Blocking Loop Without Concurrency
+
+**// Bad** — Blocking loop defeats concurrency:
+
+```ts
+for (const item of items) {
+  yield* process(item); // Sequential!
+}
+```
+
+**// Good** — Use forEach with concurrency:
+
+```ts
+yield* Effect.forEach(items, process, { concurrency: 5 });
+```
+
+### Forgetting to Join Fibers
+
+**// Bad** — Fire and forget (resource leak):
+
+```ts
+yield* Effect.forkChild(longRunningTask);
+// Forgot to join! Fiber may never complete, resources leak
+```
+
+**// Good** — Always join fibers:
+
+```ts
+const fiber = yield* Effect.forkChild(longRunningTask);
+// ... do other work ...
+const result = yield* Fiber.join(fiber);
+```
+
+**// Good** — Use joinAll for multiple fibers:
+
+```ts
+const fibers = yield* Effect.all(
+  items.map((item) => Effect.forkChild(process(item))),
+  { concurrency: "unbounded" },
+);
+const results = yield* Fiber.joinAll(fibers);
+```
+
+### Using forkChild Without Scope
+
+**// Bad** — Orphan fiber (not tied to scope):
+
+```ts
+const fiber = yield* Effect.forkChild(backgroundTask);
+// fiber may be garbage collected or interrupted unexpectedly
+```
+
+**// Good** — Use forkScoped or scoped context:
+
+```ts
+yield* Effect.scoped(
+  Effect.gen(function* () {
+    const fiber = yield* Effect.forkScoped(backgroundTask);
+    // fiber tied to scope, will be interrupted if scope closes
+  }),
+);
+```
+
+### Mixing Promise and Effect Concurrency
+
+**// Bad** — Promise.all doesn't integrate with Effect fibers:
+
+```ts
+const results = await Promise.all(items.map(process)); // No Effect integration!
+```
+
+**// Good** — Use Effect.forEach:
+
+```ts
+const results = yield* Effect.forEach(items, process, { concurrency: 10 });
+```
+
+---
+
 ## Best Practices
 
 Fork long-running tasks
@@ -503,72 +614,3 @@ Avoid:
 - Using unbounded parallelism for large datasets
 - Ignoring backpressure signals
 - Racing effects that should run sequentially
-
-## Migration from v3
-
-### Forking Changes
-
-| v3                            | v4                                             |
-| ----------------------------- | ---------------------------------------------- |
-| `Effect.fork`                 | `Effect.forkChild`                             |
-| `Effect.forkDaemon`           | `Effect.forkDetach`                            |
-| `Effect.forkAll`              | Removed - use `Effect.all` with `forkChild`    |
-| `Effect.forkWithErrorHandler` | Removed - use `Fiber.join` with error handling |
-
-### Non-Yieldable Types (v4)
-
-In v4, these types are no longer Effect subtypes. Use explicit methods:
-
-**v3:**
-
-```ts
-const ref = yield * Ref.make(0);
-const value = yield * ref; // Ref was yieldable
-
-const deferred = yield * Deferred.make<string>();
-const value = yield * deferred; // Deferred was yieldable
-
-const fiber = yield * Effect.fork(task);
-const result = yield * fiber; // Fiber was yieldable
-```
-
-**v4:**
-
-```ts
-const ref = yield * Ref.make(0);
-const value = yield * Ref.get(ref); // Use Ref.get
-
-const deferred = yield * Deferred.make<string>();
-const value = yield * Deferred.await(deferred); // Use Deferred.await
-
-const fiber = yield * Effect.forkChild(task);
-const result = yield * Fiber.join(fiber); // Use Fiber.join
-```
-
-### FiberRef → ServiceMap.Reference
-
-**v3:**
-
-```ts
-import { Effect, FiberRef } from "effect";
-
-const program = Effect.gen(function* () {
-  const level = yield* FiberRef.get(FiberRef.currentLogLevel);
-  yield* FiberRef.set(FiberRef.currentLogLevel, "Debug");
-});
-
-Effect.locally(program, FiberRef.currentLogLevel, "Debug");
-```
-
-**v4:**
-
-```ts
-import { Effect, References } from "effect";
-
-const program = Effect.gen(function* () {
-  const level = yield* References.CurrentLogLevel;
-  // References are services - use provideService for scoped changes
-});
-
-Effect.provideService(program, References.CurrentLogLevel, "Debug");
-```

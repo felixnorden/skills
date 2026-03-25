@@ -4,8 +4,6 @@ Common data structures in Effect v4 ecosystem.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
 
-> **Migrating from v3?** `Cause<E>` has been flattened to a wrapper around `reasons: ReadonlyArray<Reason<E>>`. Error classes renamed from `*Exception` to `*Error`. See [migration.md](migration.md) for details.
-
 ## Option
 
 **Represents optional values**
@@ -92,19 +90,6 @@ Result.getOrThrow(result);
 
 // From Effect
 const result = yield* Effect.result(effect);
-```
-
-**Migration from Either:**
-```ts
-// v3
-import { Either } from "effect";
-Either.right(42);
-Either.left("error");
-
-// v4
-import { Result } from "effect";
-Result.ok(42);
-Result.err("error");
 ```
 
 ## Chunk
@@ -533,7 +518,7 @@ Equal.equals([1, 2], [1, 2]);  // true
 Equal.equals(new Map([["a", 1]]), new Map([["a", 1]]));  // true
 
 // NaN equality
-Equal.equals(NaN, NaN);  // true (v4), false (v3)
+Equal.equals(NaN, NaN);  // true
 
 // Opt out: reference equality
 const obj = Equal.byReference({ a: 1 });
@@ -557,51 +542,3 @@ Avoid:
 - Mutating Chunk/HashSet/HashMap
 - Using Array methods on Chunk directly
 - Ignoring Stream backpressure
-
-## Migration from v3
-
-### Either → Result
-
-| v3 | v4 |
-|----|-----|
-| `Either.right(42)` | `Result.ok(42)` |
-| `Either.left("error")` | `Result.err("error")` |
-| `Either.isRight` | `Result.isOk` |
-| `Either.isLeft` | `Result.isErr` |
-| `Either.map` | `Result.map` |
-| `Either.mapLeft` | `Result.mapError` |
-
-### Cause Changes
-
-| v3 | v4 |
-|----|-----|
-| `Cause.Sequential` / `Cause.Parallel` | `Cause.combine` |
-| `Cause.isFailType(cause)` | `Cause.isFailReason(reason)` |
-| `Cause.isDieType(cause)` | `Cause.isDieReason(reason)` |
-| `Cause.isInterruptType(cause)` | `Cause.isInterruptReason(reason)` |
-| `Cause.isFailure(cause)` | `Cause.hasFails(cause)` |
-| `Cause.isDie(cause)` | `Cause.hasDies(cause)` |
-| `Cause.isInterrupted(cause)` | `Cause.hasInterrupts(cause)` |
-| `Cause.isInterruptedOnly(cause)` | `Cause.hasInterruptsOnly(cause)` |
-| `Cause.failureOption(cause)` | `Cause.findErrorOption(cause)` |
-| `Cause.failureOrCause(cause)` | `Cause.findError(cause)` |
-| `Cause.dieOption(cause)` | `Cause.findDefect(cause)` |
-| `Cause.interruptOption(cause)` | `Cause.findInterrupt(cause)` |
-
-### Error Classes (v4: renamed from Exception)
-
-| v3 | v4 |
-|----|-----|
-| `NoSuchElementException` | `NoSuchElementError` |
-| `TimeoutException` | `TimeoutError` |
-| `IllegalArgumentException` | `IllegalArgumentError` |
-| `ExceededCapacityException` | `ExceededCapacityError` |
-| `UnknownException` | `UnknownError` |
-
-### Equality Changes
-
-| v3 | v4 |
-|----|-----|
-| Reference equality by default | Structural equality by default |
-| `Equal.equivalence()` | `Equal.asEquivalence()` |
-| `Equal.equals(NaN, NaN)` → `false` | `Equal.equals(NaN, NaN)` → `true` |

@@ -24,12 +24,12 @@ The StandardSchemaV1 formatter is used by `Schema.toStandardSchemaV1` and return
 
 ```ts
 export interface FailureResult {
-  readonly issues: ReadonlyArray<Issue>
+  readonly issues: ReadonlyArray<Issue>;
 }
 
 export interface Issue {
-  readonly message: string
-  readonly path: ReadonlyArray<PropertyKey>
+  readonly message: string;
+  readonly path: ReadonlyArray<PropertyKey>;
 }
 ```
 
@@ -56,19 +56,21 @@ There are two kinds of hooks:
 **Example** (Default hooks)
 
 ```ts
-import { Effect, Schema, SchemaIssue } from "effect/unstable/schema"
+import { Effect, Schema, SchemaIssue } from "effect/unstable/schema";
 
 const schema = Schema.Struct({
   a: Schema.NonEmptyString,
-  b: Schema.NonEmptyString
-})
+  b: Schema.NonEmptyString,
+});
 
 Schema.decodeUnknownEffect(schema)({ b: "" }, { errors: "all" })
   .pipe(
-    Effect.mapError((error) => SchemaIssue.makeFormatterStandardSchemaV1()(error.issue)),
-    Effect.runPromise
+    Effect.mapError((error) =>
+      SchemaIssue.makeFormatterStandardSchemaV1()(error.issue),
+    ),
+    Effect.runPromise,
   )
-  .then(console.log, (a) => console.dir(a, { depth: null }))
+  .then(console.log, (a) => console.dir(a, { depth: null }));
 /*
 Output:
 {
@@ -85,48 +87,48 @@ Output:
 **Example** (Using hooks to translate common messages)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect/unstable/schema";
 
 const Person = Schema.Struct({
-  name: Schema.String.check(Schema.isNonEmpty())
-})
+  name: Schema.String.check(Schema.isNonEmpty()),
+});
 
 const logIssues = getLogIssues({
   leafHook: (issue) => {
     switch (issue._tag) {
       case "InvalidType": {
         if (issue.ast._tag === "String") {
-          return t("string.mismatch")
+          return t("string.mismatch");
         } else if (issue.ast._tag === "Objects") {
-          return t("struct.mismatch")
+          return t("struct.mismatch");
         }
-        return t("default.mismatch")
+        return t("default.mismatch");
       }
       case "InvalidValue": {
-        return t("default.invalidValue")
+        return t("default.invalidValue");
       }
       case "MissingKey":
-        return t("struct.missingKey")
+        return t("struct.missingKey");
       case "UnexpectedKey":
-        return t("struct.unexpectedKey")
+        return t("struct.unexpectedKey");
       case "Forbidden":
-        return t("default.forbidden")
+        return t("default.forbidden");
       case "OneOf":
-        return t("default.oneOf")
+        return t("default.oneOf");
     }
   },
   checkHook: (issue) => {
-    const meta = issue.filter.annotations?.meta
+    const meta = issue.filter.annotations?.meta;
     if (meta) {
       switch (meta._tag) {
         case "isMinLength": {
-          return t("string.minLength", { minLength: meta.minLength })
+          return t("string.minLength", { minLength: meta.minLength });
         }
       }
     }
-    return t("default.check")
-  }
-})
+    return t("default.check");
+  },
+});
 ```
 
 ## Inline Custom Messages
@@ -136,15 +138,15 @@ You can attach custom error messages directly to a schema using annotations.
 **Example** (Attaching custom messages to a struct field)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect/unstable/schema";
 
 const Person = Schema.Struct({
-  name: Schema.String
-    .annotate({ message: t("string.mismatch") })
+  name: Schema.String.annotate({ message: t("string.mismatch") })
     .annotateKey({ messageMissingKey: t("struct.missingKey") })
-    .check(Schema.isNonEmpty({ message: t("string.minLength", { minLength: 1 }) }))
-})
-  .annotate({ message: t("struct.mismatch") })
+    .check(
+      Schema.isNonEmpty({ message: t("string.minLength", { minLength: 1 }) }),
+    ),
+}).annotate({ message: t("struct.mismatch") });
 ```
 
 ## Sending a FailureResult over the Wire
@@ -152,24 +154,29 @@ const Person = Schema.Struct({
 You can use the `Schema.StandardSchemaV1FailureResult` schema to send a `StandardSchemaV1.FailureResult` over the wire.
 
 ```ts
-import { Schema, SchemaIssue, SchemaParser } from "effect/unstable/schema"
+import { Schema, SchemaIssue, SchemaParser } from "effect/unstable/schema";
 
-const b = Symbol.for("b")
+const b = Symbol.for("b");
 
 const schema = Schema.Struct({
   a: Schema.NonEmptyString,
   [b]: Schema.Finite,
-  c: Schema.Tuple([Schema.String])
-})
+  c: Schema.Tuple([Schema.String]),
+});
 
-const r = SchemaParser.decodeUnknownExit(schema)({ a: "", c: [] }, { errors: "all" })
+const r = SchemaParser.decodeUnknownExit(schema)(
+  { a: "", c: [] },
+  { errors: "all" },
+);
 
 if (r._tag === "Failure") {
-  const failures = r.cause.failures
+  const failures = r.cause.failures;
   if (failures[0]?._tag === "Fail") {
-    const failureResult = SchemaIssue.makeFormatterStandardSchemaV1()(failures[0].error)
-    const serializer = Schema.toCodecJson(Schema.StandardSchemaV1FailureResult)
-    console.dir(Schema.encodeSync(serializer)(failureResult), { depth: null })
+    const failureResult = SchemaIssue.makeFormatterStandardSchemaV1()(
+      failures[0].error,
+    );
+    const serializer = Schema.toCodecJson(Schema.StandardSchemaV1FailureResult);
+    console.dir(Schema.encodeSync(serializer)(failureResult), { depth: null });
   }
 }
 ```

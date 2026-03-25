@@ -4,8 +4,6 @@ Safe resource acquisition and cleanup in Effect v4.
 
 See related examples in [effect-smol/ai-docs/src/01_effect/04_resources/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/04_resources/)
 
-> **Migrating from v3?** `Scope.extend` has been renamed to `Scope.provide`. Service patterns use `ServiceMap.Service`. See [migration.md](migration.md) for details.
-
 ## Basic Pattern
 
 **acquireRelease**
@@ -26,6 +24,102 @@ Effect.acquireUseRelease(
   (conn) => conn.close(),
 );
 ```
+
+## Resource Pattern Selector
+
+Choose the right resource management pattern based on your scenario:
+
+| Scenario | Pattern | Why |
+|----------|---------|-----|
+| External resource (file, connection, socket) | `acquireUseRelease` | Guarantees cleanup even on interruption |
+| Shared mutable state with atomic updates | `Ref` | Thread-safe state management |
+| Cleanup within existing scope | `addFinalizer` | Add cleanup to already-acquired resource |
+| In-memory cache with TTL | `Ref` | Mutable reference for cache map |
+| Connection pool | `acquireUseRelease` + pool pattern | Lifecycle management for pool members |
+| Temporary resource in service method | `acquireUseRelease` | Scoped to method execution |
+
+### When to Use Each Pattern
+
+**acquireUseRelease** — For resources with lifecycle needs:
+
+```ts
+// Good — file handle with guaranteed cleanup
+const readFile = (path: string) =>
+  Effect.acquireUseRelease(
+    Effect.sync(() => fs.openSync(path, "r")),  // acquire
+    (fd) => Effect.sync(() => fs.readFileSync(fd, "utf-8")),  // use
+    (fd) => Effect.sync(() => fs.closeSync(fd)),  // release
+  );
+```
+
+**Ref** — For shared mutable state:
+
+```ts
+// Good — cache state with atomic updates
+const cacheRef = yield* Ref.make<Map<string, string>>(new Map());
+
+const getOrSet = (key: string, generator: () => Effect<string>) =>
+  Effect.gen(function* () {
+    const cache = yield* Ref.get(cacheRef);
+    const existing = cache.get(key);
+    if (existing) return existing;
+    
+    const value = yield* generator();
+    yield* Ref.update(cacheRef, (m) => m.set(key, value));
+    return value;
+  });
+```
+
+**addFinalizer** — For cleanup side effects:
+
+```ts
+// Good — add cleanup to resource acquired elsewhere
+Effect.gen(function* () {
+  const resource = yield* acquireResource();
+  yield* Effect.addFinalizer(() => cleanup(resource));
+  // Use resource...
+});
+```
+
+### Common Mistakes
+
+**// Bad** — DON'T use Ref when you need acquireUseRelease:
+
+```ts
+// Wrong - Ref doesn't provide cleanup guarantees
+const badFile = Ref.make<number>(0);
+yield* Ref.update(badFile, () => fs.openSync("file.txt", "r")); // No cleanup!
+```
+
+**// Good** — use acquireUseRelease for file handles:
+
+```ts
+const readFile = Effect.acquireUseRelease(
+  Effect.sync(() => fs.openSync("file.txt", "r")),
+  (fd) => Effect.sync(() => fs.readFileSync(fd, "utf-8")),
+  (fd) => Effect.sync(() => fs.closeSync(fd)),
+);
+```
+
+**// Bad** — DON'T use addFinalizer without existing scope:
+
+```ts
+// Wrong - finalizer needs a scope
+yield* Effect.addFinalizer(() => cleanup()); // No scope!
+```
+
+**// Good** — use addFinalizer within scoped context:
+
+```ts
+Effect.scoped(
+  Effect.gen(function* () {
+    const resource = yield* acquireResource();
+    yield* Effect.addFinalizer(() => cleanup(resource));
+  }),
+);
+```
+
+---
 
 ## Scope
 
@@ -345,71 +439,3 @@ Avoid:
 - Leaking scoped resources
 - Ignoring cleanup failures
 - Nesting try/finally (use acquireRelease)
-
-## Migration from v3
-
-### Scope.extend → Scope.provide
-
-**v3:**
-
-```ts
-import { Effect, Scope } from "effect";
-
-const program = Effect.gen(function* () {
-  const scope = yield* Scope.make();
-  yield* Scope.extend(myEffect, scope);
-});
-```
-
-**v4:**
-
-```ts
-import { Effect, Scope } from "effect";
-
-const program = Effect.gen(function* () {
-  const scope = yield* Scope.make();
-  yield* Scope.provide(scope)(myEffect);
-  // Or: Scope.provide(myEffect, scope)
-});
-```
-
-### Effect.Service → ServiceMap.Service
-
-**v3:**
-
-```ts
-class HttpClient extends Effect.Service<HttpClient>()("HttpClient", {
-  scoped: Effect.gen(function* () {
-    const client = yield* Effect.acquireRelease(
-      Effect.sync(() => new Client()),
-      (c) => Effect.sync(() => c.close()),
-    );
-    return { get: (url) => Effect.tryPromise(() => client.fetch(url)) };
-  }),
-}) {}
-```
-
-**v4:**
-
-```ts
-class HttpClient extends ServiceMap.Service<HttpClient>()("HttpClient", {
-  make: Effect.gen(function* () {
-    const client = yield* Effect.acquireRelease(
-      Effect.sync(() => new Client()),
-      (c) => Effect.sync(() => c.close()),
-    );
-    return { get: (url) => Effect.tryPromise(() => client.fetch(url)) };
-  }),
-}) {
-  static readonly layer = Layer.scoped(this, this.make);
-}
-```
-
-## Quick Reference
-
-| v3                                | v4                                                               |
-| --------------------------------- | ---------------------------------------------------------------- |
-| `Scope.extend(effect, scope)`     | `Scope.provide(scope)(effect)` or `Scope.provide(effect, scope)` |
-| `Effect.Service` with `scoped`    | `ServiceMap.Service` with `make` + `Layer.scoped`                |
-| `Logger.Default` (auto-generated) | `Logger.layer` (explicitly defined)                              |
-| `dependencies: [X.Default]`       | Wire via `Layer.provide`                                         |

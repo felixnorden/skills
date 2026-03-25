@@ -366,36 +366,6 @@ const withCircuitBreaker = operation.pipe(
 6. **Log retry attempts** for observability
 7. **Use `orDie` after retries** to convert to defects if recovery fails
 
-## Migration from v3
-
-### Retry Syntax
-
-**v3:**
-
-```ts
-Effect.retry(effect, Schedule.exponential("100 millis"));
-```
-
-**v4:**
-
-```ts
-effect.pipe(Effect.retry(Schedule.exponential("100 millis")));
-```
-
-### Schedule While
-
-**v3:**
-
-```ts
-Schedule.while(Schedule.spaced("1 second"), (output) => condition);
-```
-
-**v4:**
-
-```ts
-Schedule.spaced("1 second").pipe(Schedule.while((output) => condition));
-```
-
 ## Quick Reference
 
 ```ts

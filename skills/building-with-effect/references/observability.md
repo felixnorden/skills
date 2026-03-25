@@ -4,11 +4,10 @@ Built-in observability primitives in Effect v4.
 
 See related examples in [effect-smol/ai-docs/src/08_observability/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/08_observability/)
 
-> **Migrating from v3?** `FiberRef` has been replaced by `ServiceMap.Reference`. Built-in refs moved to `References` module. See [migration.md](migration.md) for details.
-
 ## Logging
 
 **Basic logging**
+
 ```ts
 Effect.log("Application started");
 Effect.logDebug("Debug info");
@@ -19,11 +18,13 @@ Effect.logFatal("Fatal error");
 ```
 
 **With context**
+
 ```ts
 Effect.log("User created", { userId: 123, email: "user@example.com" });
 ```
 
 **Log levels (v4: References module)**
+
 ```ts
 import { Effect, References } from "effect";
 
@@ -31,11 +32,12 @@ import { Effect, References } from "effect";
 const withDebug = Effect.provideService(
   program,
   References.MinimumLogLevel,
-  "Debug"
+  "Debug",
 );
 ```
 
 **Custom logger**
+
 ```ts
 import { Logger } from "effect";
 
@@ -43,42 +45,67 @@ const customLogger = Logger.make(({ message, logLevel, annotations }) => {
   console.log(`[${logLevel.label}] ${message}`);
 });
 
-const withCustom = Logger.replace(
-  Logger.defaultLogger,
-  customLogger
-);
+const withCustom = Logger.replace(Logger.defaultLogger, customLogger);
 
 program.pipe(Effect.provide(withCustom));
 ```
 
 **Structured logging**
+
 ```ts
 Effect.logDebug("Processing order").pipe(
   Effect.annotateLogs({
     orderId: order.id,
     customerId: order.customerId,
-    amount: order.total
-  })
+    amount: order.total,
+  }),
 );
 ```
 
 **Disable logging**
+
 ```ts
-Effect.provideService(
-  program,
-  References.MinimumLogLevel,
-  "None"
-);
+Effect.provideService(program, References.MinimumLogLevel, "None");
 ```
+
+## Logging Template for Effect.fn
+
+Use this template for consistent logging in Effect.fn methods:
+
+### Entry/Exit Logging Pattern
+
+```ts
+const myMethod = Effect.fn("MyService.method")(function* (arg: string) {
+  yield* Effect.logInfo(`Starting method: ${arg}`);  // Entry
+  
+  const result = yield* doSomething(arg);
+  
+  yield* Effect.logInfo(`Completed: ${result}`);     // Exit
+  return result;
+});
+```
+
+### Log Levels by Scenario
+
+| Scenario | Level | Example |
+|----------|-------|---------|
+| Method entry | `logInfo` | `Starting fetchUser(id=123)` |
+| Method exit | `logInfo` | `Completed fetchUser: { name: "Ada" }` |
+| Recoverable error (caught) | `logWarning` | `Validation failed, using default` |
+| Propagated error | `logError` | `Database connection failed` |
+| Debug details | `logDebug` | `Retry attempt 2/3` |
+
+---
 
 ## Metrics
 
 **Counter**
+
 ```ts
 import { Metric } from "effect";
 
 const requestCount = Metric.counter("http_requests_total", {
-  description: "Total HTTP requests"
+  description: "Total HTTP requests",
 });
 
 Effect.gen(function* () {
@@ -89,6 +116,7 @@ Effect.gen(function* () {
 ```
 
 **Gauge**
+
 ```ts
 const activeConnections = Metric.gauge("active_connections");
 
@@ -100,9 +128,10 @@ Effect.gen(function* () {
 ```
 
 **Histogram**
+
 ```ts
 const requestDuration = Metric.histogram("http_request_duration_seconds", {
-  boundaries: [0.1, 0.5, 1.0, 2.5, 5.0]
+  boundaries: [0.1, 0.5, 1.0, 2.5, 5.0],
 });
 
 Effect.gen(function* () {
@@ -114,10 +143,11 @@ Effect.gen(function* () {
 ```
 
 **Summary**
+
 ```ts
 const responseSize = Metric.summary("response_size_bytes", {
   maxAge: "1 hour",
-  maxSize: 100
+  maxSize: 100,
 });
 
 Effect.gen(function* () {
@@ -127,6 +157,7 @@ Effect.gen(function* () {
 ```
 
 **Frequency**
+
 ```ts
 const errorTypes = Metric.frequency("error_types");
 
@@ -136,12 +167,13 @@ Effect.gen(function* () {
 ```
 
 **Tagged metrics**
+
 ```ts
 const requests = Metric.counter("requests").pipe(
   Metric.taggedWith({
     method: "GET",
-    path: "/api/users"
-  })
+    path: "/api/users",
+  }),
 );
 
 Effect.gen(function* () {
@@ -150,79 +182,75 @@ Effect.gen(function* () {
 ```
 
 **Track duration**
+
 ```ts
 const tracked = Effect.gen(function* () {
   // Expensive operation
   yield* Effect.sleep("1 second");
   return "done";
-}).pipe(
-  Metric.trackDuration(requestDuration)
-);
+}).pipe(Metric.trackDuration(requestDuration));
 ```
 
 ## Tracing
 
 **Basic spans**
+
 ```ts
 const program = Effect.gen(function* () {
   yield* Effect.log("Starting");
   return "done";
 }).pipe(
   Effect.withSpan("myOperation", {
-    attributes: { userId: "123" }
-  })
+    attributes: { userId: "123" },
+  }),
 );
 ```
 
 **Nested spans**
+
 ```ts
 const program = Effect.gen(function* () {
-  const user = yield* fetchUser().pipe(
-    Effect.withSpan("fetchUser")
-  );
-  
+  const user = yield* fetchUser().pipe(Effect.withSpan("fetchUser"));
+
   const orders = yield* fetchOrders(user.id).pipe(
-    Effect.withSpan("fetchOrders")
+    Effect.withSpan("fetchOrders"),
   );
-  
+
   return { user, orders };
-}).pipe(
-  Effect.withSpan("loadUserData")
-);
+}).pipe(Effect.withSpan("loadUserData"));
 ```
 
 **Add span attributes**
+
 ```ts
 Effect.gen(function* () {
   yield* Effect.annotateCurrentSpan({
     "user.id": userId,
-    "request.method": "GET"
+    "request.method": "GET",
   });
-  
+
   const result = yield* processRequest();
-  
+
   yield* Effect.annotateCurrentSpan({
-    "response.status": result.status
+    "response.status": result.status,
   });
 });
 ```
 
 **Links between spans**
+
 ```ts
 Effect.gen(function* () {
   const parentSpan = yield* Effect.currentSpan;
-  
-  yield* Effect.forkChild(
-    backgroundTask.pipe(
-      Effect.linkSpans([parentSpan])
-    )
-  );
+
+  yield* Effect.forkChild(backgroundTask.pipe(Effect.linkSpans([parentSpan])));
 });
 ```
 
 ## OpenTelemetry Integration
 
 **Setup**
+
 ```ts
 import { NodeSdk } from "@effect/opentelemetry";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
@@ -231,8 +259,8 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 const TracingLive = NodeSdk.layer(() => ({
   resource: { serviceName: "my-app" },
   spanProcessor: new BatchSpanProcessor(
-    new OTLPTraceExporter({ url: "http://localhost:4318/v1/traces" })
-  )
+    new OTLPTraceExporter({ url: "http://localhost:4318/v1/traces" }),
+  ),
 }));
 
 program.pipe(Effect.provide(TracingLive));
@@ -257,26 +285,14 @@ const program = Effect.gen(function* () {
 });
 ```
 
-### Available Built-in References (v4)
-
-| v3 FiberRef | v4 Reference |
-|-------------|--------------|
-| `FiberRef.currentConcurrency` | `References.CurrentConcurrency` |
-| `FiberRef.currentLogLevel` | `References.CurrentLogLevel` |
-| `FiberRef.currentMinimumLogLevel` | `References.MinimumLogLevel` |
-| `FiberRef.currentLogAnnotations` | `References.CurrentLogAnnotations` |
-| `FiberRef.currentLogSpan` | `References.CurrentLogSpans` |
-| `FiberRef.currentScheduler` | `References.Scheduler` |
-| `FiberRef.currentMaxOpsBeforeYield` | `References.MaxOpsBeforeYield` |
-| `FiberRef.currentTracerEnabled` | `References.TracerEnabled` |
-| `FiberRef.unhandledErrorLogLevel` | `References.UnhandledLogLevel` |
+### Available Built-in References
 
 ### Custom References
 
 ```ts
 // Create custom reference with default
 const RequestId = ServiceMap.Reference<string>("RequestId", {
-  defaultValue: () => ""
+  defaultValue: () => "",
 });
 
 // Use like a service
@@ -286,48 +302,19 @@ const program = Effect.gen(function* () {
 });
 
 // Override with provideService
-const withRequestId = Effect.provideService(
-  program,
-  RequestId,
-  "req-123"
-);
-```
-
-### Scoped Updates (v4: `provideService` replaces `locally`)
-
-**v3:**
-```ts
-import { Effect, FiberRef } from "effect";
-
-Effect.locally(
-  myEffect,
-  FiberRef.currentLogLevel,
-  LogLevel.Debug
-);
-```
-
-**v4:**
-```ts
-import { Effect, References } from "effect";
-
-Effect.provideService(
-  myEffect,
-  References.CurrentLogLevel,
-  "Debug"
-);
+const withRequestId = Effect.provideService(program, RequestId, "req-123");
 ```
 
 ## Common Patterns
 
 **Request ID tracking**
+
 ```ts
 const RequestId = ServiceMap.Reference<string>("RequestId", {
-  defaultValue: () => ""
+  defaultValue: () => "",
 });
 
-const withRequestId = <A, E, R>(
-  effect: Effect.Effect<A, E, R>
-) =>
+const withRequestId = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   Effect.gen(function* () {
     const id = crypto.randomUUID();
     yield* Effect.annotateLogs("requestId", id);
@@ -336,56 +323,57 @@ const withRequestId = <A, E, R>(
 ```
 
 **HTTP request logging**
+
 ```ts
 const logRequest = (req: Request) =>
   Effect.gen(function* () {
     yield* Effect.log("Request received", {
       method: req.method,
-      path: req.url
+      path: req.url,
     });
-    
+
     const start = Date.now();
     const response = yield* handleRequest(req);
     const duration = Date.now() - start;
-    
+
     yield* Effect.log("Request completed", {
       status: response.status,
-      duration
+      duration,
     });
-    
+
     yield* requestDuration.pipe(Metric.update(duration / 1000));
-    
+
     return response;
   }).pipe(
     Effect.withSpan("httpRequest", {
       attributes: {
         "http.method": req.method,
-        "http.url": req.url
-      }
-    })
+        "http.url": req.url,
+      },
+    }),
   );
 ```
 
 **Error tracking**
+
 ```ts
 const errorCounter = Metric.counter("errors_total");
 
-const trackErrors = <A, E, R>(
-  effect: Effect.Effect<A, E, R>
-) =>
+const trackErrors = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(
     Effect.tapError((error) =>
       Effect.all([
         Effect.logError("Error occurred", { error }),
-        errorCounter.pipe(Metric.increment)
-      ])
-    )
+        errorCounter.pipe(Metric.increment),
+      ]),
+    ),
   );
 ```
 
 ## Testing Observability
 
 **Test logger**
+
 ```ts
 import { Logger } from "effect";
 
@@ -399,6 +387,7 @@ const test = program.pipe(Effect.provide(TestLogger));
 ```
 
 **Inspect spans**
+
 ```ts
 import { Effect } from "effect";
 
@@ -424,53 +413,9 @@ Track errors and latencies
 Set up OpenTelemetry early
 
 Avoid:
+
 - Logging sensitive data
 - Over-logging in hot paths
 - Creating too many metrics
 - Forgetting to track failures
 - Ignoring span cleanup
-
-## Migration from v3
-
-### FiberRef → ServiceMap.Reference
-
-**v3:**
-```ts
-import { Effect, FiberRef, LogLevel } from "effect";
-
-const program = Effect.gen(function* () {
-  const level = yield* FiberRef.get(FiberRef.currentLogLevel);
-  yield* FiberRef.set(FiberRef.currentLogLevel, LogLevel.Debug);
-});
-
-Effect.locally(program, FiberRef.currentLogLevel, LogLevel.Debug);
-```
-
-**v4:**
-```ts
-import { Effect, References } from "effect";
-
-const program = Effect.gen(function* () {
-  const level = yield* References.CurrentLogLevel;
-  // Set via provideService for scoped changes
-});
-
-Effect.provideService(program, References.CurrentLogLevel, "Debug");
-```
-
-### Quick Reference
-
-| v3 | v4 |
-|----|-----|
-| `FiberRef.make(default)` | `ServiceMap.Reference<T>("Name", { defaultValue: () => default })` |
-| `FiberRef.get(ref)` | `yield* ref` (reference is a service) |
-| `FiberRef.set(ref, value)` | `Effect.provideService(effect, ref, value)` |
-| `FiberRef.locally(ref, value)(effect)` | `Effect.provideService(effect, ref, value)` |
-| `FiberRef.currentLogLevel` | `References.CurrentLogLevel` |
-| `FiberRef.currentMinimumLogLevel` | `References.MinimumLogLevel` |
-| `FiberRef.currentLogAnnotations` | `References.CurrentLogAnnotations` |
-| `FiberRef.currentLogSpan` | `References.CurrentLogSpans` |
-| `FiberRef.currentScheduler` | `References.Scheduler` |
-| `FiberRef.currentMaxOpsBeforeYield` | `References.MaxOpsBeforeYield` |
-| `FiberRef.currentTracerEnabled` | `References.TracerEnabled` |
-| `FiberRef.unhandledErrorLogLevel` | `References.UnhandledLogLevel` |

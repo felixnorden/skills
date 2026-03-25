@@ -4,8 +4,6 @@ Effect v4 vs Promise, fp-ts, and ZIO.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
 
-> **Migrating from v3?** Service patterns have changed significantly. See [migration.md](migration.md) for details.
-
 ## Effect vs Promise
 
 **Creation**
@@ -194,7 +192,6 @@ Effect.gen(function* () {
 - Type params reversed
 - ZIO in Scala, Effect in TypeScript
 - Similar concepts, different ecosystems
-- Effect v4 uses ServiceMap (was Context in v3)
 
 ## Common Equivalents
 
@@ -207,7 +204,7 @@ Effect.gen(function* () {
 | `Task<A>` | `Effect<A>` |
 | `IO<A>` | `Effect.sync(() => A)` |
 | `Option<A>` | `Option<A>` |
-| `Either<E, A>` | `Result<A, E>` (v4: Either renamed to Result) |
+| `Either<E, A>` | `Result<A, E>` |
 | `map` | `map` |
 | `chain` | `flatMap` / `andThen` |
 | `mapLeft` | `mapError` |
@@ -225,59 +222,9 @@ Effect.gen(function* () {
 | `Promise.race([...])` | `Effect.race(...)` |
 | `async/await` | `Effect.gen` |
 
-### Effect v3 to v4
-
-| v3 | v4 |
-|----|-----|
-| `Context.Tag(id)<S, T>()` | `ServiceMap.Service<S, T>()(id)` |
-| `Effect.Service<S>()(id, { effect, dependencies })` | `ServiceMap.Service<S>()(id, { make })` with explicit layer |
-| `Effect.Tag(id)<S, T>()` | `ServiceMap.Service<S, T>()(id)` (no static accessors) |
-| `Effect.catchAll` | `Effect.catch` |
-| `Effect.catchAllCause` | `Effect.catchCause` |
-| `Effect.catchAllDefect` | `Effect.catchDefect` |
-| `Effect.fork` | `Effect.forkChild` |
-| `Effect.forkDaemon` | `Effect.forkDetach` |
-| `FiberRef` | `ServiceMap.Reference` |
-| `Scope.extend` | `Scope.provide` |
-| `Runtime<R>` | Removed - use `ServiceMap<R>` |
-| `Either` | `Result` |
-| `@effect/schema` | `effect/unstable/schema` |
-
 ## Key v4 Changes
 
-### ServiceMap Replaces Context
-
-**v3:**
-```ts
-import { Context, Effect } from "effect";
-
-class Database extends Context.Tag("Database")<
-  Database,
-  { query: (sql: string) => Effect.Effect<unknown[]> }
->() {}
-
-const program = Effect.gen(function* () {
-  const db = yield* Database;
-  return yield* db.query("SELECT *");
-});
-```
-
-**v4:**
-```ts
-import { ServiceMap, Effect } from "effect";
-
-class Database extends ServiceMap.Service<Database>()(
-  "Database",
-  { query: (sql: string) => Effect.Effect<unknown[]> }
-)() {}
-
-const program = Effect.gen(function* () {
-  const db = yield* Database;
-  return yield* db.query("SELECT *");
-});
-```
-
-### Yieldable Types
+### ServiceMap Pattern
 
 In v4, types like `Option` and `Config` are `Yieldable` but not `Effect` subtypes:
 
@@ -297,11 +244,6 @@ Effect.map(Option.some(42).asEffect(), x => x + 1);
 In v4, `Ref`, `Deferred`, and `Fiber` are no longer Effect subtypes:
 
 ```ts
-// v3
-const ref = yield* Ref.make(0);
-const value = yield* ref;  // Ref was yieldable
-
-// v4
 const ref = yield* Ref.make(0);
 const value = yield* Ref.get(ref);  // Use explicit method
 ```

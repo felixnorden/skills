@@ -1,6 +1,6 @@
 ---
 name: building-with-effect
-description: Build robust TypeScript programs with Effect - type-safe error handling, dependency injection, concurrency, resource management. Use when writing Effect code, managing services/layers, handling errors, coordinating async operations, or working with Effect data types.
+description: Build TypeScript programs with the Effect library - type-safe error handling, dependency injection, concurrency, resource management, and composable abstractions. Use when working with Effect, Schema, or any @effect/* ecosystem package.
 ---
 
 # Building with Effect
@@ -69,6 +69,8 @@ These operations have a narrow safe path - follow exactly:
 - **Service structure**: Extend `ServiceMap.Service` with static `layer` property
 - **Effect.fn usage**: Always use `Effect.fn("name")` for functions returning Effects
 - **Resource cleanup**: Always use `acquireUseRelease` or `Effect.addFinalizer`
+- **Resource pattern selection**: Use `acquireUseRelease` for external resources, `Ref` for shared mutable state, `addFinalizer` for cleanup within existing scope
+- **Error recovery vs propagation**: Use `catchTags`/`orElse` to recover; use `return yield* new Error()` to propagate (ALWAYS use `return yield*` to signal the function stops)
 
 **Medium Freedom** (preferred patterns, some variation acceptable)
 
@@ -134,6 +136,9 @@ Effect<Success, Error, Requirements>;
 6. **Handle interruptions** with `acquireRelease` for resources
 7. **Use Layer.launch** as application entry point for long-running apps
 8. **Enable dual APIs** when appropriate (data-first + data-last)
+9. **Choose resource patterns deliberately**: See [Resource Pattern Selector](references/resource-management.md#resource-pattern-selector)
+10. **Use error recovery for resilience**: See [Error Handling Decision Tree](references/error-handling.md#error-handling-decision-tree)
+11. **Prefer Effect.forEach with concurrency**: See [Concurrency Anti-Patterns](references/concurrency.md#anti-patterns-to-avoid)
 
 ## Workflows
 
@@ -313,22 +318,6 @@ Dive deeper into specific topics and patterns:
 - **[HTTP Client/Server](references/http-client-server.md)** - HttpClient and HttpApi
 - **[Resource Management](references/resource-management.md)** - Scope, acquire/release patterns
 - **[Schema](references/schema.md)** - Quick start & index
-  - [schema-elementary.md](references/schema-elementary.md) - Primitives, literals, strings, numbers
-  - [schema-composite.md](references/schema-composite.md) - Structs, tuples, arrays, records, unions
-  - [schema-recursive.md](references/schema-recursive.md) - Recursive schemas
-  - [schema-custom-types.md](references/schema-custom-types.md) - declare, declareConstructor
-  - [schema-validation.md](references/schema-validation.md) - Filters, refinements, branding
-  - [schema-constructors.md](references/schema-constructors.md) - makeUnsafe, defaults
-  - [schema-transformations.md](references/schema-transformations.md) - decodeTo, encodeTo
-  - [schema-flipping.md](references/schema-flipping.md) - Schema.flip
-  - [schema-classes.md](references/schema-classes.md) - Opaque, Class, TaggedClass
-  - [schema-serialization.md](references/schema-serialization.md) - JSON, FormData, XML codecs
-  - [schema-tooling.md](references/schema-tooling.md) - JSON Schema, Arbitraries, Optics
-  - [schema-representation.md](references/schema-representation.md) - Portable representation, AST
-  - [schema-error-handling.md](references/schema-error-handling.md) - Formatters, hooks, i18n
-  - [schema-middlewares.md](references/schema-middlewares.md) - catchDecoding, fallbacks
-  - [schema-advanced.md](references/schema-advanced.md) - Type model, hierarchy
-  - [schema-integrations.md](references/schema-integrations.md) - TanStack Form, Elysia
 - **[Observability](references/observability.md)** - Logging, metrics, tracing with Otlp
 - **[Testing](references/testing.md)** - @effect/vitest patterns
 - **[Integration](references/integration.md)** - ManagedRuntime for non-Effect code

@@ -12,7 +12,6 @@ Error management strategies with Effect using Schema.TaggedErrorClass.
 - [Error Inspection](#error-inspection) - Cause operations
 - [Error in Effect.fn](#error-in-effectfn) - Handling in function definitions
 - [Common Patterns](#common-patterns) - Validation, recovery chains
-- [Migration from v3](#migration-from-v3) - Upgrading error definitions
 - [Best Practices](#best-practices) - Recommendations
 - [Quick Reference](#quick-reference) - Common operations
 
@@ -399,78 +398,6 @@ const resilientFetch = (id: string) =>
   );
 ```
 
-### Converting Between Error Types
-
-```ts
-// In service implementation
-const fetchUser = Effect.fn("UserService.fetchUser")(function* (id: string) {
-  const response = yield* httpClient
-    .get(`/users/${id}`)
-    .pipe(
-      Effect.mapError(
-        (httpError) => new UserServiceError({ cause: httpError }),
-      ),
-    );
-  return response;
-});
-```
-
-## Migration from v3
-
-### Error Definition
-
-**v3:**
-
-```ts
-import { Data } from "effect";
-
-class MyError extends Data.TaggedError("MyError")<{
-  message: string;
-}> {}
-```
-
-**v4:**
-
-```ts
-import { Schema } from "effect";
-
-class MyError extends Schema.TaggedErrorClass<MyError>()("MyError", {
-  message: Schema.String,
-}) {}
-```
-
-### Error Class Names
-
-**v3:**
-
-```ts
-NoSuchElementException;
-TimeoutException;
-IllegalArgumentException;
-ExceededCapacityException;
-UnknownException;
-```
-
-**v4:**
-
-```ts
-NoSuchElementError;
-TimeoutError;
-IllegalArgumentError;
-ExceededCapacityError;
-UnknownError;
-```
-
-### Combinator Renames
-
-| v3                      | v4                        |
-| ----------------------- | ------------------------- |
-| `Effect.catchAll`       | `Effect.catch`            |
-| `Effect.catchAllCause`  | `Effect.catchCause`       |
-| `Effect.catchAllDefect` | `Effect.catchDefect`      |
-| `Effect.catchSome`      | `Effect.catchFilter`      |
-| `Effect.catchSomeCause` | `Effect.catchCauseFilter` |
-
 ## External Examples
 
 See full examples:
@@ -487,6 +414,102 @@ See full examples:
 5. **Handle errors at appropriate layers** - don't let them bubble too far
 6. **Use reasons for complex error hierarchies** (e.g., AI errors with rate limits, quotas)
 7. **Always return when raising errors** in Effect.fn to ensure type safety
+
+## Error Handling Decision Tree
+
+Use this decision guide to choose the right error handling approach:
+
+### Decision 1: Recovery vs Propagation
+
+**"Do you want to RECOVER from this error and continue?"**
+
+| If... | Use... | Example |
+|-------|--------|---------|
+| You want to retry | `Effect.retry` with `Schedule` | Network timeout → retry with exponential backoff |
+| You want a fallback value | `orElse` or `catchTags` | Config missing → use defaults |
+| You want to log and continue | `catch` with logging | Non-critical error → log warning |
+| You want to transform error type | `mapError` | Convert to domain error |
+
+**"Do you want to FAIL and PROPAGATE this error?"**
+
+| If... | Use... | Example |
+|-------|--------|---------|
+| Validation failure | `yield* new ValidationError({...})` | Invalid input format |
+| Business rule violation | `yield* new BusinessRuleError({...})` | Insufficient funds |
+| Unrecoverable state | `return yield* new ErrorType({...})` | Database corruption |
+
+### Decision 2: Which Combinator?
+
+**For specific error types with different handlers:**
+
+```ts
+// Good — Use catchTags for multiple specific errors
+Effect.catchTags({
+  NotFoundError: () => fallbackValue,
+  ValidationError: () => fallbackValue,
+})
+```
+
+**For fallback after specific handling:**
+
+```ts
+// Good — Use catchTag then catch for final fallback
+Effect.catchTag("NotFoundError", () => fallback)
+Effect.catch(() => anotherFallback)
+```
+
+**For retryable errors:**
+
+```ts
+// Good — Use retry with schedule
+Effect.retry({
+  times: 3,
+  schedule: Schedule.exponential("100 millis"),
+})
+```
+
+### Anti-Patterns
+
+**// Bad** — DON'T use catchTags when you should propagate:
+
+```ts
+// Wrong - catching and re-throwing defeats the purpose
+Effect.catchTags({
+  ValidationError: (e) => Effect.fail(e),  // Just re-raise it!
+})
+```
+
+**// Good** — CORRECT: propagate validation errors with `return yield*`:
+
+```ts
+const validateInput = Effect.fn("validateInput")(function* (input) {
+  if (!isValid(input)) {
+    return yield* new ValidationError({ message: "Invalid" }); // Propagate
+  }
+  return process(input);
+});
+```
+
+**// Good** — CORRECT: recover with fallback:
+
+```ts
+const withFallback = validateInput(input).pipe(
+  Effect.catchTag("ValidationError", () => Effect.succeed(defaultValue)), // Recover
+);
+```
+
+### Quick Reference
+
+| Scenario | Pattern |
+|----------|---------|
+| Retry transient failure | `Effect.retry(Schedule.exponential(...))` |
+| Use fallback value | `Effect.orElse(() => fallback)` |
+| Handle multiple errors differently | `Effect.catchTags({...})` |
+| Convert error type | `Effect.mapError(...)` |
+| Fail with domain error | `return yield* new DomainError({...})` |
+| Log and re-throw | `Effect.catch(...)` then re-raise |
+
+---
 
 ## Quick Reference
 
@@ -513,7 +536,6 @@ Effect.retry({ times: 3, schedule: Schedule.exponential("100 millis") });
 
 // Timeout
 Effect.timeout("5 seconds");
-
 // Fallback
 Effect.orElse(() => fallback);
 ```
