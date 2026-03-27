@@ -32,19 +32,19 @@ A synchronous, pure type for representing computations that can succeed (`Succes
 A practical example: parsing and validating input with Result.
 
 ```ts
-import { Result, Option } from "effect"
+import { Result, Option } from "effect";
 
 const parse = (input: string): Result.Result<number, string> =>
   isNaN(Number(input))
     ? Result.fail("not a number")
-    : Result.succeed(Number(input))
+    : Result.succeed(Number(input));
 
 const ensurePositive = (n: number): Result.Result<number, string> =>
-  n > 0 ? Result.succeed(n) : Result.fail("not positive")
+  n > 0 ? Result.succeed(n) : Result.fail("not positive");
 
-const result = Result.flatMap(parse("42"), ensurePositive)
+const result = Result.flatMap(parse("42"), ensurePositive);
 
-console.log(Result.getOrElse(result, (err) => `Error: ${err}`))
+console.log(Result.getOrElse(result, (err) => `Error: ${err}`));
 // Output: 42
 ```
 
@@ -60,17 +60,17 @@ console.log(Result.getOrElse(result, (err) => `Error: ${err}`))
 
 ## Result vs Option
 
-| Type | Use When |
-|------|----------|
-| `Option<A>` | Value may or may not be present (like nullable) |
+| Type           | Use When                                                 |
+| -------------- | -------------------------------------------------------- |
+| `Option<A>`    | Value may or may not be present (like nullable)          |
 | `Result<A, E>` | Computation may succeed or fail with explicit error type |
 
 ```ts
 // Option - value might be missing
-Option.fromNullable(maybeValue)
+Option.fromNullable(maybeValue);
 
 // Result - computation might fail
-Result.try(() => JSON.parse(userInput))
+Result.try(() => JSON.parse(userInput));
 ```
 
 ## Constructors
@@ -78,22 +78,22 @@ Result.try(() => JSON.parse(userInput))
 ### succeed / fail
 
 ```ts
-import { Result } from "effect"
+import { Result } from "effect";
 
 // Success with a value
-const success = Result.succeed(42)
+const success = Result.succeed(42);
 
 // Failure with an error
-const failure = Result.fail("something went wrong")
+const failure = Result.fail("something went wrong");
 ```
 
 ### Pre-built constants
 
 ```ts
-Result.void      // Result<void> - success with undefined
-Result.failVoid  // Result<never, void> - failure with undefined
-Result.succeedNone  // Result<Option<never>> - success with None
-Result.succeedSome(a) // Result<Option<A>> - success with Some(a)
+Result.void; // Result<void> - success with undefined
+Result.failVoid; // Result<never, void> - failure with undefined
+Result.succeedNone; // Result<Option<never>> - success with None
+Result.succeedSome(a); // Result<Option<A>> - success with Some(a)
 ```
 
 ### fromNullishOr
@@ -101,8 +101,8 @@ Result.succeedSome(a) // Result<Option<A>> - success with Some(a)
 Converts `null` or `undefined` to a `Failure`:
 
 ```ts
-Result.fromNullishOr(1, () => "fallback")  // Success(1)
-Result.fromNullishOr(null, () => "fallback") // Failure("fallback")
+Result.fromNullishOr(1, () => "fallback"); // Success(1)
+Result.fromNullishOr(null, () => "fallback"); // Failure("fallback")
 ```
 
 ### fromOption
@@ -110,23 +110,23 @@ Result.fromNullishOr(null, () => "fallback") // Failure("fallback")
 Converts `Option<A>` to `Result<A, E>`:
 
 ```ts
-Result.fromOption(Option.some(1), () => "missing") // Success(1)
-Result.fromOption(Option.none(), () => "missing")   // Failure("missing")
+Result.fromOption(Option.some(1), () => "missing"); // Success(1)
+Result.fromOption(Option.none(), () => "missing"); // Failure("missing")
 ```
 
-### try_ (try)
+### try\_ (try)
 
 Wraps synchronous code that may throw:
 
 ```ts
 // Simple form - error type is unknown
-Result.try(() => JSON.parse('{"name": "Alice"}'))
+Result.try(() => JSON.parse('{"name": "Alice"}'));
 
 // With error mapping
 Result.try({
   try: () => JSON.parse("not json"),
-  catch: (e) => `Parse failed: ${e}`
-})
+  catch: (e) => `Parse failed: ${e}`,
+});
 ```
 
 ### liftPredicate
@@ -137,19 +137,19 @@ Creates a `Result` from a predicate:
 const ensurePositive = (n: number) =>
   Result.liftPredicate(
     (n: number) => n > 0,
-    (n) => `${n} is not positive`
-  )
+    (n) => `${n} is not positive`,
+  );
 
-ensurePositive(5)  // Success(5)
-ensurePositive(-1) // Failure("-1 is not positive")
+ensurePositive(5); // Success(5)
+ensurePositive(-1); // Failure("-1 is not positive")
 ```
 
 ## Type Guards
 
 ```ts
-Result.isResult(input)   // true for Success or Failure
-Result.isSuccess(result)  // true if Success
-Result.isFailure(result)  // true if Failure
+Result.isResult(input); // true for Success or Failure
+Result.isSuccess(result); // true if Success
+Result.isFailure(result); // true if Failure
 ```
 
 ## Getters
@@ -159,8 +159,8 @@ Result.isFailure(result)  // true if Failure
 Extract as `Option`:
 
 ```ts
-Result.getSuccess(Result.succeed(42))  // Some(42)
-Result.getSuccess(Result.fail("err"))  // None
+Result.getSuccess(Result.succeed(42)); // Some(42)
+Result.getSuccess(Result.fail("err")); // None
 ```
 
 ### getOrElse
@@ -168,27 +168,27 @@ Result.getSuccess(Result.fail("err"))  // None
 Extract with fallback:
 
 ```ts
-Result.getOrElse(Result.succeed(1), () => 0) // 1
-Result.getOrElse(Result.fail("err"), () => 0) // 0
+Result.getOrElse(Result.succeed(1), () => 0); // 1
+Result.getOrElse(Result.fail("err"), () => 0); // 0
 ```
 
 ### getOrNull / getOrUndefined
 
 ```ts
-Result.getOrNull(Result.succeed(1))  // 1
-Result.getOrNull(Result.fail("err"))  // null
+Result.getOrNull(Result.succeed(1)); // 1
+Result.getOrNull(Result.fail("err")); // null
 
-Result.getOrUndefined(Result.succeed(1))  // 1
-Result.getOrUndefined(Result.fail("err")) // undefined
+Result.getOrUndefined(Result.succeed(1)); // 1
+Result.getOrUndefined(Result.fail("err")); // undefined
 ```
 
 ### getOrThrow / getOrThrowWith
 
 ```ts
-Result.getOrThrow(Result.succeed(1))  // 1
-Result.getOrThrow(Result.fail("err"))  // throws "err"
+Result.getOrThrow(Result.succeed(1)); // 1
+Result.getOrThrow(Result.fail("err")); // throws "err"
 
-Result.getOrThrowWith(Result.fail("err"), () => new Error(`Unexpected: ${e}`))
+Result.getOrThrowWith(Result.fail("err"), () => new Error(`Unexpected: ${e}`));
 ```
 
 ### merge
@@ -196,8 +196,8 @@ Result.getOrThrowWith(Result.fail("err"), () => new Error(`Unexpected: ${e}`))
 Returns `A | E` regardless of variant:
 
 ```ts
-Result.merge(Result.succeed(42))  // 42
-Result.merge(Result.fail("err")) // "err"
+Result.merge(Result.succeed(42)); // 42
+Result.merge(Result.fail("err")); // "err"
 ```
 
 ## Mapping
@@ -206,16 +206,16 @@ Result.merge(Result.fail("err")) // "err"
 
 ```ts
 // Transform success
-Result.map(Result.succeed(3), (n) => n * 2)  // Success(6)
+Result.map(Result.succeed(3), (n) => n * 2); // Success(6)
 
 // Transform error
-Result.mapError(Result.fail("err"), (e) => `Error: ${e}`)  // Failure("Error: err")
+Result.mapError(Result.fail("err"), (e) => `Error: ${e}`); // Failure("Error: err")
 
 // Transform both
 Result.mapBoth(Result.succeed(1), {
   onSuccess: (n) => n + 1,
-  onFailure: (e) => `Error: ${e}`
-})  // Success(2)
+  onFailure: (e) => `Error: ${e}`,
+}); // Success(2)
 ```
 
 ## Sequencing
@@ -225,12 +225,14 @@ Result.mapBoth(Result.succeed(1), {
 Chain operations that return `Result`:
 
 ```ts
-import { pipe } from "effect"
+import { pipe } from "effect";
 
 pipe(
   Result.succeed(5),
-  Result.flatMap((n) => n > 0 ? Result.succeed(n * 2) : Result.fail("not positive"))
-)  // Success(10)
+  Result.flatMap((n) =>
+    n > 0 ? Result.succeed(n * 2) : Result.fail("not positive"),
+  ),
+); // Success(10)
 ```
 
 ### andThen
@@ -239,13 +241,13 @@ Flexible variant accepting values or functions:
 
 ```ts
 // Function returning Result (like flatMap)
-Result.andThen(Result.succeed(1), (n) => Result.succeed(n + 1))
+Result.andThen(Result.succeed(1), (n) => Result.succeed(n + 1));
 
 // Function returning plain value (auto-wrapped)
-Result.andThen(Result.succeed(1), (n) => n + 1)
+Result.andThen(Result.succeed(1), (n) => n + 1);
 
 // Constant value
-Result.andThen(Result.succeed(1), "done")
+Result.andThen(Result.succeed(1), "done");
 ```
 
 ### all
@@ -254,15 +256,15 @@ Collect multiple Results:
 
 ```ts
 // Tuple
-Result.all([Result.succeed(1), Result.succeed("two")])
+Result.all([Result.succeed(1), Result.succeed("two")]);
 // Success([1, "two"])
 
 // Struct
-Result.all({ x: Result.succeed(1), y: Result.succeed(2) })
+Result.all({ x: Result.succeed(1), y: Result.succeed(2) });
 // Success({ x: 1, y: 2 })
 
 // Short-circuits on first failure
-Result.all([Result.succeed(1), Result.fail("err")])
+Result.all([Result.succeed(1), Result.fail("err")]);
 // Failure("err")
 ```
 
@@ -273,12 +275,12 @@ Result.all([Result.succeed(1), Result.fail("err")])
 Recover from failure with a fallback:
 
 ```ts
-import { pipe } from "effect"
+import { pipe } from "effect";
 
 pipe(
   Result.fail("primary failed"),
-  Result.orElse(() => Result.succeed(99))
-)  // Success(99)
+  Result.orElse(() => Result.succeed(99)),
+); // Success(99)
 ```
 
 ### filterOrFail
@@ -286,15 +288,15 @@ pipe(
 Validate success value:
 
 ```ts
-import { pipe } from "effect"
+import { pipe } from "effect";
 
 pipe(
   Result.succeed(0),
   Result.filterOrFail(
     (n) => n > 0,
-    (n) => `${n} is not positive`
-  )
-)  // Failure("0 is not positive")
+    (n) => `${n} is not positive`,
+  ),
+); // Failure("0 is not positive")
 ```
 
 ## Generators
@@ -302,13 +304,13 @@ pipe(
 Use `yield*` for sequential composition:
 
 ```ts
-import { Result } from "effect"
+import { Result } from "effect";
 
-const result = Result.gen(function*() {
-  const a = yield* Result.succeed(1)
-  const b = yield* Result.succeed(2)
-  return a + b
-})  // Success(3)
+const result = Result.gen(function* () {
+  const a = yield* Result.succeed(1);
+  const b = yield* Result.succeed(2);
+  return a + b;
+}); // Success(3)
 ```
 
 Key difference from `Effect.gen`: Result.gen evaluates **eagerly and synchronously**.
@@ -318,14 +320,14 @@ Key difference from `Effect.gen`: Result.gen evaluates **eagerly and synchronous
 Build objects step by step:
 
 ```ts
-import { pipe, Result } from "effect"
+import { pipe, Result } from "effect";
 
 const result = pipe(
   Result.Do,
   Result.bind("x", () => Result.succeed(2)),
   Result.bind("y", () => Result.succeed(3)),
-  Result.let("sum", ({ x, y }) => x + y)
-)  // Success({ x: 2, y: 3, sum: 5 })
+  Result.let("sum", ({ x, y }) => x + y),
+); // Success({ x: 2, y: 3, sum: 5 })
 ```
 
 ## Transposing
@@ -333,15 +335,15 @@ const result = pipe(
 Convert between `Option<Result>` and `Result<Option>`:
 
 ```ts
-import { Option, Result } from "effect"
+import { Option, Result } from "effect";
 
 // Option<Result> -> Result<Option>
-Result.transposeOption(Option.some(Result.succeed(42)))
+Result.transposeOption(Option.some(Result.succeed(42)));
 // Success(Some(42))
 
 Result.transposeMapOption(Option.some("42"), (s) =>
-  isNaN(Number(s)) ? Result.fail("not a number") : Result.succeed(Number(s))
-)
+  isNaN(Number(s)) ? Result.fail("not a number") : Result.succeed(Number(s)),
+);
 // Success(Some(42))
 ```
 
@@ -352,8 +354,8 @@ Result.transposeMapOption(Option.some("42"), (s) =>
 Swap success and failure channels:
 
 ```ts
-Result.flip(Result.succeed(42))  // Failure(42)
-Result.flip(Result.fail("err"))  // Success("err")
+Result.flip(Result.succeed(42)); // Failure(42)
+Result.flip(Result.fail("err")); // Success("err")
 ```
 
 ### makeEquivalence
@@ -361,12 +363,12 @@ Result.flip(Result.fail("err"))  // Success("err")
 Create an `Equivalence` for comparing Results:
 
 ```ts
-import { Equivalence, Result } from "effect"
+import { Equivalence, Result } from "effect";
 
 const eq = Result.makeEquivalence(
   Equivalence.strictEqual<number>(),
-  Equivalence.strictEqual<string>()
-)
+  Equivalence.strictEqual<string>(),
+);
 ```
 
 ## Effect Interoperability
@@ -374,14 +376,14 @@ const eq = Result.makeEquivalence(
 Convert between Effect and Result:
 
 ```ts
-import { Effect, Result } from "effect"
+import { Effect, Result } from "effect";
 
 // Effect -> Result
-const result = Effect.result(Effect.succeed(42))
+const result = Effect.result(Effect.succeed(42));
 // Effect<Result<number, never>>
 
-// Result -> Effect  
-const effect = Effect.fromResult(Result.succeed(42))
+// Result -> Effect
+const effect = Effect.fromResult(Result.succeed(42));
 // Effect<number>
 ```
 
