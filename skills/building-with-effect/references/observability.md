@@ -266,12 +266,12 @@ const TracingLive = NodeSdk.layer(() => ({
 program.pipe(Effect.provide(TracingLive));
 ```
 
-## ServiceMap References (v4: replaces FiberRef)
+## Context References (v4: replaces FiberRef)
 
-In v4, `FiberRef` has been replaced by `ServiceMap.Reference`. Built-in references are in the `References` module:
+In v4, `FiberRef` has been replaced by `Context.Reference`. Built-in references are in the `References` module:
 
 ```ts
-import { Effect, References, ServiceMap } from "effect";
+import { Effect, References, Context } from "effect";
 
 // Built-in references
 const program = Effect.gen(function* () {
@@ -291,7 +291,7 @@ const program = Effect.gen(function* () {
 
 ```ts
 // Create custom reference with default
-const RequestId = ServiceMap.Reference<string>("RequestId", {
+const RequestId = Context.Reference<string>("RequestId", {
   defaultValue: () => "",
 });
 
@@ -310,7 +310,7 @@ const withRequestId = Effect.provideService(program, RequestId, "req-123");
 **Request ID tracking**
 
 ```ts
-const RequestId = ServiceMap.Reference<string>("RequestId", {
+const RequestId = Context.Reference<string>("RequestId", {
   defaultValue: () => "",
 });
 

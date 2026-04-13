@@ -18,7 +18,7 @@ See related examples in [effect-smol/ai-docs/src/03_integration/](https://github
 ### Creating a ManagedRuntime
 
 ```ts
-import { Effect, Layer, ManagedRuntime, Schema, ServiceMap } from "effect";
+import { Effect, Layer, ManagedRuntime, Schema, Context } from "effect";
 import { Hono } from "hono";
 
 class Todo extends Schema.Class<Todo>("Todo")({
@@ -38,7 +38,7 @@ class TodoNotFound extends Schema.TaggedErrorClass<TodoNotFound>()(
   { id: Schema.Number },
 ) {}
 
-export class TodoRepo extends ServiceMap.Service<
+export class TodoRepo extends Context.Service<
   TodoRepo,
   {
     readonly getAll: Effect.Effect<ReadonlyArray<Todo>>;

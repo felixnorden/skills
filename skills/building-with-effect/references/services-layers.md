@@ -1,26 +1,26 @@
 # Services & Layers
 
-Dependency injection and context management with ServiceMap (v4).
+Dependency injection and context management with Context (v4).
 
 ## Overview
 
-In Effect v4, the dependency injection system uses **ServiceMap** for dependency management. Services are defined using `ServiceMap.Service` and provided via Layers.
+In Effect v4, the dependency injection system uses **Context** for dependency management. Services are defined using `Context.Service` and provided via Layers.
 
 ## Services
 
 ### Define Service with Effect.fn
 
-**Recommended: Using ServiceMap.Service with class extension**
+**Recommended: Using Context.Service with class extension**
 
 ```ts
-import { Effect, ServiceMap, Layer, Schema } from "effect";
+import { Effect, Context, Layer, Schema } from "effect";
 
 class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "DatabaseError",
   { cause: Schema.Defect },
 ) {}
 
-export class Database extends ServiceMap.Service<
+export class Database extends Context.Service<
   Database,
   {
     query(sql: string): Effect.Effect<unknown[], DatabaseError>;
@@ -50,14 +50,14 @@ export type DatabaseService = Database["Service"]
 **With dependencies**
 
 ```ts
-import { Effect, ServiceMap, Layer, Schema } from "effect";
+import { Effect, Context, Layer, Schema } from "effect";
 
 class UserRespositoryError extends Schema.TaggedErrorClass<UserRespositoryError>()(
   "UserRespositoryError",
   { reason: Schema.Defect },
 ) {}
 
-export class UserRepository extends ServiceMap.Service<
+export class UserRepository extends Context.Service<
   UserRepository,
   {
     findById(
@@ -160,7 +160,7 @@ const DbLayerScoped = Layer.scoped(
 ```ts
 import { Config, Layer } from "effect";
 
-export class MessageStore extends ServiceMap.Service<
+export class MessageStore extends Context.Service<
   MessageStore,
   {
     append(message: string): Effect.Effect<void>;
@@ -261,7 +261,7 @@ Effect.provide(program, [DbLayer, CacheLayer, LoggerLayer]);
 Effect.provide(program, AppLayer, { local: true });
 ```
 
-## ServiceMap (Context Replacement)
+## Context (Context Replacement)
 
 ### Direct Service Provision
 
@@ -272,14 +272,14 @@ Effect.provideService(program, Database, {
 });
 ```
 
-### Build ServiceMap Manually
+### Build Context Manually
 
 ```ts
-import { ServiceMap } from "effect";
+import { Context } from "effect";
 
-const map = ServiceMap.empty().pipe(
-  ServiceMap.add(Database, dbImpl),
-  ServiceMap.add(Cache, cacheImpl),
+const map = Context.empty().pipe(
+  Context.add(Database, dbImpl),
+  Context.add(Cache, cacheImpl),
 );
 
 Effect.provide(program, map);
@@ -287,12 +287,12 @@ Effect.provide(program, map);
 
 ## Service References (FiberRef Replacement)
 
-Services with default values use `ServiceMap.Reference`:
+Services with default values use `Context.Reference`:
 
 ```ts
-import { ServiceMap } from "effect";
+import { Context } from "effect";
 
-const LogLevel = ServiceMap.Reference<"info" | "warn" | "error">("LogLevel", {
+const LogLevel = Context.Reference<"info" | "warn" | "error">("LogLevel", {
   defaultValue: () => "info" as const,
 });
 
@@ -309,7 +309,7 @@ const withDebug = Effect.provideService(program, LogLevel, "debug");
 **Feature flags example**
 
 ```ts
-export const FeatureFlag = ServiceMap.Reference<boolean>("myapp/FeatureFlag", {
+export const FeatureFlag = Context.Reference<boolean>("myapp/FeatureFlag", {
   defaultValue: () => false,
 });
 ```
@@ -393,10 +393,10 @@ const test = program.pipe(Effect.provide(MockDb));
 
 ```ts
 import { assert, describe, it, layer } from "@effect/vitest";
-import { Array, Effect, Layer, Ref, ServiceMap } from "effect";
+import { Array, Effect, Layer, Ref, Context } from "effect";
 
 // Create a test ref service
-export class TodoRepoTestRef extends ServiceMap.Service<
+export class TodoRepoTestRef extends Context.Service<
   TodoRepoTestRef,
   Ref.Ref<Array<Todo>>
 >()("app/TodoRepoTestRef") {
@@ -406,7 +406,7 @@ export class TodoRepoTestRef extends ServiceMap.Service<
   );
 }
 
-class TodoRepo extends ServiceMap.Service<
+class TodoRepo extends Context.Service<
   TodoRepo,
   {
     create(title: string): Effect.Effect<Todo>;
@@ -453,9 +453,9 @@ layer(TodoRepo.layerTest)("TodoRepo", (it) => {
 ### LayerMap for Dynamic Resources
 
 ```ts
-import { Effect, Layer, LayerMap, Schema, ServiceMap } from "effect";
+import { Effect, Layer, LayerMap, Schema, Context } from "effect";
 
-class DatabasePool extends ServiceMap.Service<
+class DatabasePool extends Context.Service<
   DatabasePool,
   {
     readonly tenantId: string;
@@ -518,7 +518,7 @@ const AppLayer =
 
 ## Best Practices
 
-- Use `ServiceMap.Service` for service definition
+- Use `Context.Service` for service definition
 - Name services with app namespace (e.g., "app/Database")
 - Build layers explicitly with `Layer.effect`
 - Use `Effect.fn` for service methods
@@ -539,6 +539,6 @@ Avoid:
 ## External Examples
 
 See full examples:
-- [ServiceMap.Reference](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/10_reference.ts)
+- [Context.Reference](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/10_reference.ts)
 - [Layer Composition](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/20_layer-composition.ts)
 - [Layer Unwrap](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/20_layer-unwrap.ts)

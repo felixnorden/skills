@@ -101,16 +101,16 @@ effect.pipe(
 );
 ```
 
-**Services (v4: ServiceMap pattern)**
+**Services (v4: Context pattern)**
 ```ts
 // fp-ts (manual)
 interface Has<T> { _tag: unique symbol }
 type AppEnv = Has<Database> & Has<Logger>;
 
 // Effect v4 (built-in)
-import { Effect, ServiceMap, Layer } from "effect";
+import { Effect, Context, Layer } from "effect";
 
-class Database extends ServiceMap.Service<Database>()("Database", {
+class Database extends Context.Service<Database>()("Database", {
   make: Effect.gen(function* () {
     // ... initialization
     return { query: (sql: string) => Effect.succeed([]) };
@@ -121,7 +121,7 @@ class Database extends ServiceMap.Service<Database>()("Database", {
 ```
 
 **Key differences**
-- Effect has native services/layers via ServiceMap
+- Effect has native services/layers via Context
 - Effect has runtime system
 - Effect has concurrency primitives
 - Effect has resource management
@@ -147,7 +147,7 @@ ZIO[R, E, A]
 Effect<A, E, R>
 ```
 
-**Service pattern (v4: ServiceMap)**
+**Service pattern (v4: Context)**
 ```scala
 // ZIO
 trait UserRepo {
@@ -160,9 +160,9 @@ object UserRepo {
 }
 
 // Effect v4
-import { Effect, ServiceMap, Layer } from "effect";
+import { Effect, Context, Layer } from "effect";
 
-class UserRepo extends ServiceMap.Service<UserRepo>()("UserRepo", {
+class UserRepo extends Context.Service<UserRepo>()("UserRepo", {
   make: Effect.succeed({
     find: (id: string) => Effect.succeed(user)
   })
@@ -224,7 +224,7 @@ Effect.gen(function* () {
 
 ## Key v4 Changes
 
-### ServiceMap Pattern
+### Context Pattern
 
 In v4, types like `Option` and `Config` are `Yieldable` but not `Effect` subtypes:
 
@@ -253,8 +253,8 @@ const value = yield* Ref.get(ref);  // Use explicit method
 Effect v4 maintains the same core programming model while improving:
 - **Type safety** via Yieldable trait
 - **Explicitness** in service dependencies
-- **Consistency** with ServiceMap replacing Context
+- **Consistency** with Context replacing Context
 - **Performance** with automatic fiber keep-alive
 - **Simplicity** with unified package versioning
 
-The main migration effort is in service definitions (Context → ServiceMap) and understanding which types are Yieldable vs Effect subtypes.
+The main migration effort is in service definitions (Context → Context) and understanding which types are Yieldable vs Effect subtypes.

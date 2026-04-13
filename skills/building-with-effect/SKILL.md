@@ -66,7 +66,7 @@ Match the level of specificity to the task's fragility:
 These operations have a narrow safe path - follow exactly:
 
 - **Error definition**: Always use `Schema.TaggedErrorClass` with descriptive `_tag`
-- **Service structure**: Extend `ServiceMap.Service` with static `layer` property
+- **Service structure**: Extend `Context.Service` with static `layer` property
 - **Effect.fn usage**: Always use `Effect.fn("name")` for functions returning Effects
 - **Resource cleanup**: Always use `acquireUseRelease` or `Effect.addFinalizer`
 - **Resource pattern selection**: Use `acquireUseRelease` for external resources, `Ref` for shared mutable state, `addFinalizer` for cleanup within existing scope
@@ -130,7 +130,7 @@ Effect<Success, Error, Requirements>;
 
 1. **Use Effect.fn** for functions that return Effects (not Effect.gen alone)
 2. **Define errors with Schema.TaggedErrorClass** for type safety
-3. **Use ServiceMap.Service** for dependency injection
+3. **Use Context.Service** for dependency injection
 4. **Build layers explicitly** with `Layer.effect` and compose with `Layer.provide`
 5. **Use ExecutionPlan** for AI provider fallback strategies
 6. **Handle interruptions** with `acquireRelease` for resources
@@ -151,7 +151,7 @@ Copy this checklist and track progress:
 ```
 Service Creation Progress:
 - [ ] Step 1: Define error types with Schema.TaggedErrorClass
-- [ ] Step 2: Create service class extending ServiceMap.Service
+- [ ] Step 2: Create service class extending Context.Service
 - [ ] Step 3: Implement methods using Effect.fn
 - [ ] Step 4: Build Layer.effect with service implementation
 - [ ] Step 5: Provide dependencies via Layer.provide
@@ -170,7 +170,7 @@ class ServiceError extends Schema.TaggedErrorClass<ServiceError>()(
 **Step 2: Create service class**
 
 ```ts
-export class MyService extends ServiceMap.Service<
+export class MyService extends Context.Service<
   MyService,
   {
     method(): Effect.Effect<ReturnType, ServiceError>;
@@ -227,14 +227,14 @@ See [Error Handling](references/error-handling.md) for patterns and examples.
 ### Service with Effect.fn
 
 ```ts
-import { Effect, ServiceMap, Layer, Schema } from "effect";
+import { Effect, Context, Layer, Schema } from "effect";
 
 class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "DatabaseError",
   { cause: Schema.Defect },
 ) {}
 
-export class Database extends ServiceMap.Service<
+export class Database extends Context.Service<
   Database,
   {
     query(sql: string): Effect.Effect<unknown[], DatabaseError>;
@@ -308,7 +308,7 @@ Dive deeper into specific topics and patterns:
 
 - **[Core Patterns](references/core-patterns.md)** - Foundational Effect patterns with Effect.fn
 - **[Error Handling](references/error-handling.md)** - Schema.TaggedErrorClass, catchTags, catchReason
-- **[Services & Layers](references/services-layers.md)** - Dependency injection with ServiceMap
+- **[Services & Layers](references/services-layers.md)** - Dependency injection with Context
 - **[Concurrency](references/concurrency.md)** - Fibers, racing, interruption, coordination
 - **[Data Types](references/data-types.md)** - Option, Either, Chunk, HashSet, Stream
 - **[Streams](references/streams.md)** - Creating and consuming streams
@@ -362,7 +362,7 @@ Dive deeper into specific topics and patterns:
 Browse detailed examples in the [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/) directory:
 
 - **[Effect Basics](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/01_basics/)** - Creating effects, pipe composition
-- **[Services](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/02_services/)** - ServiceMap.Service, Layer composition
+- **[Services](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/02_services/)** - Context.Service, Layer composition
 - **[Error Handling](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/03_errors/)** - catchTags, catchReason, error hierarchies
 - **[Resources](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/04_resources/)** - acquireRelease, Scope
 - **[PubSub](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/06_pubsub/)** - Event broadcasting

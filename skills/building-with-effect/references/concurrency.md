@@ -370,12 +370,12 @@ Schedule.spaced("1 second").pipe(Schedule.upTo("1 minute"));
 effect.pipe(Effect.retry(Schedule.exponential("100 millis")));
 ```
 
-## ServiceMap References
+## Context References
 
-Fiber-local state is now handled by `ServiceMap.Reference`:
+Fiber-local state is now handled by `Context.Reference`:
 
 ```ts
-import { Effect, ServiceMap, References } from "effect";
+import { Effect, Context, References } from "effect";
 
 // Built-in references
 const program = Effect.gen(function* () {
@@ -385,7 +385,7 @@ const program = Effect.gen(function* () {
 });
 
 // Custom reference
-const RequestId = ServiceMap.Reference<string>("RequestId", {
+const RequestId = Context.Reference<string>("RequestId", {
   defaultValue: () => "",
 });
 

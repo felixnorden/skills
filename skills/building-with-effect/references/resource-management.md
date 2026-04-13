@@ -226,12 +226,12 @@ Effect.scoped(
 );
 ```
 
-## Layers with Resources (v4: ServiceMap pattern)
+## Layers with Resources (v4: Context pattern)
 
 **Scoped layer**
 
 ```ts
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
 const DbLayer = Layer.effect(
   Database,
@@ -250,7 +250,7 @@ const DbLayer = Layer.effect(
 **Service with scoped resources (v4)**
 
 ```ts
-class HttpClient extends ServiceMap.Service<HttpClient>()("HttpClient", {
+class HttpClient extends Context.Service<HttpClient>()("HttpClient", {
   make: Effect.gen(function* () {
     const client = yield* Effect.acquireRelease(
       Effect.sync(() => new Client()),

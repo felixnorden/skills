@@ -149,10 +149,10 @@ interface Codec<T, E, RD, RE> {
 
 ```ts
 import type { Effect } from "effect"
-import { Schema, ServiceMap } from "effect/unstable/schema"
+import { Schema, Context } from "effect/unstable/schema"
 
 // A service that retrieves full user info from an ID
-class UserDatabase extends ServiceMap.Service<
+class UserDatabase extends Context.Service<
   UserDatabase,
   {
     getUserById: (id: string) => Effect.Effect<{ readonly id: string; readonly name: string }>

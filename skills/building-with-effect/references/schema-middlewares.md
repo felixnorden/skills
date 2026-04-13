@@ -57,10 +57,10 @@ You can use `Schema.catchDecodingWithContext` to get a fallback value from a ser
 **Example** (Retrieving a fallback value from a service)
 
 ```ts
-import { Effect, Option, Schema, ServiceMap } from "effect/unstable/schema"
+import { Effect, Option, Schema, Context } from "effect/unstable/schema"
 
 // Define a service that provides a fallback value
-class Service extends ServiceMap.Service<Service, { fallback: Effect.Effect<string> }>()("Service") {}
+class Service extends Context.Service<Service, { fallback: Effect.Effect<string> }>()("Service") {}
 
 //      ┌─── Codec<string, string, Service, never>
 //      ▼

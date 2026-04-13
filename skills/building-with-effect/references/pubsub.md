@@ -38,14 +38,14 @@ const pubsub = yield * PubSub.unbounded<OrderEvent>();
 ## Service Pattern with PubSub
 
 ```ts
-import { Effect, Layer, PubSub, ServiceMap, Stream } from "effect";
+import { Effect, Layer, PubSub, Context, Stream } from "effect";
 
 export type OrderEvent =
   | { readonly _tag: "OrderPlaced"; readonly orderId: string }
   | { readonly _tag: "PaymentCaptured"; readonly orderId: string }
   | { readonly _tag: "OrderShipped"; readonly orderId: string };
 
-export class OrderEvents extends ServiceMap.Service<
+export class OrderEvents extends Context.Service<
   OrderEvents,
   {
     publish(event: OrderEvent): Effect.Effect<void>;
@@ -251,9 +251,9 @@ const transformedSubscriber = Effect.gen(function* () {
 ## Integration with Services
 
 ```ts
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
-class OrderService extends ServiceMap.Service<
+class OrderService extends Context.Service<
   OrderService,
   {
     createOrder(data: CreateOrderData): Effect.Effect<Order>;

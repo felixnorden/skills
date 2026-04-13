@@ -31,7 +31,7 @@ import {
   Effect,
   Layer,
   Schema,
-  ServiceMap,
+  Context,
   Stream,
   String,
 } from "effect";
@@ -41,7 +41,7 @@ class DevToolsError extends Schema.TaggedErrorClass<DevToolsError>()(
   { cause: Schema.Defect },
 ) {}
 
-export class DevTools extends ServiceMap.Service<
+export class DevTools extends Context.Service<
   DevTools,
   {
     readonly nodeVersion: Effect.Effect<string, DevToolsError>;

@@ -17,7 +17,7 @@ RequestResolver allows you to:
 ### Define Request Type
 
 ```ts
-import { Effect, Exit, Layer, Request, RequestResolver, Schema, ServiceMap } from "effect"
+import { Effect, Exit, Layer, Request, RequestResolver, Schema, Context } from "effect"
 
 class User extends Schema.Class<User>("User")({
   id: Schema.Number,
@@ -34,7 +34,7 @@ class UserNotFound extends Schema.TaggedErrorClass<UserNotFound>()(
 ### Create Service with Batching
 
 ```ts
-export class Users extends ServiceMap.Service<Users, {
+export class Users extends Context.Service<Users, {
   getUserById(id: number): Effect.Effect<User, UserNotFound>
 }>()("app/Users") {
   static readonly layer = Layer.effect(
@@ -118,7 +118,7 @@ const resolver = yield* RequestResolver.make<GetUserById>(
   Effect.fn(function*(entries) {
     for (const entry of entries) {
       // Access span from request services
-      const requestSpan = ServiceMap.getOption(
+      const requestSpan = Context.getOption(
         entry.services,
         Tracer.ParentSpan
       )

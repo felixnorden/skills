@@ -9,7 +9,7 @@ Use these scenarios to test the effectiveness of the building-with-effect skill.
 **Expected Behavior**:
 
 - [ ] Defines UserNotFoundError and DatabaseError using Schema.TaggedErrorClass with descriptive \_tag fields
-- [ ] Creates UserService class extending ServiceMap.Service with proper type annotations
+- [ ] Creates UserService class extending Context.Service with proper type annotations
 - [ ] Implements fetchUser method using Effect.fn with tracing span
 - [ ] Handles errors appropriately with catchTags for specific error types
 - [ ] Builds a Layer.effect with the service implementation
@@ -30,7 +30,7 @@ class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   { cause: Schema.Defect },
 ) {}
 
-export class UserService extends ServiceMap.Service<
+export class UserService extends Context.Service<
   UserService,
   {
     fetchUser: (
@@ -107,7 +107,7 @@ const resilientFetch = (url: string) =>
 - [ ] Installs and imports correct provider packages (@effect/ai-openai, @effect/ai-anthropic)
 - [ ] Configures client layers with Config.redacted for API keys
 - [ ] Defines ExecutionPlan with multiple providers and attempt counts
-- [ ] Creates AI service class extending ServiceMap.Service
+- [ ] Creates AI service class extending Context.Service
 - [ ] Implements generation method using Effect.fn
 - [ ] Uses Effect.withExecutionPlan to apply the fallback strategy
 - [ ] Maps AI errors to domain-specific error types
@@ -131,7 +131,7 @@ class AiGenerationError extends Schema.TaggedErrorClass<AiGenerationError>()(
   }
 }
 
-export class AiService extends ServiceMap.Service<
+export class AiService extends Context.Service<
   AiService,
   {
     generate: (prompt: string) => Effect.Effect<
@@ -173,7 +173,7 @@ When using this skill, verify it helps you:
 
 1. **Select appropriate patterns**: Does Claude recommend Effect.fn for new functions?
 2. **Handle errors correctly**: Are errors defined with Schema.TaggedErrorClass?
-3. **Structure services properly**: Are services created with ServiceMap.Service?
+3. **Structure services properly**: Are services created with Context.Service?
 4. **Use workflows**: Does Claude suggest workflow checklists for complex tasks?
 5. **Follow degrees of freedom**: Does Claude know when to be strict vs flexible?
 

@@ -124,7 +124,7 @@ describe("property-based", () => {
 ### With Shared Layers
 
 ```ts
-import { Array, Effect, Layer, Ref, ServiceMap } from "effect";
+import { Array, Effect, Layer, Ref, Context } from "effect";
 import { assert, describe, it, layer } from "@effect/vitest";
 
 interface Todo {
@@ -133,7 +133,7 @@ interface Todo {
 }
 
 // Test ref for shared state
-class TodoRepoTestRef extends ServiceMap.Service<
+class TodoRepoTestRef extends Context.Service<
   TodoRepoTestRef,
   Ref.Ref<Array<Todo>>
 >()("app/TodoRepoTestRef") {
@@ -143,7 +143,7 @@ class TodoRepoTestRef extends ServiceMap.Service<
   );
 }
 
-class TodoRepo extends ServiceMap.Service<
+class TodoRepo extends Context.Service<
   TodoRepo,
   {
     create(title: string): Effect.Effect<Todo>;

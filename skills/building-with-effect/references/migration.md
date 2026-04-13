@@ -14,7 +14,7 @@ Effect v4 is a major release with structural and organizational changes. The cor
 2. **Schema.TaggedErrorClass** - Type-safe error definitions with Schema
 3. **Unified versioning** - All ecosystem packages share a single version number
 4. **Package consolidation** - Platform, RPC, Cluster, and more merged into core `effect`
-5. **ServiceMap** - New dependency injection system replacing Context
+5. **Context** - New dependency injection system replacing Context
 6. **Yieldable trait** - More explicit type safety for yieldable types
 7. **Automatic fiber keep-alive** - No need for `runMain` in most cases
 8. **Layer memoization** - Automatic across `Effect.provide` calls
@@ -189,7 +189,7 @@ import { Effect } from "effect";
 
 ## Services Migration
 
-### Context.Tag → ServiceMap.Service
+### Context.Tag → Context.Service
 
 **v3:**
 
@@ -206,22 +206,22 @@ class Database extends Context.Tag("Database")<Database, Database>() {}
 **v4:**
 
 ```ts
-import { ServiceMap, Effect } from "effect";
+import { Context, Effect } from "effect";
 
 interface Database {
   readonly query: (sql: string) => Effect.Effect<unknown[]>;
 }
 
 // Function syntax
-const Database = ServiceMap.Service<Database>("Database");
+const Database = Context.Service<Database>("Database");
 
 // Or class syntax
-class Database extends ServiceMap.Service<Database>()("Database", {
+class Database extends Context.Service<Database>()("Database", {
   query: (sql: string) => Effect.Effect<unknown[]>,
 })() {}
 ```
 
-### Effect.Service → ServiceMap.Service
+### Effect.Service → Context.Service
 
 **v3:**
 
@@ -243,9 +243,9 @@ const program = Effect.provide(Logger.Default);
 **v4:**
 
 ```ts
-import { Effect, Layer, ServiceMap } from "effect";
+import { Effect, Layer, Context } from "effect";
 
-class Logger extends ServiceMap.Service<Logger>()("Logger", {
+class Logger extends Context.Service<Logger>()("Logger", {
   make: Effect.gen(function* () {
     const config = yield* Config;
     return { log: (msg: string) => Effect.log(msg) };
@@ -261,7 +261,7 @@ class Logger extends ServiceMap.Service<Logger>()("Logger", {
 const program = Effect.provide(Logger.layer);
 ```
 
-### Effect.Tag → ServiceMap.Service
+### Effect.Tag → Context.Service
 
 **v3:**
 
@@ -280,9 +280,9 @@ const program = Notifications.notify("hello");
 **v4:**
 
 ```ts
-import { Effect, ServiceMap } from "effect";
+import { Effect, Context } from "effect";
 
-class Notifications extends ServiceMap.Service<Notifications>()(
+class Notifications extends Context.Service<Notifications>()(
   "Notifications",
   { notify: (message: string) => Effect.Effect<void> },
 )() {}
@@ -297,7 +297,7 @@ const program = Effect.gen(function* () {
 const program2 = Notifications.use((n) => n.notify("hello"));
 ```
 
-### Context.Reference → ServiceMap.Reference
+### Context.Reference → Context.Reference
 
 **v3:**
 
@@ -312,9 +312,9 @@ class LogLevel extends Context.Reference<LogLevel>()("LogLevel", {
 **v4:**
 
 ```ts
-import { ServiceMap } from "effect";
+import { Context } from "effect";
 
-const LogLevel = ServiceMap.Reference<"info" | "warn" | "error">("LogLevel", {
+const LogLevel = Context.Reference<"info" | "warn" | "error">("LogLevel", {
   defaultValue: () => "info" as const,
 });
 ```
@@ -450,7 +450,7 @@ const result = yield * Fiber.join(fiber); // Use Fiber.join
 
 ## FiberRef Migration
 
-In v4, `FiberRef` has been replaced by `ServiceMap.Reference`:
+In v4, `FiberRef` has been replaced by `Context.Reference`:
 
 ### Built-in References
 
@@ -504,7 +504,7 @@ yield * FiberRef.set(requestId, "req-123");
 **v4:**
 
 ```ts
-const RequestId = ServiceMap.Reference<string>("RequestId", {
+const RequestId = Context.Reference<string>("RequestId", {
   defaultValue: () => "unknown",
 });
 
@@ -752,7 +752,7 @@ Runtime.runPromise(runtime, effect);
 **v4:**
 
 ```ts
-// Runtime<R> removed - use ServiceMap<R>
+// Runtime<R> removed - use Context<R>
 // Run functions live directly on Effect
 Effect.runPromise(effect);
 Effect.runSync(effect);
@@ -787,11 +787,11 @@ NodeRuntime.runMain(program);
 
 | v3                                                     | v4                                                          |
 | ------------------------------------------------------ | ----------------------------------------------------------- |
-| `Context.GenericTag<T>(id)`                            | `ServiceMap.Service<T>(id)`                                 |
-| `Context.Tag(id)<Self, Shape>()`                       | `ServiceMap.Service<Self, Shape>()(id)`                     |
-| `Effect.Tag(id)<Self, Shape>()`                        | `ServiceMap.Service<Self, Shape>()(id)`                     |
-| `Effect.Service<Self>()(id, { effect, dependencies })` | `ServiceMap.Service<Self>()(id, { make })` + explicit layer |
-| `Context.Reference<Self>()(id, opts)`                  | `ServiceMap.Reference<T>(id, opts)`                         |
+| `Context.GenericTag<T>(id)`                            | `Context.Service<T>(id)`                                 |
+| `Context.Tag(id)<Self, Shape>()`                       | `Context.Service<Self, Shape>()(id)`                     |
+| `Effect.Tag(id)<Self, Shape>()`                        | `Context.Service<Self, Shape>()(id)`                     |
+| `Effect.Service<Self>()(id, { effect, dependencies })` | `Context.Service<Self>()(id, { make })` + explicit layer |
+| `Context.Reference<Self>()(id, opts)`                  | `Context.Reference<T>(id, opts)`                         |
 | `Service.Default`                                      | `Service.layer` (explicit)                                  |
 
 ### Error Handling
@@ -840,22 +840,22 @@ NodeRuntime.runMain(program);
 | v3               | v4                       |
 | ---------------- | ------------------------ |
 | `Scope.extend`   | `Scope.provide`          |
-| `FiberRef`       | `ServiceMap.Reference`   |
+| `FiberRef`       | `Context.Reference`   |
 | `Runtime<R>`     | Removed                  |
 | `@effect/schema` | `effect/unstable/schema` |
 
 ## Migration Checklist
 
 - [ ] Update package versions to unified v4 versions
-- [ ] Replace `Context.Tag` with `ServiceMap.Service`
-- [ ] Replace `Effect.Service` with `ServiceMap.Service` + explicit layers
-- [ ] Replace `Effect.Tag` with `ServiceMap.Service` (remove static accessors)
+- [ ] Replace `Context.Tag` with `Context.Service`
+- [ ] Replace `Effect.Service` with `Context.Service` + explicit layers
+- [ ] Replace `Effect.Tag` with `Context.Service` (remove static accessors)
 - [ ] Update error handling: `catchAll` → `catch`, etc.
 - [ ] Update forking: `fork` → `forkChild`, `forkDaemon` → `forkDetach`
 - [ ] Replace `yield* ref` with `yield* Ref.get(ref)`
 - [ ] Replace `yield* deferred` with `yield* Deferred.await(deferred)`
 - [ ] Replace `yield* fiber` with `yield* Fiber.join(fiber)`
-- [ ] Replace `FiberRef` with `ServiceMap.Reference`
+- [ ] Replace `FiberRef` with `Context.Reference`
 - [ ] Replace `Scope.extend` with `Scope.provide`
 - [ ] Update Cause handling for flattened structure
 - [ ] Replace `Either` with `Result`

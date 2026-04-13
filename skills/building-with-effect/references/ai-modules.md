@@ -63,7 +63,7 @@ const AnthropicClientLayer = AnthropicClient.layerConfig({
 ### Simple Generation
 
 ```ts
-import { Effect, Layer, Schema, ServiceMap } from "effect";
+import { Effect, Layer, Schema, Context } from "effect";
 import { LanguageModel } from "effect/unstable/ai";
 
 import { AiError } from "effect/unstable/ai"
@@ -77,7 +77,7 @@ export class AiWriterError extends Schema.TaggedErrorClass<AiWriterError>()(
   }
 }
 
-export class AiWriter extends ServiceMap.Service<
+export class AiWriter extends Context.Service<
   AiWriter,
   {
     draftAnnouncement(product: string): Effect.Effect<
@@ -190,7 +190,7 @@ const DraftPlan = ExecutionPlan.make(
   { provide: AnthropicLanguageModel.model("claude-opus-4-6"), attempts: 2 }
 )
 
-export class AiWriter extends ServiceMap.Service<
+export class AiWriter extends Context.Service<
   AiWriter,
   {
     draftAnnouncement(product: string): Effect.Effect<

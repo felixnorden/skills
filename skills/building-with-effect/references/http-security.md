@@ -92,9 +92,9 @@ const bearerSecurity = HttpApiSecurity.bearer()
 ## Security Middleware Implementation
 
 ```ts
-import { Redacted, ServiceMap } from "effect"
+import { Redacted, Context } from "effect"
 
-class CurrentUser extends ServiceMap.Service<CurrentUser, { readonly id: number }>()("CurrentUser") {}
+class CurrentUser extends Context.Service<CurrentUser, { readonly id: number }>()("CurrentUser") {}
 
 class Unauthorized extends Schema.TaggedErrorClass<Unauthorized>()(
   "Unauthorized",
