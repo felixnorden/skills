@@ -184,7 +184,7 @@ const encoded = yield* Schema.encodeEffect(OutputSchema)(input);
 | Recursive schemas, suspend | [schema-recursive.md](schema-recursive.md) |
 | declare, declareConstructor | [schema-custom-types.md](schema-custom-types.md) |
 | Filters, refinements, branding | [schema-validation.md](schema-validation.md) |
-| makeUnsafe, defaults | [schema-constructors.md](schema-constructors.md) |
+| make, defaults | [schema-constructors.md](schema-constructors.md) |
 | decodeTo/encodeTo, SchemaTransformation | [schema-transformations.md](schema-transformations.md) |
 | Schema.flip | [schema-flipping.md](schema-flipping.md) |
 | Opaque, Class, TaggedClass, ErrorClass, TaggedErrorClass | [schema-classes.md](schema-classes.md) |

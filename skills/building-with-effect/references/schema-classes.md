@@ -56,7 +56,7 @@ class Person extends Schema.Opaque<Person>()(
 const codec = Schema.revealCodec(Person)
 
 // const person: Person
-const person = Person.makeUnsafe({ name: "John" })
+const person = Person.make({ name: "John" })
 
 console.log(person.name)
 // "John"
@@ -181,11 +181,11 @@ class B extends Schema.Opaque<B, { readonly brand: unique symbol }>()(
 const f = (a: A) => a
 const g = (b: B) => b
 
-f(A.makeUnsafe({ a: "a" })) // ok
-g(B.makeUnsafe({ a: "a" })) // ok
+f(A.make({ a: "a" })) // ok
+g(B.make({ a: "a" })) // ok
 
-f(B.makeUnsafe({ a: "a" })) // error: Argument of type 'B' is not assignable to parameter of type 'A'.
-g(A.makeUnsafe({ a: "a" })) // error: Argument of type 'A' is not assignable to parameter of type 'B'.
+f(B.make({ a: "a" })) // error: Argument of type 'B' is not assignable to parameter of type 'A'.
+g(A.make({ a: "a" })) // error: Argument of type 'A' is not assignable to parameter of type 'B'.
 ```
 
 ## Classes
@@ -205,7 +205,7 @@ const PersonConstructorArguments = Schema.Tuple([Schema.String, Schema.Finite])
 
 class Person {
   constructor(readonly name: string, readonly age: number) {
-    PersonConstructorArguments.makeUnsafe([name, age])
+    PersonConstructorArguments.make([name, age])
   }
 }
 
@@ -240,12 +240,12 @@ class Person extends Schema.Class<Person>("Person")({
   }
 }
 
-const person = Person.makeUnsafe({ name: "John", age: 30 })
+const person = Person.make({ name: "John", age: 30 })
 console.log(person.greet())
 // Hello, John!
 
 // Equality works out of the box
-const another = Person.makeUnsafe({ name: "John", age: 30 })
+const another = Person.make({ name: "John", age: 30 })
 console.log(person === another)
 // false (different instances, but equal values)
 ```

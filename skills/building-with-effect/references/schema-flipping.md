@@ -87,8 +87,8 @@ type Encoded = {
 */
 type Encoded = (typeof schema)["Encoded"]
 
-// makeUnsafe: { readonly a: string }  ──▶  { readonly a: string }
-Schema.flip(schema).makeUnsafe
+// make: { readonly a: string }  ──▶  { readonly a: string }
+Schema.flip(schema).make
 ```
 
 ## See Also

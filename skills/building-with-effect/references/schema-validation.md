@@ -58,7 +58,7 @@ console.log(String(Schema.decodeUnknownExit(schema)("")))
 
 ## Preserving Schema Type After Filtering
 
-Adding a filter does not change the schema's type. You can still use all schema-specific methods (like `.fields` on a struct or `.makeUnsafe`) after calling `.check(...)`.
+Adding a filter does not change the schema's type. You can still use all schema-specific methods (like `.fields` on a struct or `.make`) after calling `.check(...)`.
 
 **Example** (Chaining filters and annotations without losing type information)
 

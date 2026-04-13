@@ -284,7 +284,7 @@ const decodeTyped = Stream.make(
 // Encode objects to NDJSON
 const encodeTyped = Stream.make(
   new LogEntry({
-    timestamp: DateTime.makeUnsafe("2025-06-01T00:00:00Z"),
+    timestamp: DateTime.make("2025-06-01T00:00:00Z"),
     level: "info",
     message: "start",
   }),
