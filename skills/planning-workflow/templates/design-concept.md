@@ -1,7 +1,6 @@
 # Design Concept Template
 
-**Usage**: Produced during the QRSPI Design (D) phase. The design-discussant sub-agent authors this after the engineer approves a direction.
-Status remains `draft` until the orchestrator advances the checkpoint to `approved`.
+**Usage**: Produced during the QRSPI Design (D) phase. The design-discussant sub-agent authors this after the engineer approves a direction. Status remains `draft` until the orchestrator advances the checkpoint to `approved`.
 
 **Constraints**:
 
@@ -9,8 +8,23 @@ Status remains `draft` until the orchestrator advances the checkpoint to `approv
 - No file paths, no function names, no pseudo-code, no code blocks
 - Architecture and boundaries only — no implementation detail
 - Stop when the solution shape is unambiguous; do not pad
+- Status remains `draft` until the orchestrator or user confirms approval
+
+## How to Produce This Document
+
+1. Read the research document silently. Do not summarise it back.
+2. Identify what is still ambiguous about the solution shape. Use `question` — maximum 3 questions at once. Do not proceed until ambiguities are resolved.
+3. Present 2–3 distinct design options. For each state: what it optimises for, what it gives up, and which constraints from the scope it satisfies.
+4. Use `question`: "Does this direction feel right, or should we adjust?"
+5. Once direction is agreed, write the document using the schema below.
+6. Write to `<worktree-root>/.opencode/designs/YYYYMMDD-{slug}.md`.
+7. Return the artifact path and a one-paragraph summary of the chosen direction.
 
 ---
+
+## Schema
+
+**Path**: `<worktree-root>/.opencode/designs/YYYYMMDD-{slug}.md`
 
 ```markdown
 # Design Concept: {slug}

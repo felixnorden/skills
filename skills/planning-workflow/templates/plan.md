@@ -3,16 +3,26 @@
 **Usage**: Produced during the QRSPI Plan (P) phase. Load `skill:tdd` before authoring any "Tests First" section. Each phase is a vertical slice — one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
 
 **Constraints**:
+
 - Prose under 800 words, excluding code blocks
 - Code samples are illustrative (locate insertion point, show pattern) — not complete implementations
 - Each phase must deliver something demonstrable at its verification gate
 - No phase may be a technical layer (e.g., "implement all models") — each phase is a behavior
 - In verification gates, use tools over bash commands where available
 
+## How to Produce This Document
+
+1. Read the design concept and structure/outline silently.
+2. If more exploration is needed, read the research document and look for answers before exploring further.
+3. Write the document using the schema below.
+4. Write to `<worktree-root>/.opencode/plans/YYYYMMDD-{slug}.md`.
+5. Return the artifact path and a one-paragraph summary of the plan.
+
 ---
 
 ````markdown
 # {Feature/Task Name} — Implementation Plan
+
 **Date**: {ISO date}
 **Status**: ready
 **Design concept**: {path to design concept artifact}
@@ -116,11 +126,13 @@ Load `skill:tdd` → `references/test-doubles.md` and `assets/test-template.md` 
 **Build Agent must complete every item before starting Slice 2.**
 
 Automated:
+
 - [ ] All tests written in "Tests First" above pass
 - [ ] `{additional command}` — {expected outcome}
 - [ ] `{lint or type-check command}` — zero errors
 
 Manual:
+
 - [ ] {Observable behavior to confirm from the outside — what a caller or user sees}
 
 ---
@@ -152,18 +164,20 @@ Manual:
 **Build Agent must complete every item before starting Slice 3.**
 
 Automated:
+
 - [ ] All tests written in "Tests First" above pass
 - [ ] `{command}` — {expected outcome}
 
 Manual:
+
 - [ ] {Observable behavior}
 
 ---
 
 ## Risk Register
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
+| Risk   | Likelihood       | Impact           | Mitigation   |
+| ------ | ---------------- | ---------------- | ------------ |
 | {risk} | low / med / high | low / med / high | {mitigation} |
 
 ---
