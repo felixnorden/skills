@@ -22,7 +22,7 @@ A constructor creates a value of the schema's type, running all validations at t
 Every schema exposes a `make` method for creating values. If the value does not satisfy the schema, the constructor throws an error.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.Number.check(Schema.isGreaterThan(0))
@@ -37,7 +37,7 @@ const value = schema.make({ a: 1 })
 For a non-throwing alternative, use `Schema.makeOption` (or `SchemaParser.makeOption`), which returns `Option.Some` on success and `Option.None` on failure.
 
 ```ts
-import { Schema, SchemaParser } from "effect/unstable/schema"
+import { Schema, SchemaParser } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.Number.check(Schema.isGreaterThan(0))
@@ -60,7 +60,7 @@ console.log(parse({ a: 1 }))
 To support constructing values from composed schemas, `make` is now available on all schemas, including unions.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Union([Schema.Struct({ a: Schema.String }), Schema.Struct({ b: Schema.Number })])
 
@@ -73,7 +73,7 @@ schema.make({ b: 1 })
 Branding adds an invisible marker to a type so that values from different domains cannot be accidentally mixed. For branded schemas, the default constructor accepts an unbranded input and returns a branded output.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.String.pipe(Schema.brand<"a">())
 
@@ -84,7 +84,7 @@ schema.make
 However, when a branded schema is part of a composite (such as a struct), you must pass a branded value.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String.pipe(Schema.brand<"a">()),
@@ -108,7 +108,8 @@ schema.make
 For refined schemas, the constructor accepts the unrefined type and returns the refined one.
 
 ```ts
-import { Option, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Option } from "effect";
 
 const schema = Schema.Option(Schema.String).pipe(Schema.refine(Option.isSome))
 
@@ -123,7 +124,8 @@ You can define a default value for a field using `Schema.withConstructorDefault`
 **Example** (Providing a default number)
 
 ```ts
-import { Option, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Option } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.Number.pipe(Schema.withConstructorDefault(() => Option.some(-1)))
@@ -141,7 +143,8 @@ The function passed to `withConstructorDefault` will be executed each time a def
 **Example** (Re-executing the default function)
 
 ```ts
-import { Option, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Option } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.Date.pipe(Schema.withConstructorDefault(() => Option.some(new Date())))
@@ -159,7 +162,8 @@ console.log(schema.make({}))
 Default values can be nested inside composed schemas. In this case, inner defaults are resolved first.
 
 ```ts
-import { Option, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Option } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.Struct({
@@ -180,7 +184,8 @@ Default values can also come from an `Effect` — for example, reading from a co
 **Example** (Using an effect to provide a default)
 
 ```ts
-import { Effect, Option, Schema, SchemaParser } from "effect/unstable/schema"
+import { Schema, SchemaParser } from "effect";
+import { Effect, Option } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.Number.pipe(

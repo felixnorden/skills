@@ -9,7 +9,7 @@ Type-safe parsing, validation, and transformation with Effect Schema v4.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
 
-> **Important:** Schema is in `effect/unstable/schema`. APIs may change in minor releases until stabilized.
+> **Important:** Schema is in `effect`. APIs may change in minor releases until stabilized.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/
 **Define and parse a schema**
 
 ```ts
-import { Schema } from "effect/unstable/schema";
+import { Schema } from "effect";
 
 const User = Schema.Struct({
   id: Schema.Number,
@@ -68,7 +68,7 @@ const User = Schema.Struct({
 **Transform between types**
 
 ```ts
-import { Schema, SchemaGetter } from "effect/unstable/schema";
+import { Schema, SchemaGetter } from "effect";
 
 // Date from string
 const DateFromString = Schema.Date.pipe(

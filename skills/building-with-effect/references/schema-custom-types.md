@@ -28,17 +28,17 @@ The first argument is your type guard. Schema will call it on any input value: i
 **Example** (Creating a schema for `URL`)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // The type guard tells Schema how to recognize a URL instance
-const URLSchema = Schema.declare(
-  (u): u is URL => u instanceof URL
-)
+const URLSchema = Schema.declare((u): u is URL => u instanceof URL);
 
-console.log(String(Schema.decodeUnknownExit(URLSchema)(new URL("https://example.com"))))
+console.log(
+  String(Schema.decodeUnknownExit(URLSchema)(new URL("https://example.com"))),
+);
 // Success(https://example.com/)
 
-console.log(String(Schema.decodeUnknownExit(URLSchema)(null)))
+console.log(String(Schema.decodeUnknownExit(URLSchema)(null)));
 // Failure(Cause([Fail(SchemaError(Expected <Declaration>, got null))]))
 ```
 
@@ -51,14 +51,13 @@ The default error message `Expected <Declaration>` is not very descriptive. Use 
 **Example** (Adding an `expected` annotation)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
-const URLSchema = Schema.declare(
-  (u): u is URL => u instanceof URL,
-  { expected: "URL" }
-)
+const URLSchema = Schema.declare((u): u is URL => u instanceof URL, {
+  expected: "URL",
+});
 
-console.log(String(Schema.decodeUnknownExit(URLSchema)(null)))
+console.log(String(Schema.decodeUnknownExit(URLSchema)(null)));
 // Failure(Cause([Fail(SchemaError(Expected URL, got null))]))
 ```
 
@@ -69,40 +68,48 @@ console.log(String(Schema.decodeUnknownExit(URLSchema)(null)))
 **Example** (Making `URL` JSON-serializable)
 
 ```ts
-import { Effect, Option, Schema, SchemaIssue, SchemaTransformation } from "effect/unstable/schema"
+import {
+  Effect,
+  Option,
+  Schema,
+  SchemaIssue,
+  SchemaTransformation,
+} from "effect";
 
-const URLSchema = Schema.declare(
-  (u): u is URL => u instanceof URL,
-  {
-    expected: "URL",
-    // Teach Schema how to convert URL <-> JSON
-    toCodecJson: () =>
-      Schema.link<globalThis.URL>()(
-        // The JSON representation is a plain string
-        Schema.String,
-        // How to convert between URL and string
-        SchemaTransformation.transformOrFail<URL, string>({
-          // JSON string -> URL (may fail if the string is not a valid URL)
-          decode: (s) =>
-            Effect.try({
-              try: () => new URL(s),
-              catch: (e) => new SchemaIssue.InvalidValue(Option.some(s), { message: globalThis.String(e) })
-            }),
-          // URL -> JSON string (always succeeds)
-          encode: (url) => Effect.succeed(url.href)
-        })
-      )
-  }
-)
+const URLSchema = Schema.declare((u): u is URL => u instanceof URL, {
+  expected: "URL",
+  // Teach Schema how to convert URL <-> JSON
+  toCodecJson: () =>
+    Schema.link<globalThis.URL>()(
+      // The JSON representation is a plain string
+      Schema.String,
+      // How to convert between URL and string
+      SchemaTransformation.transformOrFail<URL, string>({
+        // JSON string -> URL (may fail if the string is not a valid URL)
+        decode: (s) =>
+          Effect.try({
+            try: () => new URL(s),
+            catch: (e) =>
+              new SchemaIssue.InvalidValue(Option.some(s), {
+                message: globalThis.String(e),
+              }),
+          }),
+        // URL -> JSON string (always succeeds)
+        encode: (url) => Effect.succeed(url.href),
+      }),
+    ),
+});
 
-const codec = Schema.toCodecJson(URLSchema)
+const codec = Schema.toCodecJson(URLSchema);
 
 // Now encoding produces the URL's href string
-console.log(String(Schema.encodeUnknownExit(codec)(new URL("https://example.com"))))
+console.log(
+  String(Schema.encodeUnknownExit(codec)(new URL("https://example.com"))),
+);
 // Success("https://example.com/")
 
 // And decoding parses a string back into a URL
-console.log(String(Schema.decodeUnknownExit(codec)("https://example.com")))
+console.log(String(Schema.decodeUnknownExit(codec)("https://example.com")));
 // Success(https://example.com/)
 ```
 
@@ -120,8 +127,8 @@ While `Schema.declare` works for fixed types like `URL` or `File`, some types ar
 Schema.declareConstructor<Type, Encoded>()(
   typeParameters, // array of schemas, one per type parameter
   run, // factory that produces the parsing function
-  annotations // optional metadata (same as Schema.declare)
-)
+  annotations, // optional metadata (same as Schema.declare)
+);
 ```
 
 1. **Outer call** `declareConstructor<Type, Encoded>()` — fixes the TypeScript types
@@ -130,42 +137,43 @@ Schema.declareConstructor<Type, Encoded>()(
 **Example** (A generic `Box<A>` container)
 
 ```ts
-import { Effect, Option, Schema, SchemaIssue, SchemaParser } from "effect/unstable/schema"
+import { Effect, Option, Schema, SchemaIssue, SchemaParser } from "effect";
 
 // 1. Define the type
 interface Box<A> {
-  readonly value: A
+  readonly value: A;
 }
 
 // 2. A type guard that checks the shape (ignoring the inner type)
-const isBox = (u: unknown): u is Box<unknown> => typeof u === "object" && u !== null && "value" in u
+const isBox = (u: unknown): u is Box<unknown> =>
+  typeof u === "object" && u !== null && "value" in u;
 
 // 3. Create a schema factory
 const Box = <A extends Schema.Top>(item: A) =>
   Schema.declareConstructor<Box<A["Type"]>, Box<A["Encoded"]>>()(
     [item],
     ([itemCodec]) =>
-    (u, ast, options) => {
-      if (!isBox(u)) {
-        return Effect.fail(new SchemaIssue.InvalidType(ast, Option.some(u)))
-      }
-      return Effect.mapBothEager(
-        SchemaParser.decodeUnknownEffect(itemCodec)(u.value, options),
-        {
-          onSuccess: (value) => ({ value }),
-          onFailure: (issue) => new SchemaIssue.Pointer(["value"], issue)
+      (u, ast, options) => {
+        if (!isBox(u)) {
+          return Effect.fail(new SchemaIssue.InvalidType(ast, Option.some(u)));
         }
-      )
-    }
-  )
+        return Effect.mapBothEager(
+          SchemaParser.decodeUnknownEffect(itemCodec)(u.value, options),
+          {
+            onSuccess: (value) => ({ value }),
+            onFailure: (issue) => new SchemaIssue.Pointer(["value"], issue),
+          },
+        );
+      },
+  );
 
 // Use it: Box<number> that decodes strings to finite numbers
-const schema = Box(Schema.FiniteFromString)
+const schema = Box(Schema.FiniteFromString);
 
-console.log(String(Schema.decodeUnknownExit(schema)({ value: "1" })))
+console.log(String(Schema.decodeUnknownExit(schema)({ value: "1" })));
 // Success({ value: 1 })
 
-console.log(String(Schema.decodeUnknownExit(schema)({ value: "a" })))
+console.log(String(Schema.decodeUnknownExit(schema)({ value: "a" })));
 // Failure(Cause([Fail(SchemaError(Expected a finite number, got NaN
 //   at ["value"]))]))
 ```

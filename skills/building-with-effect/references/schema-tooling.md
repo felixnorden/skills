@@ -34,7 +34,7 @@ By default, a schema produces a draft-2020-12 JSON Schema.
 **Example** (Tuple to draft-2020-12 JSON Schema)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Tuple([Schema.String, Schema.Finite])
 const document = Schema.toJsonSchemaDocument(schema)
@@ -64,7 +64,7 @@ To generate a draft-07 JSON Schema, use `JsonSchema.toDocumentDraft07`.
 Use `.annotate(...)` to attach standard JSON Schema annotations:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.NonEmptyString.annotate({
   title: "Username",
@@ -81,7 +81,7 @@ const document = Schema.toJsonSchemaDocument(schema)
 Optional fields are converted to optional fields or elements in the JSON Schema.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.optionalKey(Schema.String)
@@ -112,7 +112,7 @@ This example shows how `Schema.toCodecJson` and `Schema.toJsonSchema` can descri
 **Example** (Align a JSON serializer and JSON Schema for `Headers`)
 
 ```ts
-import { Schema, SchemaGetter } from "effect/unstable/schema"
+import { Schema, SchemaGetter } from "effect";
 
 const MyHeaders = Schema.instanceOf(Headers, {
   toCodecJson: () =>
@@ -137,7 +137,7 @@ const document = Schema.toJsonSchemaDocument(schema)
 #### Validation Constraints
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.String.check(Schema.isMinLength(1))
 
@@ -163,7 +163,7 @@ Property-based testing checks your code against many randomly generated inputs. 
 You can convert any non-declaration, non-`never` schema to a Fast-Check `Arbitrary<T>`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 import { FastCheck } from "effect/testing"
 
 const schema = Schema.Tuple([Schema.String, Schema.Number])
@@ -179,7 +179,7 @@ For a custom type, provide an `arbitrary` annotation.
 **Example** (Custom Arbitrary for `URL`)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 import { FastCheck } from "effect/testing"
 
 const URL = Schema.instanceOf(globalThis.URL, {
@@ -194,7 +194,7 @@ console.log(FastCheck.sample(Schema.toArbitrary(URL), 3))
 #### Overriding the default generated Arbitrary
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 import { FastCheck } from "effect/testing"
 
 // Add an override to restrict numbers to integers 10..20
@@ -211,7 +211,7 @@ console.log(FastCheck.sample(Schema.toArbitrary(schema), 3))
 An equivalence function checks whether two values are structurally equal according to the schema's definition.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,
@@ -224,7 +224,7 @@ const equivalence = Schema.toEquivalence(schema)
 #### Providing a custom equivalence for a class
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class MyClass {
   constructor(readonly a: string) {}
@@ -244,7 +244,7 @@ Optics provide a composable way to read and update deeply nested values without 
 **Example** (Generating an `Iso` automatically from a schema)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class A extends Schema.Class<A>("A")({ s: Schema.String }) {}
 class B extends Schema.Class<B>("B")({ a: A }) {}
@@ -265,7 +265,7 @@ The `Differ` module lets you compute and apply JSON Patch (RFC 6902) changes.
 **Example** (Compare two values and apply the patch)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   id: Schema.Number,

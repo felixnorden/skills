@@ -95,7 +95,7 @@ Use `Top`, `Schema`, and `Codec` as _constraints_ only. Do not use them as expli
 **Example** (Prefer constraints over wide annotations)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // ✅ Use as a constraint. S can be any schema that extends Top.
 declare function foo<S extends Schema.Top>(schema: S)
@@ -113,7 +113,7 @@ You can retrieve typed annotations with the `Annotations.resolveInto` function.
 **Example** (Adding a custom annotation for versioning)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // Extend the Annotations interface with a custom `version` annotation
 declare module "effect/Schema" {
@@ -149,7 +149,8 @@ interface Codec<T, E, RD, RE> {
 
 ```ts
 import type { Effect } from "effect"
-import { Schema, Context } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Context } from "effect";
 
 // A service that retrieves full user info from an ID
 class UserDatabase extends Context.Service<

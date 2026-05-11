@@ -20,9 +20,7 @@ PubSub provides an in-process event bus for broadcasting messages to multiple su
 ```ts
 import { Effect, PubSub } from "effect";
 
-const pubsub =
-  yield *
-  PubSub.bounded<OrderEvent>({
+const pubsub = yield* PubSub.bounded<OrderEvent>({
     capacity: 256, // Maximum events in buffer
     replay: 50, // Allow late subscribers to catch up on recent events
   });
@@ -31,7 +29,7 @@ const pubsub =
 ### Unbounded PubSub
 
 ```ts
-const pubsub = yield * PubSub.unbounded<OrderEvent>();
+const pubsub = yield* PubSub.unbounded<OrderEvent>();
 // No backpressure - use with caution
 ```
 
@@ -297,7 +295,7 @@ describe("OrderEvents", () => {
       const received: OrderEvent[] = [];
 
       // Subscribe
-      yield* Effect.fork(
+      yield* Effect.forkScoped(
         events.subscribe.pipe(
           Stream.take(1),
           Stream.runForEach((event) => Effect.sync(() => received.push(event))),
@@ -390,7 +388,10 @@ emitter.emit("order", data);
 **After:**
 
 ```ts
-const pubsub = yield * PubSub.bounded<OrderEvent>({ capacity: 256 });
-const subscribe = Stream.fromPubSub(pubsub);
-yield * PubSub.publish(pubsub, data);
+const program = Effect.gen(function* () {
+  const pubsub = yield* PubSub.bounded<OrderEvent>({ capacity: 256 });
+  const subscribe = Stream.fromPubSub(pubsub);
+  yield* PubSub.publish(pubsub, data);
+  // Process subscription...
+});
 ```

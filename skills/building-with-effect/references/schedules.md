@@ -285,7 +285,7 @@ const withTimeout = operation.pipe(
 import { TestClock } from "effect/testing";
 
 const test = Effect.gen(function* () {
-  const fiber = yield* Effect.fork(
+  const fiber = yield* Effect.forkChild(
     operation.pipe(Effect.retry(Schedule.spaced("1 second"))),
   );
 

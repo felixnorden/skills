@@ -28,7 +28,8 @@ Schema integrates with popular frameworks and libraries.
 ```tsx
 import { useForm } from "@tanstack/react-form"
 import type { AnyFieldApi } from "@tanstack/react-form"
-import { Effect, Schema, SchemaGetter, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaGetter, SchemaTransformation } from "effect";
+import { Effect } from "effect";
 import React from "react"
 
 // ----------------------------------------------------
@@ -138,7 +139,7 @@ export default function App() {
 ```ts
 import { node } from "@elysiajs/node"
 import { openapi } from "@elysiajs/openapi"
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 import { Elysia } from "elysia"
 
 function encodingJsonSchema<T, E, RD>(schema: Schema.Codec<T, E, RD, never>) {

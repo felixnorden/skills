@@ -244,7 +244,7 @@ export class Database extends Context.Service<
     Database,
     Effect.gen(function* () {
       const query = Effect.fn("Database.query")(function* (sql: string) {
-        yield* Effect.log("Executing SQL:", sql);
+        yield* Effect.logInfo("Executing SQL:", sql);
         return [{ id: 1, name: "Alice" }];
       });
       return Database.of({ query });
@@ -288,10 +288,10 @@ import { Effect } from "effect";
 **Unstable Modules** (may have breaking changes in minor releases)
 
 ```ts
-import { Schema } from "effect/unstable/schema";
 import { HttpClient } from "effect/unstable/http";
 import { LanguageModel } from "effect/unstable/ai";
 import { PubSub } from "effect/unstable/pubsub";
+// Note: effect/unstable/schema only exports Model and VariantSchema submodules
 ```
 
 **Platform-Specific Packages** (separate packages)

@@ -24,7 +24,7 @@ Schema provides built-in schemas for all common TypeScript types. These schemas 
 Use these schemas when a value should be exactly one of the basic JavaScript types.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // primitive types
 Schema.String
@@ -39,7 +39,8 @@ Schema.Null
 Sometimes you receive data that is not the right type yet — for example, a number that should become a string. You can build a schema that converts (coerces) values to the target type during decoding:
 
 ```ts
-import { Getter, Parser, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Getter, Parser } from "effect";
 
 //      ┌─── Codec<string, unknown>
 //      ▼
@@ -63,7 +64,7 @@ console.log(parser(null)) // => "null"
 A literal schema matches one exact value. Use it when a field must be a specific string, number, or other constant.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const tuna = Schema.Literal("tuna")
 const twelve = Schema.Literal(12)
@@ -74,7 +75,7 @@ const tru = Schema.Literal(true)
 Symbol literals:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const terrific = Schema.UniqueSymbol(Symbol("terrific"))
 ```
@@ -82,7 +83,7 @@ const terrific = Schema.UniqueSymbol(Symbol("terrific"))
 `null`, `undefined`, and `void`:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.Null
 Schema.Undefined
@@ -92,7 +93,7 @@ Schema.Void
 To allow multiple literal values:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Literals(["red", "green", "blue"])
 ```
@@ -100,7 +101,7 @@ const schema = Schema.Literals(["red", "green", "blue"])
 To extract the set of allowed values from a literal schema:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Literals(["red", "green", "blue"])
 
@@ -116,7 +117,7 @@ schema.members
 You can add validation rules to a string schema. Each rule is applied with `.check(...)` and returns a new schema that enforces that constraint.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.String.check(Schema.isMaxLength(5))
 Schema.String.check(Schema.isMinLength(5))
@@ -132,7 +133,7 @@ Schema.String.check(Schema.isLowercased())
 To perform some simple string transforms:
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
 Schema.String.decode(SchemaTransformation.trim())
 Schema.String.decode(SchemaTransformation.toLowerCase())
@@ -144,7 +145,7 @@ Schema.String.decode(SchemaTransformation.toUpperCase())
 Schema includes built-in checks for common string formats.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.String.check(Schema.isUUID())
 Schema.String.check(Schema.isBase64())
@@ -154,7 +155,7 @@ Schema.String.check(Schema.isBase64Url())
 ## Numbers
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.Number // all numbers
 Schema.Finite // finite numbers (i.e. not +/-Infinity or NaN)
@@ -163,7 +164,7 @@ Schema.Finite // finite numbers (i.e. not +/-Infinity or NaN)
 You can add validation rules to a number schema. Each rule constrains the allowed range or value.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.Number.check(Schema.isBetween({ minimum: 5, maximum: 10 }))
 Schema.Number.check(Schema.isGreaterThan(5))
@@ -178,7 +179,7 @@ Schema.Number.check(Schema.isMultipleOf(5))
 To require that a number has no decimal part, use `isInt()`. For 32-bit integers specifically, use `isInt32()`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.Number.check(Schema.isInt())
 Schema.Number.check(Schema.isInt32())
@@ -189,7 +190,8 @@ Schema.Number.check(Schema.isInt32())
 Schema does not ship pre-built BigInt validation factories (unlike numbers). Instead, you create your own using helper functions and a BigInt-compatible ordering. The example below shows how.
 
 ```ts
-import { BigInt, Order, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { BigInt, Order } from "effect";
 
 const options = { order: Order.BigInt }
 
@@ -225,7 +227,7 @@ Schema.BigInt.check(isNonPositive)
 The `Schema.Date` schema matches `Date` objects. You can combine it with a string encoding to decode date strings into `Date` instances.
 
 ```ts
-import { Schema, SchemaGetter } from "effect/unstable/schema"
+import { Schema, SchemaGetter } from "effect";
 
 Schema.Date
 
@@ -244,7 +246,7 @@ You can use `Schema.TemplateLiteral` to define structured string patterns made o
 **Example** (Constraining parts of an email-like string)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // Construct a template literal schema for values like `${string}@${string}`
 // Apply constraints to both sides of the "@" symbol
@@ -281,7 +283,7 @@ If you want to extract the parts of a string that match a template, you can use 
 **Example** (Parsing a template literal into components)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const email = Schema.TemplateLiteralParser([
   Schema.String.check(Schema.isMinLength(1)),

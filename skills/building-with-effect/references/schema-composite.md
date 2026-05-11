@@ -46,7 +46,7 @@ By default, every key in a struct is required and readonly. Use `Schema.optional
 You can mark struct properties as optional or mutable using `Schema.optionalKey` and `Schema.mutableKey`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,
@@ -73,7 +73,7 @@ type Type = (typeof schema)["Type"]
 There are several ways to represent optional properties, depending on whether you want `undefined` in the type, `null` in the type, or just a missing key. By combining `Schema.optionalKey`, `Schema.optional`, and `Schema.NullOr`, you can represent any variant.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 export const schema = Schema.Struct({
   // Exact Optional Property
@@ -112,7 +112,8 @@ type Type = typeof schema.Type
 If an optional field arrives as `undefined`, you may want to omit it from the output entirely rather than keeping it.
 
 ```ts
-import { Option, Predicate, Schema, SchemaGetter } from "effect/unstable/schema"
+import { Schema, SchemaGetter } from "effect";
+import { Option, Predicate } from "effect";
 
 export const schema = Schema.Struct({
   a: Schema.optional(Schema.FiniteFromString).pipe(
@@ -136,7 +137,7 @@ You can assign default values to fields during decoding using:
 **Example** (Providing a default for a missing or undefined value)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.FiniteFromString.pipe(Schema.withDecodingDefault(() => "1"))
@@ -167,7 +168,7 @@ You can annotate individual keys using the `annotateKey` method.
 **Example** (Annotating a required `username` field)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   username: Schema.String.annotateKey({
@@ -183,7 +184,7 @@ const schema = Schema.Struct({
 You can annotate a struct with a custom message to use when a key is unexpected.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String
@@ -195,7 +196,7 @@ const schema = Schema.Struct({
 You can preserve unexpected keys by setting `onExcessProperty` to `preserve`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String
@@ -214,7 +215,7 @@ An index signature lets a struct accept any string key in addition to its fixed 
 **Example** (Combining fixed properties with an index signature)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // Define a schema with one fixed key "a" and any number of string keys mapping to numbers
 export const schema = Schema.StructWithRest(Schema.Struct({ a: Schema.Number }), [
@@ -237,7 +238,7 @@ Every `Schema.Struct` exposes a `.fields` property containing its field definiti
 **Example** (Single inheritance)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const Timestamped = Schema.Struct({
   createdAt: Schema.Date,
@@ -260,7 +261,8 @@ You can derive new struct schemas from existing ones — picking, omitting, rena
 Use `Struct.pick` to keep only a selected set of fields.
 
 ```ts
-import { Schema, Struct } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Struct } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,
@@ -273,7 +275,8 @@ const schema = Schema.Struct({
 Use `Struct.omit` to remove specified fields from a struct.
 
 ```ts
-import { Schema, Struct } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Struct } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,
@@ -286,7 +289,8 @@ const schema = Schema.Struct({
 Use `Struct.assign` to add new fields to an existing struct.
 
 ```ts
-import { Schema, Struct } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Struct } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,
@@ -303,7 +307,8 @@ const schema = Schema.Struct({
 Use `Struct.evolve` to transform the value schema of individual fields.
 
 ```ts
-import { Schema, Struct } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Struct } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,
@@ -322,7 +327,7 @@ A tagged struct is a struct that includes a `_tag` field. This field is used to 
 **Example** (Tagged struct as a shorthand for a struct with a `_tag` field)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // Defines a struct with a fixed `_tag` field
 const tagged = Schema.TaggedStruct("A", {
@@ -345,7 +350,7 @@ A tuple schema describes a fixed-length array where each position has its own ty
 You can add rest elements to a tuple using `Schema.TupleWithRest`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 export const schema = Schema.TupleWithRest(Schema.Tuple([Schema.FiniteFromString, Schema.String]), [
   Schema.Boolean,
@@ -363,7 +368,7 @@ type Type = typeof schema.Type
 You can annotate elements using the `annotateKey` method.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Tuple([
   Schema.String.annotateKey({
@@ -382,7 +387,8 @@ You can map the elements of a tuple schema using the `mapElements` static method
 Use `Tuple.pick` to keep only a selected set of elements.
 
 ```ts
-import { Schema, Tuple } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Tuple } from "effect";
 
 const schema = Schema.Tuple([Schema.String, Schema.Number, Schema.Boolean]).mapElements(Tuple.pick([0, 2]))
 ```
@@ -392,7 +398,8 @@ const schema = Schema.Tuple([Schema.String, Schema.Number, Schema.Boolean]).mapE
 Use `Tuple.omit` to remove specified elements from a tuple.
 
 ```ts
-import { Schema, Tuple } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Tuple } from "effect";
 
 const schema = Schema.Tuple([Schema.String, Schema.Number, Schema.Boolean]).mapElements(Tuple.omit([1]))
 ```
@@ -406,7 +413,7 @@ An array schema describes a variable-length list where every element shares the 
 You can deduplicate arrays using `Schema.UniqueArray`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.UniqueArray(Schema.String)
 
@@ -425,7 +432,7 @@ A record schema describes an object whose keys are dynamic (not known ahead of t
 **Example** (Transforming snake_case keys to camelCase)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
 const SnakeToCamel = Schema.String.pipe(Schema.decode(SchemaTransformation.snakeToCamel()))
 
@@ -440,7 +447,7 @@ console.log(Schema.decodeUnknownSync(schema)({ a_b: 1, c_d: 2 }))
 Records with number keys are supported.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Record(Schema.Int, Schema.String)
 ```
@@ -450,7 +457,7 @@ const schema = Schema.Record(Schema.Int, Schema.String)
 By default, records are tagged as `readonly`. You can mark a record as mutable using `Schema.mutableKey`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 export const schema = Schema.Record(Schema.String, Schema.mutableKey(Schema.Number))
 ```
@@ -460,7 +467,7 @@ export const schema = Schema.Record(Schema.String, Schema.mutableKey(Schema.Numb
 When you pass a union of string literals as the key schema to `Schema.Record`, you get a struct-like schema where each literal becomes a required key.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Record(Schema.Literals(["a", "b"]), Schema.Number)
 
@@ -482,7 +489,7 @@ A union schema accepts a value if it matches any one of its members.
 If a union member is not compatible with the input, it is automatically excluded during validation.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Union([Schema.NonEmptyString, Schema.Number])
 
@@ -495,7 +502,7 @@ console.log(String(Schema.decodeUnknownExit(schema)("")))
 You can create an exclusive union, where the union matches if exactly one member matches, by passing the `{ mode: "oneOf" }` option.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Union([Schema.Struct({ a: Schema.String }), Schema.Struct({ b: Schema.Number })], {
   mode: "oneOf"
@@ -507,7 +514,7 @@ const schema = Schema.Union([Schema.Struct({ a: Schema.String }), Schema.Struct(
 You can create a union of literals using `Schema.Literals`.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Literals(["red", "green", "blue"])
 ```
@@ -517,7 +524,7 @@ const schema = Schema.Literals(["red", "green", "blue"])
 You can define a tagged union using the `Schema.TaggedUnion` helper.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // Create a union of two tagged structs
 const schema = Schema.TaggedUnion({

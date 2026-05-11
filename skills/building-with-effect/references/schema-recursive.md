@@ -18,7 +18,7 @@ Use `Schema.suspend` when a schema needs to refer to itself (or to another schem
 **Example** (Recursive Struct with Same Encoded and Type)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 interface Category {
   readonly name: string
@@ -38,7 +38,7 @@ The explicit `Schema.Codec<Category>` annotation is important in recursive decla
 **Example** (Recursive Struct with Different Encoded and Type)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 interface Category {
   readonly name: number
@@ -65,7 +65,7 @@ Using only `Schema.Codec<Category>` would force encoded and decoded types to be 
 **Example** (Recursive Union)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 type U = A | B
 

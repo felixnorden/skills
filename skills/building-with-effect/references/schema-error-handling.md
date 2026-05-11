@@ -56,7 +56,8 @@ There are two kinds of hooks:
 **Example** (Default hooks)
 
 ```ts
-import { Effect, Schema, SchemaIssue } from "effect/unstable/schema";
+import { Schema, SchemaIssue } from "effect";
+import { Effect } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.NonEmptyString,
@@ -87,7 +88,7 @@ Output:
 **Example** (Using hooks to translate common messages)
 
 ```ts
-import { Schema } from "effect/unstable/schema";
+import { Schema } from "effect";
 
 const Person = Schema.Struct({
   name: Schema.String.check(Schema.isNonEmpty()),
@@ -138,7 +139,7 @@ You can attach custom error messages directly to a schema using annotations.
 **Example** (Attaching custom messages to a struct field)
 
 ```ts
-import { Schema } from "effect/unstable/schema";
+import { Schema } from "effect";
 
 const Person = Schema.Struct({
   name: Schema.String.annotate({ message: t("string.mismatch") })
@@ -154,7 +155,7 @@ const Person = Schema.Struct({
 You can use the `Schema.StandardSchemaV1FailureResult` schema to send a `StandardSchemaV1.FailureResult` over the wire.
 
 ```ts
-import { Schema, SchemaIssue, SchemaParser } from "effect/unstable/schema";
+import { Schema, SchemaIssue, SchemaParser } from "effect";
 
 const b = Symbol.for("b");
 

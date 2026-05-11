@@ -25,7 +25,7 @@ Serialization converts typed values into a format suitable for storage or transm
 A schema that decodes a JSON-encoded string into an unknown value.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 Schema.decodeUnknownSync(Schema.UnknownFromJsonString)(`{"a":1,"b":2}`)
 // => { a: 1, b: 2 }
@@ -36,7 +36,7 @@ Schema.decodeUnknownSync(Schema.UnknownFromJsonString)(`{"a":1,"b":2}`)
 Returns a schema that decodes a JSON string and then decodes the parsed value using the given schema.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({ a: Schema.Number })
 const schemaFromJsonString = Schema.fromJsonString(schema)
@@ -50,7 +50,7 @@ Schema.decodeUnknownSync(schemaFromJsonString)(`{"a":1,"b":2}`)
 `Schema.fromFormData` returns a schema that reads a `FormData` instance and decodes it using the provided schema.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.fromFormData(
   Schema.Struct({
@@ -71,7 +71,7 @@ console.log(String(Schema.decodeUnknownExit(schema)(formData)))
 Express nested values using bracket notation.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.fromFormData(
   Schema.Struct({
@@ -97,7 +97,7 @@ console.log(String(Schema.decodeUnknownExit(schema)(formData)))
 `Schema.fromURLSearchParams` returns a schema that reads a `URLSearchParams` instance.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.fromURLSearchParams(
   Schema.Struct({
@@ -129,7 +129,7 @@ Many JavaScript values cannot be serialized to JSON in a safe and reversible way
 **Example** (Encoding a class as a JSON tuple)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
 class Point {
   constructor(public readonly x: number, public readonly y: number) {}
@@ -183,7 +183,7 @@ console.log(stringTree)
 The `keepDeclarations: true` option does not convert declarations without a `toCodecJson` annotation to `undefined`. This is useful when encoding to `FormData` and you want to preserve `Blob` values.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.instanceOf(URL),
@@ -206,7 +206,7 @@ console.log(
 The ISO canonical codec (`toCodecIso`) converts schemas to their `Iso` representation.
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class Person extends Schema.Class<Person>("Person")({
   name: Schema.String,
@@ -231,7 +231,8 @@ console.log(deserialized)
 `Schema.toEncoderXml` lets you serialize values to XML.
 
 ```ts
-import { Effect, Option, Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
+import { Effect, Option } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.String,

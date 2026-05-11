@@ -20,7 +20,7 @@ Flipping a schema swaps its decoding and encoding directions. If a schema decode
 **Example** (Flipping a schema that parses a string into a number)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 // Flips a schema that decodes a string into a number,
 // turning it into one that decodes a number into a string
@@ -35,7 +35,7 @@ const StringFromFinite = Schema.flip(Schema.FiniteFromString)
 You can access the original schema using the `.schema` property:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const StringFromFinite = Schema.flip(Schema.FiniteFromString)
 
@@ -49,7 +49,7 @@ StringFromFinite.schema
 Flipping a schema twice returns a schema with the same structure and behavior as the original:
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 //      ┌─── FiniteFromString
 //      ▼
@@ -74,7 +74,7 @@ A flipped schema also includes a constructor. It builds values of the **encoded*
 **Example** (Using a flipped schema to construct an encoded value)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.FiniteFromString

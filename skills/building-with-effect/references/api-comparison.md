@@ -110,14 +110,15 @@ type AppEnv = Has<Database> & Has<Logger>;
 // Effect v4 (built-in)
 import { Effect, Context, Layer } from "effect";
 
-class Database extends Context.Service<Database>()("Database", {
-  make: Effect.gen(function* () {
-    // ... initialization
-    return { query: (sql: string) => Effect.succeed([]) };
-  })
-}) {
-  static readonly layer = Layer.effect(this, this.make);
-}
+class Database extends Context.Service<Database, {
+  readonly query: (sql: string) => Effect.Effect<unknown[]>
+}>()("Database") {}
+
+const DatabaseLive = Layer.effect(Database)(
+  Effect.sync(() => ({
+    query: (sql: string) => Effect.succeed([])
+  }))
+)
 ```
 
 **Key differences**
@@ -162,13 +163,13 @@ object UserRepo {
 // Effect v4
 import { Effect, Context, Layer } from "effect";
 
-class UserRepo extends Context.Service<UserRepo>()("UserRepo", {
-  make: Effect.succeed({
-    find: (id: string) => Effect.succeed(user)
-  })
-}) {
-  static readonly layer = Layer.effect(this, this.make);
-}
+class UserRepo extends Context.Service<UserRepo, {
+  readonly find: (id: string) => Effect.Effect<User>
+}>()("UserRepo") {}
+
+const UserRepoLive = Layer.succeed(UserRepo)({
+  find: (id: string) => Effect.succeed(user)
+})
 ```
 
 **For comprehension vs gen**

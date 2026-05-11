@@ -363,7 +363,7 @@ Stream.runFold(stream, 0, (acc, n) => acc + n);
 **Value equality helpers**
 
 ```ts
-import { Data } from "effect";
+import { Data, Schema } from "effect";
 
 // Struct with value equality
 const user = Data.struct({
@@ -376,14 +376,14 @@ const ok = Data.tagged("Ok", { value: 42 });
 const err = Data.tagged("Err", { error: "failed" });
 
 // Tagged errors
-class NotFoundError extends Data.TaggedError("NotFound")<{
-  id: string;
-}> {}
+class NotFoundError extends Schema.TaggedErrorClass<NotFoundError>("NotFound")({
+  id: Schema.String,
+}) {}
 
-class ValidationError extends Data.TaggedError("Validation")<{
-  field: string;
-  message: string;
-}> {}
+class ValidationError extends Schema.TaggedErrorClass<ValidationError>("Validation")({
+  field: Schema.String,
+  message: Schema.String,
+}) {}
 
 // Case class
 class User extends Data.Class<{
@@ -539,7 +539,7 @@ Use Result (Either) for explicit error handling
 Use Chunk for immutable arrays
 Use HashSet/HashMap for value equality
 Use Stream for large/infinite sequences
-Use Data.TaggedError for domain errors
+Use Schema.TaggedErrorClass for domain errors
 
 Avoid:
 

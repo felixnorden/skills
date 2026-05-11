@@ -43,7 +43,7 @@ Instance methods and custom constructors **are not allowed** in opaque structs.
 **Example** (Creating an Opaque Struct)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class Person extends Schema.Opaque<Person>()(
   Schema.Struct({
@@ -78,7 +78,7 @@ You can add static members to an opaque struct class to extend its behavior.
 **Example** (Custom serializer via static method)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class Person extends Schema.Opaque<Person>()(
   Schema.Struct({
@@ -105,7 +105,7 @@ You can attach filters and annotations to the struct passed into `Opaque`.
 **Example** (Applying a filter and title annotation)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class Person extends Schema.Opaque<Person>()(
   Schema.Struct({
@@ -122,7 +122,7 @@ console.log(String(Schema.decodeUnknownExit(Person)(null)))
 **Example** (Recursive Opaque Struct with Same Encoded and Type)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 export class Category extends Schema.Opaque<Category>()(
   Schema.Struct({
@@ -143,7 +143,7 @@ export type Encoded = (typeof Category)["Encoded"]
 **Example** (Mutually Recursive Schemas)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class Expression extends Schema.Opaque<Expression>()(
   Schema.Struct({
@@ -169,7 +169,7 @@ You can brand an opaque struct using the `Brand` generic parameter.
 **Example** (Branded Opaque Struct)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 class A extends Schema.Opaque<A, { readonly brand: unique symbol }>()(
   Schema.Struct({ a: Schema.String })
@@ -199,7 +199,7 @@ g(A.make({ a: "a" })) // error: Argument of type 'A' is not assignable to parame
 **Example** (Using a tuple to validate the constructor arguments)
 
 ```ts
-import { Schema } from "effect/unstable/schema"
+import { Schema } from "effect";
 
 const PersonConstructorArguments = Schema.Tuple([Schema.String, Schema.Finite])
 
@@ -229,7 +229,7 @@ Expected a finite number, got NaN
 **Example** (Defining a Schema Class)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
 class Person extends Schema.Class<Person>("Person")({
   name: Schema.String,

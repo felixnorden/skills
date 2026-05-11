@@ -28,10 +28,10 @@ In previous versions, transformations were directly embedded in schemas. In the 
 **Example** (The `trim` built-in transformation)
 
 ```ts
-import { SchemaTransformation } from "effect/unstable/schema"
+import { SchemaTransformation } from "effect";
 
 // const t: Transformation<string, string, never, never>
-const t = SchemaTransformation.trim()
+const t = SchemaTransformation.trim();
 ```
 
 You can apply a transformation to any compatible schema using `Schema.decode`.
@@ -39,11 +39,11 @@ You can apply a transformation to any compatible schema using `Schema.decode`.
 **Example** (Applying `trim` to a string schema)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
-const schema = Schema.String.pipe(Schema.decode(SchemaTransformation.trim()))
+const schema = Schema.String.pipe(Schema.decode(SchemaTransformation.trim()));
 
-console.log(Schema.decodeUnknownSync(schema)("  123"))
+console.log(Schema.decodeUnknownSync(schema)("  123"));
 // 123
 ```
 
@@ -52,7 +52,7 @@ console.log(Schema.decodeUnknownSync(schema)("  123"))
 A `Transformation` carries four type parameters:
 
 ```ts
-Transformation<T, E, RD, RE>
+Transformation<T, E, RD, RE>;
 ```
 
 - `T`: the decoded (output) type
@@ -69,7 +69,7 @@ A `Transformation` consists of two `Getter` functions:
 
 ```ts
 export function trim(): Transformation<string, string> {
-  return new Transformation(Getter.trim(), Getter.passthrough())
+  return new Transformation(Getter.trim(), Getter.passthrough());
 }
 ```
 
@@ -80,11 +80,13 @@ You can combine transformations using the `.compose` method.
 **Example** (Trim and lowercase a string)
 
 ```ts
-import { Option, SchemaTransformation } from "effect/unstable/schema"
+import { Option, SchemaTransformation } from "effect";
 
-const trimToLowerCase = SchemaTransformation.trim().compose(SchemaTransformation.toLowerCase())
+const trimToLowerCase = SchemaTransformation.trim().compose(
+  SchemaTransformation.toLowerCase(),
+);
 
-console.log(trimToLowerCase.decode.run(Option.some("  Abc"), {}))
+console.log(trimToLowerCase.decode.run(Option.some("  Abc"), {}));
 /*
 {
   _id: 'Exit',
@@ -108,19 +110,15 @@ Use `Schema.decodeTo` when you want to transform a source schema into a differen
 **Example** (Parsing a number from a string)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
-const NumberFromString =
-  Schema.String.pipe(
-    Schema.decodeTo(
-      Schema.Number,
-      SchemaTransformation.numberFromString
-    )
-  )
+const NumberFromString = Schema.String.pipe(
+  Schema.decodeTo(Schema.Number, SchemaTransformation.numberFromString),
+);
 
-console.log(Schema.decodeUnknownSync(NumberFromString)("123"))
+console.log(Schema.decodeUnknownSync(NumberFromString)("123"));
 // 123
-console.log(Schema.decodeUnknownSync(NumberFromString)("a"))
+console.log(Schema.decodeUnknownSync(NumberFromString)("a"));
 // NaN
 ```
 
@@ -131,9 +129,11 @@ Use `Schema.decode` when the source and target schemas are the same and you only
 **Example** (Trimming whitespace from a string)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
-const TrimmedString = Schema.String.pipe(Schema.decode(SchemaTransformation.trim()))
+const TrimmedString = Schema.String.pipe(
+  Schema.decode(SchemaTransformation.trim()),
+);
 ```
 
 ### Defining an Inline Transformation
@@ -143,16 +143,16 @@ You can create a transformation directly using helpers from the `SchemaTransform
 **Example** (Converting meters to kilometers and back)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
 const Kilometers = Schema.Finite.pipe(
   Schema.decode(
     SchemaTransformation.transform({
       decode: (meters) => meters / 1000,
-      encode: (kilometers) => kilometers * 1000
-    })
-  )
-)
+      encode: (kilometers) => kilometers * 1000,
+    }),
+  ),
+);
 ```
 
 You can define transformations that may fail during decoding or encoding using `SchemaTransformation.transformOrFail`.
@@ -160,7 +160,13 @@ You can define transformations that may fail during decoding or encoding using `
 **Example** (Converting a string URL into a `URL` object)
 
 ```ts
-import { Effect, Option, Schema, SchemaIssue, SchemaTransformation } from "effect/unstable/schema"
+import {
+  Effect,
+  Option,
+  Schema,
+  SchemaIssue,
+  SchemaTransformation,
+} from "effect";
 
 const URLFromString = Schema.String.pipe(
   Schema.decodeTo(
@@ -169,12 +175,13 @@ const URLFromString = Schema.String.pipe(
       decode: (s) =>
         Effect.try({
           try: () => new URL(s),
-          catch: (error) => new SchemaIssue.InvalidValue(Option.some(s), { cause: error })
+          catch: (error) =>
+            new SchemaIssue.InvalidValue(Option.some(s), { cause: error }),
         }),
-      encode: (url) => Effect.succeed(url.toString())
-    })
-  )
-)
+      encode: (url) => Effect.succeed(url.toString()),
+    }),
+  ),
+);
 ```
 
 ## Schema composition
@@ -184,27 +191,29 @@ You can compose transformations, but you can also compose schemas with `Schema.d
 **Example** (Converting meters to miles via kilometers)
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
 const KilometersFromMeters = Schema.Finite.pipe(
   Schema.decode(
     SchemaTransformation.transform({
       decode: (meters) => meters / 1000,
-      encode: (kilometers) => kilometers * 1000
-    })
-  )
-)
+      encode: (kilometers) => kilometers * 1000,
+    }),
+  ),
+);
 
 const MilesFromKilometers = Schema.Finite.pipe(
   Schema.decode(
     SchemaTransformation.transform({
       decode: (kilometers) => kilometers * 0.621371,
-      encode: (miles) => miles / 0.621371
-    })
-  )
-)
+      encode: (miles) => miles / 0.621371,
+    }),
+  ),
+);
 
-const MilesFromMeters = KilometersFromMeters.pipe(Schema.decodeTo(MilesFromKilometers))
+const MilesFromMeters = KilometersFromMeters.pipe(
+  Schema.decodeTo(MilesFromKilometers),
+);
 ```
 
 ## Passthrough Helpers
@@ -216,13 +225,15 @@ The `passthrough`, `passthroughSubtype`, and `passthroughSupertype` helpers let 
 Use `passthrough` when the encoded output of the target schema matches the type of the source schema.
 
 ```ts
-import { Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Schema, SchemaTransformation } from "effect";
 
-const From = Schema.Struct({ a: Schema.String })
-const To = Schema.Struct({ a: Schema.FiniteFromString })
+const From = Schema.Struct({ a: Schema.String });
+const To = Schema.Struct({ a: Schema.FiniteFromString });
 
 // To.Encoded (string) = From.Type (string)
-const schema = From.pipe(Schema.decodeTo(To, SchemaTransformation.passthrough()))
+const schema = From.pipe(
+  Schema.decodeTo(To, SchemaTransformation.passthrough()),
+);
 ```
 
 ## Managing Optional Keys
@@ -232,18 +243,20 @@ You can control how optional values are handled during transformations using `Sc
 **Example** (Optional string key transformed to `Option<NonEmptyString>`)
 
 ```ts
-import { Option, Schema, SchemaTransformation } from "effect/unstable/schema"
+import { Option, Schema, SchemaTransformation } from "effect";
 
 const OptionFromNonEmptyString = Schema.optionalKey(Schema.String).pipe(
   Schema.decodeTo(
     Schema.Option(Schema.NonEmptyString),
     SchemaTransformation.transformOptional({
       decode: (oe) =>
-        Option.isSome(oe) && oe.value !== "" ? Option.some(Option.some(oe.value)) : Option.some(Option.none()),
-      encode: (ot) => Option.flatten(ot)
-    })
-  )
-)
+        Option.isSome(oe) && oe.value !== ""
+          ? Option.some(Option.some(oe.value))
+          : Option.some(Option.none()),
+      encode: (ot) => Option.flatten(ot),
+    }),
+  ),
+);
 ```
 
 ## Omitting a Key During Encoding
@@ -253,25 +266,25 @@ Use `SchemaGetter.omit()` to exclude a field from the encoded output.
 **Example** (Field present when decoded, omitted when encoded)
 
 ```ts
-import { Schema, SchemaGetter } from "effect/unstable/schema"
+import { Schema, SchemaGetter } from "effect";
 
 const schema = Schema.Struct({
   a: Schema.FiniteFromString,
   b: Schema.String.pipe(
     Schema.encodeTo(Schema.optionalKey(Schema.String), {
       decode: SchemaGetter.withDefault(() => "default_value"),
-      encode: SchemaGetter.omit()
-    })
-  )
-})
+      encode: SchemaGetter.omit(),
+    }),
+  ),
+});
 
-console.log(Schema.decodeUnknownSync(schema)({ a: "1", b: "value" }))
+console.log(Schema.decodeUnknownSync(schema)({ a: "1", b: "value" }));
 // Output: { a: 1, b: "value" }
 
-console.log(Schema.decodeUnknownSync(schema)({ a: "1" }))
+console.log(Schema.decodeUnknownSync(schema)({ a: "1" }));
 // Output: { a: 1, b: "default_value" }
 
-console.log(Schema.encodeSync(schema)({ a: 1, b: "default_value" }))
+console.log(Schema.encodeSync(schema)({ a: 1, b: "default_value" }));
 // Output: { a: "1" }
 ```
 
