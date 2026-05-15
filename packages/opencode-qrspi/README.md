@@ -34,7 +34,7 @@ Add the plugin to your OpenCode configuration (e.g., `.opencode/opencode.json`):
 Run the complete QRSPI workflow with a single command:
 
 ```bash
-opencode qrspi --slug add-payment-flow "Implement Stripe payment processing"
+/qrspi --slug add-payment-flow "Implement Stripe payment processing"
 ```
 
 This interactively guides you through each phase with a human checkpoint at every step:
@@ -54,16 +54,16 @@ You can also run phases independently:
 
 ```bash
 # Research only
-opencode qrspi:research --slug auth-refactor "Authentication system"
+/qrspi:research --slug auth-refactor "Authentication system"
 
 # Design from research
-opencode qrspi:design --slug auth-refactor --research .opencode/research/auth-refactor.md
+/qrspi:design --slug auth-refactor --research .opencode/research/auth-refactor.md
 
 # Plan from outline and research
-opencode qrspi:plan --slug auth-refactor --outline .opencode/outlines/auth-refactor.md --research .opencode/research/auth-refactor.md
+/qrspi:plan --slug auth-refactor --outline .opencode/outlines/auth-refactor.md --research .opencode/research/auth-refactor.md
 
 # Iterate on an existing plan
-opencode qrspi:iterate --plan .opencode/plans/auth-refactor.md "Add OAuth2 support"
+/qrspi:iterate --plan .opencode/plans/auth-refactor.md "Add OAuth2 support"
 ```
 
 ---
