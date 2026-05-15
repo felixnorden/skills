@@ -2,3 +2,5 @@
 
 # opensrc - source code for packages
 opensrc/
+
+node_modules
