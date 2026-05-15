@@ -17,26 +17,12 @@ QRSPI applies harness engineering principles by providing specialized sub-agents
 
 ## Installation
 
-```bash
-bun install opencode-qrspi
-```
-
 Add the plugin to your OpenCode configuration (e.g., `.opencode/opencode.json`):
 
 ```json
 {
-  "plugins": ["opencode-qrspi/server"]
+  "plugins": ["opencode-qrspi"]
 }
-```
-
-Or import it directly in your config:
-
-```typescript
-import { qrspi } from "opencode-qrspi/server";
-
-export default {
-  plugins: [qrspi],
-};
 ```
 
 ---
