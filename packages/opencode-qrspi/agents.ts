@@ -7,7 +7,7 @@ type Agent = Omit<BaseAgent, "permission"> & {
     [key in string]: Permission | { [arg in string]: Permission };
   };
 };
-type AgentPermission = Agent["permission"][number];
+export type AgentPermission = Agent["permission"][number];
 
 export const agents: Record<"plan" | "research", Agent> = {
   research: {

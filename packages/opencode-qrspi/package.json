@@ -29,7 +29,8 @@
   "scripts": {
     "prepack": "cp -r ../../skills/ ./skills",
     "postpack": "rm -rf ./skills",
-    "pack": "bun pm pack --destination ./dist"
+    "pack": "bun pm pack --destination ./dist",
+    "test": "bun test"
   },
   "dependencies": {
     "@opencode-ai/plugin": "^1.15.0"

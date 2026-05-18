@@ -29,11 +29,11 @@ function loadSkills(input: Config) {
   // @ts-expect-error - Missing skills types in Config
   input.skills.paths ??= [];
 
-  const planningSkillDir = join(currentDir, "skills/planning-workflow/");
+  const planningSkillDir = join(currentDir, "../../skills/planning-workflow/");
   // @ts-expect-error - Missing skills types in Config
   input.skills.paths.push(planningSkillDir);
 
-  const tddSkillDir = join(currentDir, "skills/tdd/");
+  const tddSkillDir = join(currentDir, "../../skills/tdd/");
   // @ts-expect-error - Missing skills types in Config
   input.skills.paths.push(tddSkillDir);
 }
