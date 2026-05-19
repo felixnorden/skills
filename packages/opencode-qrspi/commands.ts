@@ -6,7 +6,7 @@ export const commands: Record<string, Command> = {
   qrspi: {
     description:
       "Start a full QRSPI planning workflow. Guides Q → R → D → S → P interactively with a human checkpoint at each phase.",
-    agent: "plan",
+    agent: "plot",
     subtask: false,
     template: `Load \`skill:planning-workflow\` before proceeding.
 
@@ -30,13 +30,13 @@ Execute in order. Use \`tool:question\` at each checkpoint — do not advance un
 
 **R — Research**: Spawn \`task:research --template research.md --slug {slug} {scope summary}\` as a subtask. Present inline summary. Checkpoint.
 
-**D — Design**: Spawn \`task:plan --template design-concept.md --slug {slug} --research {research-path}\` as a subtask. Present concept. Checkpoint.
+**D — Design**: Spawn \`task:plot --template design-concept.md --slug {slug} --research {research-path}\` as a subtask. Present concept. Checkpoint.
 
-**S — Structure**: Spawn \`task:plan --template outline.md --slug {slug} --design {design-path} --research {research-path}\` as a subtask. Present outline. Checkpoint.
+**S — Structure**: Spawn \`task:plot --template outline.md --slug {slug} --design {design-path} --research {research-path}\` as a subtask. Present outline. Checkpoint.
 
-**P — Plan**: Spawn \`task:plan --template plan.md --slug {slug} --outline {outline-path} --research {research-path}\` as a subtask. Present inline summary. Checkpoint.
+**P — Plan**: Spawn \`task:plot --template plan.md --slug {slug} --outline {outline-path} --research {research-path}\` as a subtask. Present inline summary. Checkpoint.
 
-If revision is needed at P, spawn \`task:plan --template iterate.md --plan {plan-path} "{feedback}"\`.
+If revision is needed at P, spawn \`task:plot --template iterate.md --plan {plan-path} "{feedback}"\`.
 
 ---
 
@@ -70,7 +70,7 @@ If invoked without arguments, use \`tool:question\`: "What area of the codebase 
   "qrspi:structure": {
     description:
       "QRSPI Structure phase. Produces a component-level structural outline from the approved design concept.",
-    agent: "plan",
+    agent: "plot",
     subtask: true,
     template: `Load \`skill:planning-workflow\` → \`templates/outline.md\`.
 
@@ -95,7 +95,7 @@ If \`--design\` is not provided, use \`tool:question\` to ask for it before proc
   "qrspi:design": {
     description:
       "QRSPI Design phase. Facilitates solution design discussion, evaluates options, and produces a design concept document.",
-    agent: "plan",
+    agent: "plot",
     subtask: true,
     template: `Load \`skill:planning-workflow\` → \`templates/design-concept.md\`.
 
@@ -120,7 +120,7 @@ If \`--research\` is not provided, use \`tool:question\` to ask for it before pr
   "qrspi:plan": {
     description:
       "QRSPI Plan phase. Produces a vertically-sliced, TDD-aligned implementation plan for Build Agent.",
-    agent: "plan",
+    agent: "plot",
     subtask: true,
     template: `Load \`skill:planning-workflow\` → \`templates/plan.md\`. Load \`skill:tdd\`.
 
@@ -146,7 +146,7 @@ If \`--outline\` is not provided, use \`tool:question\` to ask for it before pro
   "qrspi:iterate": {
     description:
       "QRSPI Iterate phase. Surgically revises an existing plan based on feedback. Updates only affected slices.",
-    agent: "plan",
+    agent: "plot",
     subtask: true,
     template: `Load \`skill:planning-workflow\` → \`templates/iterate.md\`. Load \`skill:tdd\`.
 

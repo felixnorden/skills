@@ -9,7 +9,7 @@ type Agent = Omit<BaseAgent, "permission"> & {
 };
 export type AgentPermission = Agent["permission"][number];
 
-export const agents: Record<"plan" | "research", Agent> = {
+export const agents: Record<"plot" | "research", Agent> = {
   research: {
     description:
       "Codebase research agent. Maps unfamiliar repository areas, documents existing implementations, and produces a structured research document for Plan Agent. Invoke before planning when domain familiarity is low or the task spans multiple unknown files.",
@@ -143,7 +143,7 @@ t
 If no topic is provided: use tool \`tool:question\` — "What area of the codebase should I research?"
 `,
   },
-  plan: {
+  plot: {
     description:
       "Strategic codebase analysis and implementation planning. Invoke before any multi-file change, architectural decision, or work in an unfamiliar domain. Does not write or modify code outside .opencode/plans/.",
     mode: "all",
@@ -165,7 +165,7 @@ If no topic is provided: use tool \`tool:question\` — "What area of the codeba
       task: {
         explore: "allow",
         research: "allow",
-        plan: "allow",
+        plot: "allow",
       },
 
       todoread: "allow",
@@ -193,7 +193,7 @@ You analyse codebases and produce implementation plans. Build Agent executes.
 | ----------------------------- | ----------------------- |
 | Explore codebase              | \`task:explore\`          |
 | Research codebase             | \`task:research\`         |
-| Plan subtask                  | \`task:plan\`             |
+| Plan subtask                  | \`task:plot\`             |
 | Read specific files           | \`read\`                  |
 | Find files                    | \`glob\`                  |
 | Search content                | \`grep\`, \`codesearch\`    |
