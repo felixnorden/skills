@@ -15,7 +15,7 @@
       "name": "opencode-qrspi",
       "version": "0.1.0",
       "dependencies": {
-        "@opencode-ai/plugin": "^1.15.0",
+        "@opencode-ai/plugin": "^1.15.5",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -38,9 +38,9 @@
 
     "@msgpackr-extract/msgpackr-extract-win32-x64": ["@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3", "", { "os": "win32", "cpu": "x64" }, "sha512-x0fWaQtYp4E6sktbsdAqnehxDgEc/VwM7uLsRCYWaiGu0ykYdZPiS8zCWdnjHwyiumousxfBm4SO31eXqwEZhQ=="],
 
-    "@opencode-ai/plugin": ["@opencode-ai/plugin@1.15.0", "", { "dependencies": { "@opencode-ai/sdk": "1.15.0", "effect": "4.0.0-beta.65", "zod": "4.1.8" }, "peerDependencies": { "@opentui/core": ">=0.2.10", "@opentui/keymap": ">=0.2.10", "@opentui/solid": ">=0.2.10" }, "optionalPeers": ["@opentui/core", "@opentui/keymap", "@opentui/solid"] }, "sha512-97N985FDqNMpbBbsNotu0j3lkHwDyHX+2BnPFfnuNmBrTQNqLrn2UyA6wBfP6J5l4xUslwKNrH2IVrGIZeiSxQ=="],
+    "@opencode-ai/plugin": ["@opencode-ai/plugin@1.15.5", "", { "dependencies": { "@opencode-ai/sdk": "1.15.5", "effect": "4.0.0-beta.65", "zod": "4.1.8" }, "peerDependencies": { "@opentui/core": ">=0.2.14", "@opentui/keymap": ">=0.2.14", "@opentui/solid": ">=0.2.14" }, "optionalPeers": ["@opentui/core", "@opentui/keymap", "@opentui/solid"] }, "sha512-QvhrDLlQuLeFGET1zB2crMWPvou6PpAzYtKrbun9akWvaskyAcXIAVn3lNYX/InMcut5VzL6ERbPgvM7ucHfLA=="],
 
-    "@opencode-ai/sdk": ["@opencode-ai/sdk@1.15.0", "", { "dependencies": { "cross-spawn": "7.0.6" } }, "sha512-npmURKwd1HoV/i3CsGl2tdHpGhWSGVqTN1cp0s2gDH5gE6XduAtFmmVXBZ/ovJLh3Evu6sTVZ9n0IkJzFNeveQ=="],
+    "@opencode-ai/sdk": ["@opencode-ai/sdk@1.15.5", "", { "dependencies": { "cross-spawn": "7.0.6" } }, "sha512-ozJuEmXzrOvia5n0L1KAuvpyf9ESGmTk1FiPhn0RK5X1whbzjlTXL0NAxqNCEkqETxL35jS1KHArEiTpvtJ6FQ=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
 
