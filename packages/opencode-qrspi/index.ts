@@ -3,15 +3,33 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { commands } from "./commands";
 import { agents, mergePermission } from "./agents";
+import { isSome, redirect, matchQrspiPath } from "./events";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 
-export const qrspi: Plugin = async () => {
+export const qrspi: Plugin = async ({ worktree, client }) => {
   return {
     async config(input) {
       loadCommands(input);
       loadSkills(input);
       loadAgents(input);
+    },
+    "tool.execute.before": async ({ tool }, output) => {
+      // Redirect all QRSPI document paths to always live in the root `.opencode/<artifact>` directory
+      if (tool === "write" || tool === "edit" || tool === "read") {
+        const filePath = String(output.args.filePath);
+        const newPath = redirect(filePath, worktree, matchQrspiPath);
+        if (isSome(newPath)) {
+          client.app.log({
+            body: {
+              service: "qrspi",
+              level: "info",
+              message: `Redirecting ${tool} to ${newPath.value}`,
+            },
+          });
+          output.args.filePath = join(newPath.value);
+        }
+      }
     },
   };
 };
