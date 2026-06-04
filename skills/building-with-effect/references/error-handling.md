@@ -64,7 +64,7 @@ export class MissingValueError extends Schema.TaggedErrorClass<MissingValueError
 ```ts
 export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "DatabaseError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 // Usage in try/catch
@@ -423,20 +423,20 @@ Use this decision guide to choose the right error handling approach:
 
 **"Do you want to RECOVER from this error and continue?"**
 
-| If... | Use... | Example |
-|-------|--------|---------|
-| You want to retry | `Effect.retry` with `Schedule` | Network timeout → retry with exponential backoff |
-| You want a fallback value | `orElse` or `catchTags` | Config missing → use defaults |
-| You want to log and continue | `catch` with logging | Non-critical error → log warning |
-| You want to transform error type | `mapError` | Convert to domain error |
+| If...                            | Use...                         | Example                                          |
+| -------------------------------- | ------------------------------ | ------------------------------------------------ |
+| You want to retry                | `Effect.retry` with `Schedule` | Network timeout → retry with exponential backoff |
+| You want a fallback value        | `orElse` or `catchTags`        | Config missing → use defaults                    |
+| You want to log and continue     | `catch` with logging           | Non-critical error → log warning                 |
+| You want to transform error type | `mapError`                     | Convert to domain error                          |
 
 **"Do you want to FAIL and PROPAGATE this error?"**
 
-| If... | Use... | Example |
-|-------|--------|---------|
-| Validation failure | `yield* new ValidationError({...})` | Invalid input format |
-| Business rule violation | `yield* new BusinessRuleError({...})` | Insufficient funds |
-| Unrecoverable state | `return yield* new ErrorType({...})` | Database corruption |
+| If...                   | Use...                                | Example              |
+| ----------------------- | ------------------------------------- | -------------------- |
+| Validation failure      | `yield* new ValidationError({...})`   | Invalid input format |
+| Business rule violation | `yield* new BusinessRuleError({...})` | Insufficient funds   |
+| Unrecoverable state     | `return yield* new ErrorType({...})`  | Database corruption  |
 
 ### Decision 2: Which Combinator?
 
@@ -447,15 +447,15 @@ Use this decision guide to choose the right error handling approach:
 Effect.catchTags({
   NotFoundError: () => fallbackValue,
   ValidationError: () => fallbackValue,
-})
+});
 ```
 
 **For fallback after specific handling:**
 
 ```ts
 // Good — Use catchTag then catch for final fallback
-Effect.catchTag("NotFoundError", () => fallback)
-Effect.catch(() => anotherFallback)
+Effect.catchTag("NotFoundError", () => fallback);
+Effect.catch(() => anotherFallback);
 ```
 
 **For retryable errors:**
@@ -465,7 +465,7 @@ Effect.catch(() => anotherFallback)
 Effect.retry({
   times: 3,
   schedule: Schedule.exponential("100 millis"),
-})
+});
 ```
 
 ### Anti-Patterns
@@ -475,8 +475,8 @@ Effect.retry({
 ```ts
 // Wrong - catching and re-throwing defeats the purpose
 Effect.catchTags({
-  ValidationError: (e) => Effect.fail(e),  // Just re-raise it!
-})
+  ValidationError: (e) => Effect.fail(e), // Just re-raise it!
+});
 ```
 
 **// Good** — CORRECT: propagate validation errors with `return yield*`:
@@ -500,14 +500,14 @@ const withFallback = validateInput(input).pipe(
 
 ### Quick Reference
 
-| Scenario | Pattern |
-|----------|---------|
-| Retry transient failure | `Effect.retry(Schedule.exponential(...))` |
-| Use fallback value | `Effect.orElse(() => fallback)` |
-| Handle multiple errors differently | `Effect.catchTags({...})` |
-| Convert error type | `Effect.mapError(...)` |
-| Fail with domain error | `return yield* new DomainError({...})` |
-| Log and re-throw | `Effect.catch(...)` then re-raise |
+| Scenario                           | Pattern                                   |
+| ---------------------------------- | ----------------------------------------- |
+| Retry transient failure            | `Effect.retry(Schedule.exponential(...))` |
+| Use fallback value                 | `Effect.orElse(() => fallback)`           |
+| Handle multiple errors differently | `Effect.catchTags({...})`                 |
+| Convert error type                 | `Effect.mapError(...)`                    |
+| Fail with domain error             | `return yield* new DomainError({...})`    |
+| Log and re-throw                   | `Effect.catch(...)` then re-raise         |
 
 ---
 

@@ -95,7 +95,7 @@ import { Effect, Schema } from "effect";
 
 class InvalidPayload extends Schema.TaggedErrorClass<InvalidPayload>()(
   "InvalidPayload",
-  { input: Schema.String, cause: Schema.Defect },
+  { input: Schema.String, cause: Schema.Defect() },
 ) {}
 
 // From sync code that may throw
@@ -109,7 +109,7 @@ export const parsePayload = Effect.fn("parsePayload")((input: string) =>
 // From Promise-based APIs
 class UserLookupError extends Schema.TaggedErrorClass<UserLookupError>()(
   "UserLookupError",
-  { userId: Schema.Number, cause: Schema.Defect },
+  { userId: Schema.Number, cause: Schema.Defect() },
 ) {}
 
 export const fetchUser = Effect.fn("fetchUser")((userId: number) =>

@@ -38,7 +38,7 @@ import {
 
 class DevToolsError extends Schema.TaggedErrorClass<DevToolsError>()(
   "DevToolsError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 export class DevTools extends Context.Service<

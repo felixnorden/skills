@@ -17,7 +17,7 @@ import { Effect, Context, Layer, Schema } from "effect";
 
 class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "DatabaseError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 export class Database extends Context.Service<
@@ -44,7 +44,7 @@ export class Database extends Context.Service<
 }
 
 // If you ever need to access the service type, use `Database["Service"]`
-export type DatabaseService = Database["Service"]
+export type DatabaseService = Database["Service"];
 ```
 
 **With dependencies**
@@ -54,7 +54,7 @@ import { Effect, Context, Layer, Schema } from "effect";
 
 class UserRespositoryError extends Schema.TaggedErrorClass<UserRespositoryError>()(
   "UserRespositoryError",
-  { reason: Schema.Defect },
+  { reason: Schema.Defect() },
 ) {}
 
 export class UserRepository extends Context.Service<
@@ -539,6 +539,7 @@ Avoid:
 ## External Examples
 
 See full examples:
+
 - [Context.Reference](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/10_reference.ts)
 - [Layer Composition](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/20_layer-composition.ts)
 - [Layer Unwrap](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/02_services/20_layer-unwrap.ts)

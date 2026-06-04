@@ -163,7 +163,7 @@ Service Creation Progress:
 ```ts
 class ServiceError extends Schema.TaggedErrorClass<ServiceError>()(
   "ServiceError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 ```
 
@@ -231,7 +231,7 @@ import { Effect, Context, Layer, Schema } from "effect";
 
 class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "DatabaseError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 export class Database extends Context.Service<

@@ -5,6 +5,8 @@ description: Comprehensive reference for Effect Result type - synchronous, pure 
 
 # Result - Synchronous Error Handling
 
+> **Reference for Effect v4.0.0-beta.76.** APIs may change before the final v4 release.
+
 A synchronous, pure type for representing computations that can succeed (`Success<A>`) or fail (`Failure<E>`). Unlike `Effect`, `Result` is evaluated eagerly and carries no side effects.
 
 ## Table of Contents
@@ -67,7 +69,7 @@ console.log(Result.getOrElse(result, (err) => `Error: ${err}`));
 
 ```ts
 // Option - value might be missing
-Option.fromNullable(maybeValue);
+Option.fromNullishOr(maybeValue, () => "fallback");
 
 // Result - computation might fail
 Result.try(() => JSON.parse(userInput));
@@ -268,6 +270,18 @@ Result.all([Result.succeed(1), Result.fail("err")]);
 // Failure("err")
 ```
 
+### tap
+
+Run a side-effect on success without changing the value:
+
+```ts
+Result.tap(Result.succeed(42), (n) => {
+  console.log(n); // 42
+  return Result.succeed(undefined); // ignored
+});
+// Success(42)
+```
+
 ## Error Handling
 
 ### orElse
@@ -328,6 +342,20 @@ const result = pipe(
   Result.bind("y", () => Result.succeed(3)),
   Result.let("sum", ({ x, y }) => x + y),
 ); // Success({ x: 2, y: 3, sum: 5 })
+```
+
+### bindTo
+
+Shorthand to bind the current value to a named field:
+
+```ts
+import { pipe, Result } from "effect";
+
+const result = pipe(
+  Result.succeed(42),
+  Result.bindTo("answer"),
+  Result.let("doubled", ({ answer }) => answer * 2),
+); // Success({ answer: 42, doubled: 84 })
 ```
 
 ## Transposing

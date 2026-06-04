@@ -1,6 +1,6 @@
 # Effect Data Types
 
-Common data structures in Effect v4 ecosystem.
+Common data structures in Effect v4.0.0-beta.76.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
 
@@ -15,20 +15,36 @@ import { Option } from "effect";
 const some = Option.some(42);
 const none = Option.none();
 
-// From nullable
-Option.fromNullable(value); // null|undefined -> None
+// From nullable / nullish values
+Option.fromNullishOr(value, () => "fallback"); // null|undefined -> fallback
+Option.fromUndefinedOr(value, () => "fallback"); // undefined -> fallback
+Option.fromNullOr(value, () => "fallback"); // null -> fallback
 
 // Check
+Option.isOption(value); // type guard
 Option.isSome(opt);
 Option.isNone(opt);
 
 // Access value
 Option.getOrElse(opt, () => defaultValue);
 Option.getOrThrow(opt); // throws if None
+Option.getOrThrowWith(opt, () => new Error("missing"));
+Option.getOrNull(opt);
+Option.getOrUndefined(opt);
 
 // Transform
 Option.map(opt, (n) => n * 2);
 Option.flatMap(opt, (n) => Option.some(n + 1));
+Option.filter(opt, (n) => n > 0); // Some -> None if predicate fails
+Option.filterMap(opt, (n) => n > 0 ? Option.some(n * 2) : Option.none());
+Option.liftPredicate((n: number) => n > 0)(5); // Option<number>
+Option.liftThrowable(() => JSON.parse(input)); // Option<unknown>
+Option.as(opt, "fixed"); // replace value
+Option.asVoid(opt); // Option<void>
+
+// Zip / product
+Option.zipWith(opt1, opt2, (a, b) => a + b);
+Option.product(opt1, opt2); // Option<[A, B]>
 
 // Match
 Option.match(opt, {
@@ -42,6 +58,17 @@ Option.gen(function* () {
   const b = yield* Option.some(20);
   return a + b;
 });
+
+// Recovery
+Option.orElse(opt, () => Option.some(99));
+Option.orElseSome(opt, () => 99); // convenience: wraps fallback in Some
+Option.orElseResult(opt, () => Result.fail("missing")); // Option<A> -> Result<A, E>
+Option.firstSomeOf([opt1, opt2, opt3]); // first Some from iterable
+
+// Query
+Option.contains(opt, 42); // true if Some(42)
+Option.exists(opt, (n) => n > 0); // true if Some and predicate passes
+Option.toArray(opt); // [] or [value]
 ```
 
 **Important v4 change:** Option is Yieldable but not an Effect subtype:
@@ -94,30 +121,13 @@ Result.match(result, {
 ```ts
 import { Chunk } from "effect";
 
-// Create
 const chunk = Chunk.make(1, 2, 3);
-Chunk.fromIterable([1, 2, 3]);
-Chunk.empty();
-
-// Operations (all return new Chunk)
 Chunk.append(chunk, 4);
-Chunk.prepend(chunk, 0);
-Chunk.concat(chunk1, chunk2);
-Chunk.take(chunk, 2);
-Chunk.drop(chunk, 1);
-
-// Transform
 Chunk.map(chunk, (n) => n * 2);
-Chunk.filter(chunk, (n) => n > 1);
-Chunk.flatMap(chunk, (n) => Chunk.make(n, n));
-
-// Access
-Chunk.get(chunk, 0); // Option<A>
-Chunk.unsafeGet(chunk, 0); // A (unsafe)
-
-// Convert
-Chunk.toReadonlyArray(chunk);
+Chunk.toArray(chunk);
 ```
+
+**See [data-type-chunk.md](data-type-chunk.md) for comprehensive reference** — covering 60+ APIs including constructors, transforms, access, queries, set operations, and extended reference tables.
 
 ## HashSet
 
@@ -137,6 +147,13 @@ HashSet.remove(set, 2);
 HashSet.has(set, 2);
 HashSet.size(set);
 
+// Queries
+HashSet.isHashSet(value); // type guard
+HashSet.isEmpty(set);
+HashSet.some(set, (n) => n > 2); // exists matching element
+HashSet.every(set, (n) => n > 0); // all elements match
+HashSet.isSubset(set1, set2); // set1 is subset of set2
+
 // Set operations
 HashSet.union(set1, set2);
 HashSet.intersection(set1, set2);
@@ -145,6 +162,7 @@ HashSet.difference(set1, set2);
 // Transform
 HashSet.map(set, (n) => n * 2);
 HashSet.filter(set, (n) => n > 1);
+HashSet.reduce(set, 0, (acc, n) => acc + n);
 ```
 
 ## HashMap
@@ -157,170 +175,153 @@ import { HashMap } from "effect";
 // Create
 const map = HashMap.make(["key1", "value1"], ["key2", "value2"]);
 HashMap.empty();
+HashMap.fromIterable([["a", 1], ["b", 2]]);
 
 // Operations
 HashMap.set(map, "key3", "value3");
 HashMap.remove(map, "key1");
+HashMap.removeMany(map, ["key1", "key2"]);
+HashMap.setMany(map, [["key3", "value3"], ["key4", "value4"]]);
 HashMap.get(map, "key1"); // Option<V>
+HashMap.getUnsafe(map, "key1"); // V (throws if missing)
 HashMap.has(map, "key1");
 HashMap.size(map);
+HashMap.isEmpty(map);
+HashMap.isHashMap(value); // type guard
 
 // Iteration
 HashMap.keys(map);
 HashMap.values(map);
+HashMap.entries(map);
+HashMap.toValues(map); // Array<V>
+HashMap.toEntries(map); // Array<[K, V]>
 
 // Transform
 HashMap.map(map, (v, k) => v.toUpperCase());
 HashMap.filter(map, (v, k) => v.length > 3);
-```
+HashMap.filterMap(map, (v, k) => v.length > 3 ? Option.some(v.toUpperCase()) : Option.none());
+HashMap.flatMap(map, (v, k) => HashMap.make([[v, k]]));
+HashMap.forEach(map, (v, k) => console.log(k, v));
+HashMap.reduce(map, 0, (acc, v, k) => acc + v.length);
+HashMap.compact(mapOfOptions); // HashMap<K, Option<A>> -> HashMap<K, A>
 
-## Cause (v4: Flattened Structure)
+// Queries
+HashMap.some(map, (v, k) => v.length > 3);
+HashMap.every(map, (v, k) => v.length > 3);
+HashMap.findFirst(map, (v, k) => v.length > 3); // Option<V>
 
-In v4, `Cause<E>` has been flattened to a simple wrapper around an array of `Reason` values:
-
-```ts
-interface Cause<E> {
-  readonly reasons: ReadonlyArray<Reason<E>>;
-}
-
-type Reason<E> = Fail<E> | Die | Interrupt;
-```
-
-**Creating causes**
-
-```ts
-import { Cause } from "effect";
-
-// Individual reasons
-Cause.fail(error);
-Cause.die(defect);
-Cause.interrupt(fiberId);
-
-// Combine causes (replaces sequential/parallel)
-Cause.combine(cause1, cause2);
-
-// Empty cause
-Cause.empty;
-```
-
-**Accessing reasons**
-
-```ts
-const handle = (cause: Cause.Cause<string>) => {
-  // Iterate over flat reasons array
-  for (const reason of cause.reasons) {
-    switch (reason._tag) {
-      case "Fail":
-        return reason.error;
-      case "Die":
-        return reason.defect;
-      case "Interrupt":
-        return reason.fiberId;
-    }
-  }
-};
-```
-
-**Reason guards (v4)**
-
-```ts
-// Check reason types
-Cause.isFailReason(reason);
-Cause.isDieReason(reason);
-Cause.isInterruptReason(reason);
-```
-
-**Cause-level predicates (v4)**
-
-```ts
-Cause.hasFails(cause); // has any Fail reasons
-Cause.hasDies(cause); // has any Die reasons
-Cause.hasInterrupts(cause); // has any Interrupt reasons
-Cause.hasInterruptsOnly(cause); // only Interrupt reasons
-Cause.isEmpty(cause); // no reasons
-```
-
-**Extractors (v4)**
-
-```ts
-// Find specific reason types
-Cause.findErrorOption(cause); // Option<E>
-Cause.findError(cause); // Result<E>
-Cause.findDefect(cause); // Result<unknown>
-Cause.findInterrupt(cause); // Result<FiberId>
-
-// Filter reasons
-cause.reasons.filter(Cause.isFailReason);
-cause.reasons.filter(Cause.isDieReason);
-
-// Get all of specific type
-Cause.failures(cause); // all Fail reasons
-cause.reasons.filter(Cause.isDieReason); // all Die reasons
-```
-
-**Display**
-
-```ts
-Cause.pretty(cause);
-```
-
-## Exit
-
-**Effect completion result**
-
-```ts
-import { Exit } from "effect";
-
-// Get from effect
-const exit = yield* Effect.exit(effect);
-
-// Check
-if (Exit.isSuccess(exit)) {
-  console.log(exit.value);
-} else if (Exit.isFailure(exit)) {
-  // v4: exit.cause.reasons for flattened structure
-  console.log(Cause.pretty(exit.cause));
-}
-
-// Match
-Exit.match(exit, {
-  onFailure: (cause) => /* ... */,
-  onSuccess: (value) => /* ... */
+// Mutation helpers (batch multiple updates efficiently)
+HashMap.mutate(map, (mutable) => {
+  mutable.set("key3", "value3");
+  mutable.remove("key1");
 });
+HashMap.beginMutation(map); // start mutable window
+HashMap.endMutation(map); // freeze back to immutable
+HashMap.modify(map, "key", (v) => v.toUpperCase()); // modify existing value
+HashMap.modifyAt(map, "key", Option.some("new")); // set/remove via Option
+HashMap.modifyHash(map, hash, "key", (v) => v.toUpperCase()); // modify with known hash
 
-// Create
-Exit.succeed(value);
-Exit.fail(error);
-Exit.die(defect);
-Exit.interrupt(fiberId);
+// Merge
+HashMap.union(map1, map2); // right-biased merge
 ```
+
+## Cause & Exit
+
+**Structured failure representation and effect completion**
+
+```ts
+import { Cause, Exit } from "effect";
+
+// Cause holds an array of failure reasons
+const cause = Cause.fail("something went wrong");
+Cause.hasFails(cause);
+Cause.pretty(cause);
+
+// Exit is the completion result of an Effect
+const exit = yield* Effect.exit(effect);
+Exit.isSuccess(exit);
+Exit.isFailure(exit);
+```
+
+**See [data-type-cause.md](data-type-cause.md) for comprehensive reference** — covering all Cause and Exit APIs including built-in error types (`NoSuchElementError`, `TimeoutError`, etc.), reason guards, extractors, transforms, and Exit filtering.
 
 ## Duration
 
 **Time spans**
 
 ```ts
-import { Duration } from "effect";
+import { Duration, Option } from "effect";
 
-// Create
+// Constructors
 Duration.millis(100);
 Duration.seconds(5);
 Duration.minutes(2);
 Duration.hours(1);
+Duration.nanos(BigInt(1_000_000)); // nanoseconds
+Duration.micros(BigInt(500)); // microseconds
+Duration.days(7);
+Duration.weeks(2);
+Duration.zero;
+Duration.infinity;
+Duration.negativeInfinity;
 
-// Decode from string
-Duration.decode("100 millis");
-Duration.decode("5 seconds");
-Duration.decode("2 minutes");
+// Decode from flexible input
+Duration.fromInputUnsafe("100 millis");
+Duration.fromInputUnsafe("5 seconds");
+Duration.fromInputUnsafe("2 minutes");
+Duration.fromInputUnsafe(1000); // number = millis
+Duration.fromInputUnsafe(BigInt(1e9)); // bigint = nanos
+Duration.fromInputUnsafe([2, 500_000_000]); // [seconds, nanos]
+Duration.fromInputUnsafe({ days: 1, hours: 12 }); // DurationObject
+// Safe variant returns Option<Duration>
+Duration.fromInput(input); // Option<Duration>
 
 // Operations
 Duration.sum(d1, d2);
+Duration.subtract(d1, d2);
 Duration.times(duration, 3);
-Duration.lessThan(d1, d2);
+Duration.divide(duration, 2); // Option<Duration>
+Duration.divideUnsafe(duration, 2); // Duration (throws on invalid)
+Duration.abs(duration);
+Duration.negate(duration);
+
+// Comparison
+Duration.isLessThan(d1, d2);
+Duration.isGreaterThan(d1, d2);
+Duration.equals(d1, d2);
+Duration.isFinite(duration);
+Duration.isZero(duration);
+Duration.isNegative(duration);
+Duration.isPositive(duration);
 
 // Convert
 Duration.toMillis(duration);
 Duration.toSeconds(duration);
+Duration.toMinutes(duration);
+Duration.toHours(duration);
+Duration.toDays(duration);
+Duration.toWeeks(duration);
+Duration.toNanos(duration); // Option<bigint>
+Duration.toNanosUnsafe(duration); // bigint (throws on infinite)
+Duration.toHrTime(duration); // [seconds, nanos]
+Duration.parts(duration); // { days, hours, minutes, seconds, milliseconds, microseconds, nanoseconds }
+Duration.format(duration); // human-readable string
+
+// Pattern matching
+Duration.match(duration, {
+  onMillis: (millis) => `${millis}ms`,
+  onNanos: (nanos) => `${nanos}ns`,
+  onInfinity: () => "forever",
+  onNegativeInfinity: () => "negative forever",
+});
+
+// Instances
+Duration.Order; // Order<Duration>
+Duration.Equivalence; // Equivalence<Duration>
+Duration.min(d1, d2);
+Duration.max(d1, d2);
+Duration.clamp({ minimum: min, maximum: max })(duration);
+Duration.between({ minimum: min, maximum: max })(duration);
 ```
 
 ## Stream
@@ -339,6 +340,15 @@ Stream.repeatValue(42);
 // From Effect
 Stream.fromEffect(effect);
 Stream.unfold(0, (n) => Option.some([n, n + 1]));
+
+// From queues / pubsub / schedules
+Stream.fromQueue(queue); // Stream<A, Exclude<E, Done>>
+Stream.fromPubSub(pubsub); // Stream<A>
+Stream.fromSchedule(schedule); // Stream<Output, E, R>
+
+// From context
+Stream.service(ServiceTag); // Stream<S, never, I>
+Stream.serviceOption(ServiceTag); // Stream<Option<S>>
 
 // Transform
 Stream.map(stream, (n) => n * 2);
@@ -360,41 +370,60 @@ Stream.runFold(stream, 0, (acc, n) => acc + n);
 
 ## Data
 
-**Value equality helpers**
+**Immutable data constructors with discriminated-union support**
 
 ```ts
-import { Data, Schema } from "effect";
+import { Data, Equal } from "effect";
 
-// Struct with value equality
-const user = Data.struct({
-  id: 1,
-  name: "Alice",
-});
-
-// Tagged (discriminated unions)
-const ok = Data.tagged("Ok", { value: 42 });
-const err = Data.tagged("Err", { error: "failed" });
-
-// Tagged errors
-class NotFoundError extends Schema.TaggedErrorClass<NotFoundError>("NotFound")({
-  id: Schema.String,
-}) {}
-
-class ValidationError extends Schema.TaggedErrorClass<ValidationError>("Validation")({
-  field: Schema.String,
-  message: Schema.String,
-}) {}
-
-// Case class
+// Plain immutable class with value equality
 class User extends Data.Class<{
-  id: number;
-  name: string;
+  readonly id: number;
+  readonly name: string;
 }> {}
 
 const user1 = new User({ id: 1, name: "Alice" });
 const user2 = new User({ id: 1, name: "Alice" });
 console.log(user1 === user2); // false
 console.log(Equal.equals(user1, user2)); // true
+
+// Tagged class (single-variant with _tag)
+class Person extends Data.TaggedClass("Person")<{
+  readonly name: string;
+}> {}
+
+const person = new Person({ name: "Alice" });
+console.log(person._tag); // "Person"
+
+// Tagged enum (multi-variant discriminated union)
+type Shape = Data.TaggedEnum<{
+  Circle: { readonly radius: number };
+  Rect: { readonly width: number; readonly height: number };
+}>;
+
+const { Circle, Rect, $match } = Data.taggedEnum<Shape>();
+
+const area = $match({
+  Circle: ({ radius }) => Math.PI * radius ** 2,
+  Rect: ({ width, height }) => width * height,
+});
+
+console.log(area(Circle({ radius: 5 }))); // 78.5398...
+console.log(area(Rect({ width: 3, height: 4 }))); // 12
+
+// Yieldable error (no _tag)
+class NetworkError extends Data.Error<{
+  readonly code: number;
+  readonly message: string;
+}> {}
+
+// Yieldable tagged error (with _tag for catchTag)
+class NotFound extends Data.TaggedError("NotFound")<{
+  readonly resource: string;
+}> {}
+
+class Forbidden extends Data.TaggedError("Forbidden")<{
+  readonly reason: string;
+}> {}
 ```
 
 ## Redacted
@@ -412,6 +441,15 @@ console.log(secret); // <redacted>
 
 // Access value
 const value = Redacted.value(secret); // "my-secret-key"
+
+// Type guard
+Redacted.isRedacted(value);
+
+// Wipe from internal registry (unsafe)
+Redacted.wipeUnsafe(secret);
+
+// Create equivalence for redacted values
+Redacted.makeEquivalence(Equivalence.strictEqual<string>());
 ```
 
 ## Match
@@ -436,6 +474,8 @@ Match.type<User | Admin | Guest>().pipe(
 );
 ```
 
+**See [data-type-match.md](data-type-match.md) for comprehensive reference** — covering all Match APIs including `whenOr`, `whenAnd`, `discriminator`, `type refinements`, and more.
+
 ## Queue
 
 **FIFO async coordination**
@@ -443,22 +483,55 @@ Match.type<User | Admin | Guest>().pipe(
 ```ts
 import { Queue } from "effect";
 
+// Create
 const queue = yield * Queue.bounded<number>(100);
+const slidingQueue = yield * Queue.sliding<number>(100); // drops oldest when full
+const droppingQueue = yield * Queue.dropping<number>(100); // drops new when full
+const unboundedQueue = yield * Queue.unbounded<number>();
+
+// Type guards
+Queue.isQueue(value);
+Queue.isEnqueue(value);
+Queue.isDequeue(value);
+Queue.asEnqueue(queue); // narrow to Enqueue side
+Queue.asDequeue(queue); // narrow to Dequeue side
 
 // Producer
 yield * Queue.offer(queue, 42);
+Queue.offerUnsafe(queue, 42); // synchronous, returns boolean
 yield * Queue.offerAll(queue, [1, 2, 3]);
+Queue.offerAllUnsafe(queue, [1, 2, 3]); // synchronous, returns unoffered items
+
+// Signal completion / failure
+yield * Queue.end(queue); // signal normal completion
+yield * Queue.fail(queue, error); // signal failure
+yield * Queue.failCause(queue, cause); // signal with Cause
+yield * Queue.interrupt(queue); // signal interruption
 
 // Consumer
 const item = yield * Queue.take(queue);
-const batch = yield * Queue.takeUpTo(queue, 10);
+const batch = yield * Queue.takeAll(queue); // all available items
+const collected = yield * Queue.collect(queue); // takeAll excluding Done signals
+const nItems = yield * Queue.takeN(queue, 5); // up to N items
+const rangeItems = yield * Queue.takeBetween(queue, 2, 10); // between min and max
+const peeked = yield * Queue.peek(queue); // first without removing
+const polled = yield * Queue.poll(queue); // Option<A>
+Queue.takeUnsafe(queue); // synchronous, returns Exit<A, E> | undefined
 
 // Check
 const size = yield * Queue.size(queue);
 const isFull = yield * Queue.isFull(queue);
+Queue.sizeUnsafe(queue); // synchronous
+Queue.isFullUnsafe(queue); // synchronous
+
+// Clear
+yield * Queue.clear(queue); // remove all messages
 
 // Shutdown
 yield * Queue.shutdown(queue);
+
+// Into (pipe queue into another)
+Queue.into(queue, otherQueue);
 ```
 
 ## Deferred
@@ -471,18 +544,48 @@ yield * Queue.shutdown(queue);
 import { Deferred } from "effect";
 
 const deferred = yield * Deferred.make<string, Error>();
+const unsafeDeferred = Deferred.makeUnsafe<string, Error>();
+
+// Type guard
+Deferred.isDeferred(value);
 
 // Set value (only once)
 yield * Deferred.succeed(deferred, "value");
+Deferred.sync(deferred, () => expensive()); // set via lazy function
+
+// Complete with an existing Effect
+yield * Deferred.complete(deferred, Effect.succeed("value"));
+yield * Deferred.completeWith(deferred, effect); // alias
+
+// Set with done signal
+yield * Deferred.done(deferred, Exit.succeed("value"));
+Deferred.doneUnsafe(deferred, Exit.succeed("value")); // synchronous
 
 // Or fail
 yield * Deferred.fail(deferred, new Error("failed"));
+Deferred.failSync(deferred, () => new Error("failed")); // lazy
+yield * Deferred.failCause(deferred, Cause.fail("failed"));
+
+// Defect
+yield * Deferred.die(deferred, "defect");
+Deferred.dieSync(deferred, () => "defect"); // lazy
+
+// Interrupt
+yield * Deferred.interrupt(deferred);
+yield * Deferred.interruptWith(deferred, fiberId);
 
 // Await result (v4: use explicit method)
 const value = yield * Deferred.await(deferred);
 
 // Poll (non-blocking)
-const opt = yield * Deferred.poll(deferred);
+const opt = yield * Deferred.poll(deferred); // Option<Effect<A, E>>
+
+// Check state
+const done = yield * Deferred.isDone(deferred);
+Deferred.isDoneUnsafe(deferred); // synchronous
+
+// Into (pipe into another Deferred)
+Deferred.into(deferred, otherDeferred);
 ```
 
 ## Ref
@@ -495,18 +598,56 @@ const opt = yield * Deferred.poll(deferred);
 import { Ref } from "effect";
 
 const counter = yield * Ref.make(0);
+const unsafeRef = Ref.makeUnsafe(0);
 
 // Get (v4: use explicit method)
 const value = yield * Ref.get(counter);
+const valueUnsafe = Ref.getUnsafe(counter); // synchronous read
 
 // Set
 yield * Ref.set(counter, 42);
 
+// Get and set (returns old value)
+const oldValue = yield * Ref.getAndSet(counter, 99);
+
+// Get and update (returns old value)
+const oldValue2 = yield * Ref.getAndUpdate(counter, (n) => n + 1);
+
+// Get and update some (returns Option<old value>)
+const oldOpt = yield * Ref.getAndUpdateSome(counter, {
+  onNone: () => Option.some(1),
+  onSome: (n) => n < 10 ? Option.some(n + 1) : Option.none(),
+});
+
+// Set and get (returns new value)
+const newValue = yield * Ref.setAndGet(counter, 42);
+
 // Update atomically
 yield * Ref.update(counter, (n) => n + 1);
 
+// Update and get (returns new value)
+const updated = yield * Ref.updateAndGet(counter, (n) => n + 1);
+
+// Update some (conditional)
+yield * Ref.updateSome(counter, {
+  onNone: () => 1,
+  onSome: (n) => n < 10 ? n + 1 : n,
+});
+
+// Update some and get (returns new value)
+const updatedSome = yield * Ref.updateSomeAndGet(counter, {
+  onNone: () => 1,
+  onSome: (n) => n < 10 ? n + 1 : n,
+});
+
 // Modify (get old + update)
 const prev = yield * Ref.modify(counter, (n) => [n, n + 1]);
+
+// Modify some (conditional modify)
+const modifiedOpt = yield * Ref.modifySome(counter, Option.some(0), (n) => {
+  if (n > 0) return Option.some([n, n + 1]);
+  return Option.none();
+});
 ```
 
 ## Equality (v4: Structural by Default)
@@ -530,6 +671,13 @@ Equal.equals(obj, { a: 1 }); // false
 
 // Equivalence (renamed in v4)
 Equal.asEquivalence<number>(); // v4: was equivalence()
+
+// Type guard
+Equal.isEqual(value); // check if value implements Equal
+
+// Compare collections with custom equivalence
+const mapEq = Equal.makeCompareMap(keyEq, valueEq);
+const setEq = Equal.makeCompareSet(elementEq);
 ```
 
 ## Best Practices
@@ -539,7 +687,7 @@ Use Result (Either) for explicit error handling
 Use Chunk for immutable arrays
 Use HashSet/HashMap for value equality
 Use Stream for large/infinite sequences
-Use Schema.TaggedErrorClass for domain errors
+Use Data.TaggedError for domain errors
 
 Avoid:
 

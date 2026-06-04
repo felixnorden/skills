@@ -66,7 +66,7 @@ import { Effect, Stream, Schema } from "effect";
 
 class LetterError extends Schema.TaggedErrorClass<LetterError>()(
   "LetterError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 // From async iterable
@@ -107,7 +107,7 @@ import { Schema } from "effect";
 
 class NodeStreamError extends Schema.TaggedErrorClass<NodeStreamError>()(
   "NodeStreamError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 const nodeStream = NodeStream.fromReadable({
@@ -340,6 +340,7 @@ const filterAndReencode = Stream.make(
 ## External Examples
 
 See full examples:
+
 - [Creating Streams](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/02_stream/10_creating-streams.ts)
 - [Consuming Streams](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/02_stream/20_consuming-streams.ts)
 - [Encoding](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/02_stream/30_encoding.ts)
