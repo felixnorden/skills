@@ -2,6 +2,7 @@
 description: QRSPI Design phase. Turns the research document into a solution design concept with evaluated options, written to `.qrspi/designs/`.
 argument-hint: "<research-path> [slug] [scope-path]"
 ---
+
 Load the `planning-workflow` skill → `templates/design-concept.md`.
 
 ## Arguments
@@ -11,6 +12,12 @@ Load the `planning-workflow` skill → `templates/design-concept.md`.
 - `${3:-}` — scope path: path to the scope document (optional; only needed if the research document lacks a scope summary).
 
 If `$1` is not provided, ask the user for it before proceeding.
+
+---
+
+## Orchestrated Mode
+
+When invoked as a QRSPI phase subagent from `/qrspi`: do not ask the user directly. Return your clarifying questions and the 2–3 design options in your final output; the orchestrator relays the user's direction before you write. Skip the Direction Checkpoint and Completion Gate interactions — the orchestrator runs those. Interactive steps apply only when run standalone.
 
 ---
 
@@ -44,7 +51,7 @@ Ask the user: "Does this direction feel right, or should we adjust?"
 
 Once direction is agreed, follow `templates/design-concept.md` from the `planning-workflow` skill:
 
-- 150–250 lines
+- Usually 150–250 lines — no hard minimum or maximum; completeness matters, not length
 - Status remains `draft` until the user confirms approval
 
 Write to `<worktree-root>/.qrspi/designs/{slug}.md` (the package extension stamps the `YYYYMMDD-` prefix).

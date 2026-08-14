@@ -37,7 +37,7 @@ const ARTIFACT_DIRS = ["research", "designs", "outlines", "plans"] as const;
 
 /** Matches `.qrspi/<artifact-dir>/<basename>` anywhere in a path. */
 const ARTIFACT_PATH_RE = new RegExp(
-	`(^|.*[\\\\/])\\.qrspi/(${ARTIFACT_DIRS.join("|")})/([^/\\\\]+)$`,
+  `(^|.*[\\\\/])\\.qrspi/(${ARTIFACT_DIRS.join("|")})/([^/\\\\]+)$`,
 );
 
 /** Canonical artifact filename: YYYYMMDD-slug.md */
@@ -51,10 +51,10 @@ const DASHED_DATE_RE = /^\d{4}-\d{1,2}-\d{1,2}/;
 
 /** Local-time date stamp in YYYYMMDD form. */
 export function dateStamp(now: Date): string {
-	const y = now.getFullYear();
-	const m = String(now.getMonth() + 1).padStart(2, "0");
-	const d = String(now.getDate()).padStart(2, "0");
-	return `${y}${m}${d}`;
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
 }
 
 /**
@@ -63,12 +63,12 @@ export function dateStamp(now: Date): string {
  * line start; content without frontmatter or without a `date:` key is unchanged.
  */
 export function fixFrontmatterDate(content: string, now: Date): string {
-	const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-	if (!fm) return content;
-	const block = fm[1] ?? "";
-	if (!/^date:/m.test(block)) return content;
-	const iso = now.toISOString();
-	return content.replace(block, block.replace(/^date:.*$/m, `date: ${iso}`));
+  const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return content;
+  const block = fm[1] ?? "";
+  if (!/^date:/m.test(block)) return content;
+  const iso = now.toISOString();
+  return content.replace(block, block.replace(/^date:.*$/m, `date: ${iso}`));
 }
 
 /**
@@ -77,11 +77,11 @@ export function fixFrontmatterDate(content: string, now: Date): string {
  * carry git metadata keys.
  */
 export function hasFrontmatterKey(content: string, keys: readonly string[]): boolean {
-	const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-	if (!fm) return false;
-	const block = fm[1] ?? "";
-	const pattern = new RegExp(`^(${keys.join("|")}):`, "m");
-	return pattern.test(block);
+  const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return false;
+  const block = fm[1] ?? "";
+  const pattern = new RegExp(`^(${keys.join("|")}):`, "m");
+  return pattern.test(block);
 }
 
 /**
@@ -90,64 +90,64 @@ export function hasFrontmatterKey(content: string, keys: readonly string[]): boo
  * at line start; missing keys are left alone (the template declares them).
  */
 export function fixFrontmatterGit(content: string, git: GitMetadata): string {
-	const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-	if (!fm) return content;
-	const block = fm[1] ?? "";
-	let out = block;
-	for (const { prop, key } of FRONTMATTER_GIT_KEYS) {
-		const value = git[prop];
-		if (value === undefined) continue;
-		if (!new RegExp(`^${key}:`, "m").test(out)) continue;
-		out = out.replace(new RegExp(`^${key}:.*$`, "m"), `${key}: ${value}`);
-	}
-	return out === block ? content : content.replace(block, out);
+  const fm = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!fm) return content;
+  const block = fm[1] ?? "";
+  let out = block;
+  for (const { prop, key } of FRONTMATTER_GIT_KEYS) {
+    const value = git[prop];
+    if (value === undefined) continue;
+    if (!new RegExp(`^${key}:`, "m").test(out)) continue;
+    out = out.replace(new RegExp(`^${key}:.*$`, "m"), `${key}: ${value}`);
+  }
+  return out === block ? content : content.replace(block, out);
 }
 
 /** Git metadata for artifact frontmatter, resolved from the host repository. */
 export interface GitMetadata {
-	commit?: string;
-	branch?: string;
-	repository?: string;
+  commit?: string;
+  branch?: string;
+  repository?: string;
 }
 
 /** GitMetadata property → YAML frontmatter key (`commit` is `git_commit` in the templates). */
 const FRONTMATTER_GIT_KEYS = [
-	{ prop: "commit", key: "git_commit" },
-	{ prop: "branch", key: "branch" },
-	{ prop: "repository", key: "repository" },
+  { prop: "commit", key: "git_commit" },
+  { prop: "branch", key: "branch" },
+  { prop: "repository", key: "repository" },
 ] as const;
 
 async function runGit(cwd: string, args: string[]): Promise<string | undefined> {
-	try {
-		const { stdout } = await execFileAsync("git", args, {
-			cwd,
-			timeout: GIT_TIMEOUT_MS,
-		});
-		return stdout.trim();
-	} catch {
-		return undefined;
-	}
+  try {
+    const { stdout } = await execFileAsync("git", args, {
+      cwd,
+      timeout: GIT_TIMEOUT_MS,
+    });
+    return stdout.trim();
+  } catch {
+    return undefined;
+  }
 }
 
 /** Derive a repo name from a remote URL (e.g. github.com/user/repo.git → repo). */
 export function repositoryNameFromUrl(url: string): string | undefined {
-	const cleaned = url.replace(/\.git$/, "").replace(/\/$/, "");
-	const name = cleaned.split(/[/:]/).pop();
-	return name || undefined;
+  const cleaned = url.replace(/\.git$/, "").replace(/\/$/, "");
+  const name = cleaned.split(/[/:]/).pop();
+  return name || undefined;
 }
 
 /** Resolve real git metadata from the repository at `cwd` (best effort). */
 export async function readGitMetadata(cwd: string): Promise<GitMetadata> {
-	const [commit, branch, remoteUrl] = await Promise.all([
-		runGit(cwd, ["rev-parse", "HEAD"]),
-		runGit(cwd, ["branch", "--show-current"]),
-		runGit(cwd, ["remote", "get-url", "origin"]),
-	]);
-	return {
-		commit,
-		branch: branch || undefined,
-		repository: remoteUrl ? repositoryNameFromUrl(remoteUrl) : undefined,
-	};
+  const [commit, branch, remoteUrl] = await Promise.all([
+    runGit(cwd, ["rev-parse", "HEAD"]),
+    runGit(cwd, ["branch", "--show-current"]),
+    runGit(cwd, ["remote", "get-url", "origin"]),
+  ]);
+  return {
+    commit,
+    branch: branch || undefined,
+    repository: remoteUrl ? repositoryNameFromUrl(remoteUrl) : undefined,
+  };
 }
 
 /**
@@ -163,7 +163,7 @@ const gitMetadataCache = new Map<string, { meta: GitMetadata; at: number }>();
 
 /** Invalidate the cached metadata for one working directory. */
 export function invalidateGitMetadata(cwd: string): void {
-	gitMetadataCache.delete(cwd);
+  gitMetadataCache.delete(cwd);
 }
 
 /**
@@ -171,16 +171,16 @@ export function invalidateGitMetadata(cwd: string): void {
  * Exposed for tests: pass `now` and `fetch` to control time and the fetcher.
  */
 export async function cachedGitMetadata(
-	cwd: string,
-	now: () => number = Date.now,
-	fetch: (dir: string) => Promise<GitMetadata> = readGitMetadata,
+  cwd: string,
+  now: () => number = Date.now,
+  fetch: (dir: string) => Promise<GitMetadata> = readGitMetadata,
 ): Promise<GitMetadata> {
-	const at = now();
-	const hit = gitMetadataCache.get(cwd);
-	if (hit && at - hit.at < GIT_CACHE_TTL_MS) return hit.meta;
-	const meta = await fetch(cwd);
-	gitMetadataCache.set(cwd, { meta, at });
-	return meta;
+  const at = now();
+  const hit = gitMetadataCache.get(cwd);
+  if (hit && at - hit.at < GIT_CACHE_TTL_MS) return hit.meta;
+  const meta = await fetch(cwd);
+  gitMetadataCache.set(cwd, { meta, at });
+  return meta;
 }
 
 /**
@@ -188,28 +188,44 @@ export async function cachedGitMetadata(
  * matches are harmless — they only force one re-fetch of the metadata cache.
  */
 const GIT_MUTATING_VERBS = [
-	"commit", "merge", "rebase", "pull", "push", "fetch",
-	"checkout", "switch", "reset", "restore", "revert", "cherry-pick",
-	"tag", "stash", "clean", "gc", "remote", "submodule", "update-ref",
-	// `git branch` mutates (create/delete/rename); read-only listings excluded
-	"branch(?!\\s*--(?:show-current|list))",
+  "commit",
+  "merge",
+  "rebase",
+  "pull",
+  "push",
+  "fetch",
+  "checkout",
+  "switch",
+  "reset",
+  "restore",
+  "revert",
+  "cherry-pick",
+  "tag",
+  "stash",
+  "clean",
+  "gc",
+  "remote",
+  "submodule",
+  "update-ref",
+  // `git branch` mutates (create/delete/rename); read-only listings excluded
+  "branch(?!\\s*--(?:show-current|list))",
 ] as const;
 
 const GIT_MUTATION_RE = new RegExp(`\\bgit\\s+(${GIT_MUTATING_VERBS.join("|")})`);
 
 /** Lowercase kebab-case slug. */
 export function slugify(input: string): string {
-	return input
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-+|-+$/g, "");
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export interface NormalizeResult {
-	/** Replacement path, when the filename was normalized. */
-	path?: string;
-	/** Block reason, when the path escapes the `.qrspi/` namespace. */
-	block?: string;
+  /** Replacement path, when the filename was normalized. */
+  path?: string;
+  /** Block reason, when the path escapes the `.qrspi/` namespace. */
+  block?: string;
 }
 
 /**
@@ -225,34 +241,34 @@ export interface NormalizeResult {
  * - Paths containing `..` inside the `.qrspi/` namespace are blocked.
  */
 export function normalizeArtifactPath(
-	rawPath: string,
-	now: Date,
-	exists: (path: string) => boolean,
+  rawPath: string,
+  now: Date,
+  exists: (path: string) => boolean,
 ): NormalizeResult {
-	if (rawPath.includes(".qrspi") && rawPath.split(/[\\/]/).includes("..")) {
-		return {
-			block: `QRSPI artifact path must not traverse outside .qrspi/: ${rawPath}`,
-		};
-	}
+  if (rawPath.includes(".qrspi") && rawPath.split(/[\\/]/).includes("..")) {
+    return {
+      block: `QRSPI artifact path must not traverse outside .qrspi/: ${rawPath}`,
+    };
+  }
 
-	const match = rawPath.match(ARTIFACT_PATH_RE);
-	if (!match) return {};
-	const prefix = match[1] ?? "";
-	const kind = match[2] ?? "";
-	const basename = match[3] ?? "";
+  const match = rawPath.match(ARTIFACT_PATH_RE);
+  if (!match) return {};
+  const prefix = match[1] ?? "";
+  const kind = match[2] ?? "";
+  const basename = match[3] ?? "";
 
-	if (CANONICAL_RE.test(basename)) return {};
-	if (!basename.endsWith(".md")) return {};
-	if (exists(rawPath)) return {};
+  if (CANONICAL_RE.test(basename)) return {};
+  if (!basename.endsWith(".md")) return {};
+  if (exists(rawPath)) return {};
 
-	const stem = basename
-		.replace(/\.md$/, "")
-		.replace(COMPACT_DATE_RE, "")
-		.replace(DASHED_DATE_RE, "");
-	const slug = slugify(stem);
-	if (!slug) return {};
+  const stem = basename
+    .replace(/\.md$/, "")
+    .replace(COMPACT_DATE_RE, "")
+    .replace(DASHED_DATE_RE, "");
+  const slug = slugify(stem);
+  if (!slug) return {};
 
-	return { path: `${prefix}.qrspi/${kind}/${dateStamp(now)}-${slug}.md` };
+  return { path: `${prefix}.qrspi/${kind}/${dateStamp(now)}-${slug}.md` };
 }
 
 /** Frontmatter keys the hook stamps with real values on new artifact writes. */
@@ -263,53 +279,53 @@ const FRONTMATTER_STAMP_KEYS = ["date", "git_commit", "branch", "repository"] as
  * metadata. Does nothing when the content has no stampable keys.
  */
 async function stampFrontmatter(input: { content?: unknown }, cwd: string): Promise<void> {
-	const content = input.content;
-	if (typeof content !== "string") return;
-	if (!hasFrontmatterKey(content, FRONTMATTER_STAMP_KEYS)) return;
-	const now = new Date();
-	const git = await cachedGitMetadata(cwd);
-	const fixed = fixFrontmatterGit(fixFrontmatterDate(content, now), git);
-	if (fixed !== content) {
-		input.content = fixed;
-	}
+  const content = input.content;
+  if (typeof content !== "string") return;
+  if (!hasFrontmatterKey(content, FRONTMATTER_STAMP_KEYS)) return;
+  const now = new Date();
+  const git = await cachedGitMetadata(cwd);
+  const fixed = fixFrontmatterGit(fixFrontmatterDate(content, now), git);
+  if (fixed !== content) {
+    input.content = fixed;
+  }
 }
 
 export default function (pi: ExtensionAPI) {
-	pi.on("tool_call", async (event, ctx) => {
-		// A git-mutating bash command invalidates the cached metadata for this
-		// cwd, so the next artifact write re-resolves branch/commit/remote state.
-		if (event.toolName === "bash") {
-			const command = (event.input as { command?: unknown }).command;
-			if (typeof command === "string" && GIT_MUTATION_RE.test(command)) {
-				invalidateGitMetadata(ctx.cwd);
-			}
-			return undefined;
-		}
-		if (event.toolName !== "write" && event.toolName !== "edit") return undefined;
+  pi.on("tool_call", async (event, ctx) => {
+    // A git-mutating bash command invalidates the cached metadata for this
+    // cwd, so the next artifact write re-resolves branch/commit/remote state.
+    if (event.toolName === "bash") {
+      const command = (event.input as { command?: unknown }).command;
+      if (typeof command === "string" && GIT_MUTATION_RE.test(command)) {
+        invalidateGitMetadata(ctx.cwd);
+      }
+      return undefined;
+    }
+    if (event.toolName !== "write" && event.toolName !== "edit") return undefined;
 
-		const input = event.input as { path?: unknown; content?: unknown };
-		if (typeof input.path !== "string") return undefined;
-		const rawPath = input.path;
+    const input = event.input as { path?: unknown; content?: unknown };
+    if (typeof input.path !== "string") return undefined;
+    const rawPath = input.path;
 
-		const exists = (p: string) => existsSync(resolve(ctx.cwd, p));
-		const result = normalizeArtifactPath(rawPath, new Date(), exists);
+    const exists = (p: string) => existsSync(resolve(ctx.cwd, p));
+    const result = normalizeArtifactPath(rawPath, new Date(), exists);
 
-		if (result.block) {
-			if (ctx.hasUI) ctx.ui.notify(result.block, "warning");
-			return { block: true, reason: result.block };
-		}
-		if (result.path && result.path !== rawPath) {
-			input.path = result.path; // mutate in place — the tool executes with the canonical path
-		}
-		// Stamp the frontmatter only when creating a NEW .qrspi artifact.
-		// Re-writing an existing file (iterate-overwrite) keeps its original
-		// date and provenance. `rawPath` is the pre-normalization path — both
-		// forms match ARTIFACT_PATH_RE, so the test is valid either way.
-		const isNewArtifact =
-			event.toolName === "write" && ARTIFACT_PATH_RE.test(rawPath) && !exists(rawPath);
-		if (isNewArtifact) {
-			await stampFrontmatter(input, ctx.cwd);
-		}
-		return undefined;
-	});
+    if (result.block) {
+      if (ctx.hasUI) ctx.ui.notify(result.block, "warning");
+      return { block: true, reason: result.block };
+    }
+    if (result.path && result.path !== rawPath) {
+      input.path = result.path; // mutate in place — the tool executes with the canonical path
+    }
+    // Stamp the frontmatter only when creating a NEW .qrspi artifact.
+    // Re-writing an existing file (iterate-overwrite) keeps its original
+    // date and provenance. `rawPath` is the pre-normalization path — both
+    // forms match ARTIFACT_PATH_RE, so the test is valid either way.
+    const isNewArtifact =
+      event.toolName === "write" && ARTIFACT_PATH_RE.test(rawPath) && !exists(rawPath);
+    if (isNewArtifact) {
+      await stampFrontmatter(input, ctx.cwd);
+    }
+    return undefined;
+  });
 }

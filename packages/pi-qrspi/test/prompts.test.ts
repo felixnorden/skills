@@ -22,11 +22,14 @@ function substitute(content: string, args: string[]) {
   return content.replace(
     /\$\{(\d+|ARGUMENTS|@):-([^}]*)\}|\$\{@:(\d+)(?::(\d+))?\}|\$(ARGUMENTS|@|\d+)/g,
     (_m, dt, dv, ss, sl, s) => {
-      if (dt) return (dt === "@" || dt === "ARGUMENTS" ? allArgs : args[parseInt(dt, 10) - 1]) || dv;
+      if (dt)
+        return (dt === "@" || dt === "ARGUMENTS" ? allArgs : args[parseInt(dt, 10) - 1]) || dv;
       if (ss) {
         let start = parseInt(ss, 10) - 1;
         if (start < 0) start = 0;
-        return sl ? args.slice(start, start + parseInt(sl, 10)).join(" ") : args.slice(start).join(" ");
+        return sl
+          ? args.slice(start, start + parseInt(sl, 10)).join(" ")
+          : args.slice(start).join(" ");
       }
       if (s === "ARGUMENTS" || s === "@") return allArgs;
       return args[parseInt(s, 10) - 1] ?? "";
@@ -38,7 +41,7 @@ const promptFiles = readdirSync(PROMPTS_DIR).filter((f) => f.endsWith(".md"));
 
 describe("prompt templates", () => {
   test("prompts directory contains the six QRSPI commands", () => {
-    expect(promptFiles.sort()).toEqual([
+    expect(promptFiles.toSorted()).toEqual([
       "qrspi-design.md",
       "qrspi-iterate.md",
       "qrspi-plan.md",
@@ -60,15 +63,19 @@ describe("prompt templates", () => {
       });
 
       test("all placeholders resolve with representative arguments", () => {
-        const out = substitute(parsed!.body, ["add-payment-flow", "Implement Stripe payments", "ENG-123"]);
+        const out = substitute(parsed!.body, [
+          "add-payment-flow",
+          "Implement Stripe payments",
+          "ENG-123",
+        ]);
         expect(out).not.toMatch(/\$\S/);
       });
 
       test("references only existing skill templates", () => {
         const refs = [...raw.matchAll(/templates\/([a-z-]+)\.md/g)].map((m) => m[1]!);
-        const existing = readdirSync(join(import.meta.dir, "..", "skills", "planning-workflow", "templates")).map((f) =>
-          f.replace(/\.md$/, ""),
-        );
+        const existing = readdirSync(
+          join(import.meta.dir, "..", "skills", "planning-workflow", "templates"),
+        ).map((f) => f.replace(/\.md$/, ""));
         for (const ref of refs) {
           expect(existing).toContain(ref);
         }

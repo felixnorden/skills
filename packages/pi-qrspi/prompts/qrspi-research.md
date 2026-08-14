@@ -2,6 +2,7 @@
 description: QRSPI Research phase. Documents what exists in the codebase for a topic and produces a dated research artifact in `.qrspi/research/` with an inline summary.
 argument-hint: '"<topic>" [slug] [scope-path]'
 ---
+
 Load the `planning-workflow` skill → `templates/research.md`.
 
 ## Arguments
@@ -11,6 +12,12 @@ Load the `planning-workflow` skill → `templates/research.md`.
 - `${3:-}` — scope path: optional path to an existing scope document.
 
 If invoked without a topic, ask the user: "What area of the codebase should I research?"
+
+---
+
+## Orchestrated Mode
+
+When invoked as a QRSPI phase subagent from `/qrspi`: skip Step 1 (Clarify) and the interactive completion gate — you cannot ask the user directly. Run the research roles inline in this session; do not spawn role subagents (the orchestrator owns subagent orchestration). Return the inline summary and any open questions in your final output for the orchestrator to relay. Interactive steps apply only when run standalone.
 
 ---
 

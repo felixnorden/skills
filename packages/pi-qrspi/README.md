@@ -14,7 +14,7 @@ QRSPI stands for **Q**uestions → **R**esearch → **D**esign → **S**tructure
 
 Each phase produces an artifact: a file under `.qrspi/` in your project. The next phase reads the artifact from the previous phase.
 
-The agent pauses at every checkpoint and asks for your approval. It does not advance until you approve. If you request changes, the agent revises the phase output and shows it to you again.
+The agent pauses at every checkpoint and asks for your approval. It does not advance until you approve. If you request changes, the agent revises the phase output and shows it to you again. You never approve blind: after each phase writes its artifact, the orchestrator reads the file back and shows you the full content — stamped frontmatter included — before asking for approval.
 
 This package is the Pi version of the [opencode-qrspi](https://github.com/felixnorden/skills/tree/main/packages/opencode-qrspi) plugin for OpenCode. Both tools use the same `.qrspi/` artifact format, so you can switch between them without losing your research or plans.
 
@@ -50,14 +50,22 @@ Run the complete workflow with one command:
 /qrspi add-payment-flow "Implement Stripe payment processing"
 ```
 
-| Phase | Command | What it does | Artifact |
-| ----- | ------- | ------------ | -------- |
-| **Q** — Questions | `/qrspi` | Gathers goals, constraints, and out-of-scope items | none — inline |
-| **R** — Research | `/qrspi-research` | Maps the codebase; documents existing implementations | `.qrspi/research/{slug}.md` |
-| **D** — Design | `/qrspi-design` | Evaluates options; produces a design concept | `.qrspi/designs/{slug}.md` |
-| **S** — Structure | `/qrspi-structure` | Produces a component-level outline | `.qrspi/outlines/{slug}.md` |
-| **P** — Plan | `/qrspi-plan` | Produces a TDD-aligned implementation plan | `.qrspi/plans/{slug}.md` |
-| **I** — Iterate | `/qrspi-iterate` | Revises the plan from your feedback; updates only the affected slices | updates the plan file |
+| Phase             | Command            | What it does                                                          | Artifact                    |
+| ----------------- | ------------------ | --------------------------------------------------------------------- | --------------------------- |
+| **Q** — Questions | `/qrspi`           | Gathers goals, constraints, and out-of-scope items                    | none — inline               |
+| **R** — Research  | `/qrspi-research`  | Maps the codebase; documents existing implementations                 | `.qrspi/research/{slug}.md` |
+| **D** — Design    | `/qrspi-design`    | Evaluates options; produces a design concept                          | `.qrspi/designs/{slug}.md`  |
+| **S** — Structure | `/qrspi-structure` | Produces a component-level outline                                    | `.qrspi/outlines/{slug}.md` |
+| **P** — Plan      | `/qrspi-plan`      | Produces a TDD-aligned implementation plan                            | `.qrspi/plans/{slug}.md`    |
+| **I** — Iterate   | `/qrspi-iterate`   | Revises the plan from your feedback; updates only the affected slices | updates the plan file       |
+
+### Orchestrated flow
+
+`/qrspi` is an orchestrator. It does not draft artifacts itself; each phase runs in a **separate fresh-context subagent**, so exploration and drafting stay out of your main session's context. The orchestrator owns the session: the Q phase, launching one phase agent at a time, relaying your answers to the Design phase, reading each artifact back and presenting it in full at every checkpoint, and producing the session summary.
+
+Each phase agent is told exactly what to do: which template to follow, which prior artifacts to read, where to write (`.qrspi/<kind>/<slug>.md`), and what to return (the inline summary plus any open questions). Phase agents never ask you questions directly — they return questions and design options to the orchestrator, which relays them to you.
+
+If no subagent capability is available in your environment, `/qrspi` falls back to running phases inline.
 
 ### Individual phases
 
@@ -88,16 +96,16 @@ The OpenCode plugin uses flags (`--slug`, `--research`, `--design`, `--outline`,
 
 Six prompt templates in `prompts/`, one per phase:
 
-| Template | Command |
-| -------- | ------- |
-| `prompts/qrspi.md` | `/qrspi` (full workflow) |
-| `prompts/qrspi-research.md` | `/qrspi-research` |
-| `prompts/qrspi-design.md` | `/qrspi-design` |
-| `prompts/qrspi-structure.md` | `/qrspi-structure` |
-| `prompts/qrspi-plan.md` | `/qrspi-plan` |
-| `prompts/qrspi-iterate.md` | `/qrspi-iterate` |
+| Template                     | Command                  |
+| ---------------------------- | ------------------------ |
+| `prompts/qrspi.md`           | `/qrspi` (full workflow) |
+| `prompts/qrspi-research.md`  | `/qrspi-research`        |
+| `prompts/qrspi-design.md`    | `/qrspi-design`          |
+| `prompts/qrspi-structure.md` | `/qrspi-structure`       |
+| `prompts/qrspi-plan.md`      | `/qrspi-plan`            |
+| `prompts/qrspi-iterate.md`   | `/qrspi-iterate`         |
 
-The `/qrspi` orchestrator runs each phase in a fresh subagent session, so earlier phases do not clutter your main session's context.
+The `/qrspi` orchestrator runs each phase in a fresh subagent session, so earlier phases do not clutter your main session's context. After each phase, the orchestrator reads the artifact back from disk and presents the full content before the checkpoint — what you approve is exactly what was written, including the extension-stamped frontmatter. The phase prompts double as standalone commands; when run standalone they keep their interactive steps (clarify, options, completion gate), and when invoked by the orchestrator they run in orchestrated mode (no direct user interaction; questions relayed through the orchestrator).
 
 ### Extension
 
@@ -137,5 +145,7 @@ The git metadata cache resolves lazily on the first artifact write and caches pe
 ```bash
 bun run pack       # or: npm pack — builds the tarball into dist/
 bun test           # extension + prompt template tests
-bun run typecheck
+bun run typecheck  # tsc --noEmit
+bun run lint       # oxlint
+bun run fmt:check  # oxfmt --check (run bun run fmt to write)
 ```

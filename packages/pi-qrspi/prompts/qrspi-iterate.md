@@ -2,6 +2,7 @@
 description: QRSPI Iterate phase. Surgically revises an existing plan based on feedback, updating only the slices the feedback implicates.
 argument-hint: '<plan-path> "<feedback>"'
 ---
+
 Load the `planning-workflow` skill → `templates/iterate.md`. Load the `tdd` skill.
 
 ## Arguments
@@ -11,6 +12,12 @@ Load the `planning-workflow` skill → `templates/iterate.md`. Load the `tdd` sk
 
 If `$1` is not provided, ask the user for it.
 If no feedback string is present, ask the user: "What needs to change in the plan?"
+
+---
+
+## Orchestrated Mode
+
+When invoked as a QRSPI phase subagent from `/qrspi`: the feedback arrives in the orchestrator's task, not from the user. Skip Step 1 (Clarify) and the interactive gate — state any assumption explicitly in the revision note and return the revision summary. Interactive steps apply only when run standalone.
 
 ---
 

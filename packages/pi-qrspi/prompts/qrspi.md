@@ -3,7 +3,7 @@ description: Start a full QRSPI planning workflow (Question → Research → Des
 argument-hint: '"<topic>" [slug] [ticket]'
 ---
 
-Load the `planning-workflow` skill (read its `SKILL.md`; templates live under `templates/`).
+Load the `planning-workflow` skill (read its `SKILL.md`; templates live under `templates/`). If your environment provides a subagent extension or skill, load it for environment-specific orchestration mechanics; the contract below is written generically and must not assume any particular one.
 
 ## Arguments
 
@@ -13,31 +13,41 @@ Load the `planning-workflow` skill (read its `SKILL.md`; templates live under `t
 
 ---
 
+## Role
+
+You are the orchestrator. You own the session: questions, checkpoints, and the summary. You do NOT produce phase artifacts yourself — each phase runs in its own fresh-context subagent, so exploration and drafting never pollute your context.
+
 ## Execution Model
 
-Run each phase in a separate agent session if your environment supports sub-agents — this isolates each phase's context. Otherwise run the phases directly in this session.
+Run each phase (R, D, S, P, I) in a **separate fresh-context subagent** when your environment provides subagent execution — use whatever subagent extension or mechanism your platform exposes (the environment's default subagent invocation if none is configured). This is the main flow — fall back to inline execution only when no subagent capability exists.
 
-Each phase produces an artifact. The artifact path from one phase becomes an input to the next.
+Per phase launch:
 
-The package extension stamps artifact filenames automatically: write to `.qrspi/<kind>/<slug>.md` and the date prefix (`YYYYMMDD-`) is added from the host clock.
+- One phase per run, sequential: launch the child in the foreground (blocking) and wait for it to finish, then checkpoint. Do not parallelize phases and do not background phase work — every checkpoint is human-gated.
+- Pass `context: 'fresh'` so the child carries no session history, and `cwd: <worktree-root>` so it reads and writes the same tree.
+- Pass `skill: 'planning-workflow'` (add `tdd` for P and I) so the child can load the templates.
+- The task text must be self-contained: the phase, the template to follow, the input artifact paths from prior phases, the slug, the ticket (if any), the output path `.qrspi/<kind>/<slug>.md`, and the return contract (inline summary, open questions, anything the orchestrator must relay to the user).
+- Children write the artifacts themselves. The extension stamps the `YYYYMMDD-` prefix and frontmatter on their writes too — it is shared by the orchestrator session and its subagents.
 
----
+## Artifact Preview Rule
+
+After each phase subagent completes, READ the artifact back from disk and present it in full to the user before the checkpoint — stamped frontmatter included. Never ask for checkpoint approval without the artifact content visible in the session.
 
 ## Phases
 
 Execute in order. **Ask the user for approval at each checkpoint — do not advance until approved.** If the user requests changes, revise the phase output and re-present it.
 
-**Q — Questions**: Gather goal, hard constraints, and out-of-scope items. Do not save a file. Derive the slug if not provided. Checkpoint.
+**Q — Questions** (you, inline): Gather goal, hard constraints, and out-of-scope items. Do not save a file. Derive the slug if not provided. Checkpoint.
 
-**R — Research**: Produce a research document for the topic following `planning-workflow` → `templates/research.md`. Write to `<worktree-root>/.qrspi/research/{slug}.md` (the extension stamps the `YYYYMMDD-` prefix). Present the inline summary. Checkpoint.
+**R — Research** (subagent): Launch the research phase agent. Task: load `planning-workflow` → `templates/research.md`, research the topic, write `.qrspi/research/{slug}.md`, return the inline summary and any open questions. Then read the artifact back, present it in full, checkpoint.
 
-**D — Design**: Produce a design concept from the research document following `templates/design-concept.md`. Write to `<worktree-root>/.qrspi/designs/{slug}.md` (extension stamps the date). Present the concept. Checkpoint.
+**D — Design** (subagent with interactive relay): Launch the design phase agent. The child returns its clarifying questions and 2–3 design options in its output instead of asking you. Relay them to the user with the `question` tool. On direction, send the user's choice back to the design agent (resume it if your environment supports resuming, otherwise relaunch with the choice embedded in the task); it writes `.qrspi/designs/{slug}.md` and returns the summary. Then read the artifact back, present it in full, checkpoint.
 
-**S — Structure**: Produce a component-level outline from the approved design following `templates/outline.md`. Write to `<worktree-root>/.qrspi/outlines/{slug}.md` (extension stamps the date). Present the outline. Checkpoint.
+**S — Structure** (subagent): Launch the structure phase agent. Task: load `templates/outline.md`, produce the outline from the approved design, write `.qrspi/outlines/{slug}.md`, return the outline summary and any unresolved structural decisions. Then read the artifact back, present it in full, checkpoint.
 
-**P — Plan**: Produce a vertically-sliced, TDD-aligned implementation plan from the outline following `templates/plan.md` (load the `tdd` skill for the Tests First sections). Write to `<worktree-root>/.qrspi/plans/{slug}.md` (extension stamps the date). Present the inline summary. Checkpoint.
+**P — Plan** (subagent): Launch the plan phase agent with `skill: 'planning-workflow,tdd'`. Task: load `templates/plan.md` and the `tdd` skill, produce the plan from the approved outline, write `.qrspi/plans/{slug}.md`, return the plan summary. Then read the artifact back, present it in full, checkpoint.
 
-**I — Iterate** (only on revision request): revise the plan surgically following `templates/iterate.md`, updating only the slices the feedback implicates.
+**I — Iterate** (subagent, only on revision request): Launch the iterate phase agent with the user's feedback as the task. Task: load `templates/iterate.md`, revise surgically, overwrite the plan in place, return the revision summary. Then read the plan back, present the changed sections, checkpoint. If the child reports that the feedback requires a design change, return to the D phase instead of patching the plan.
 
 ---
 

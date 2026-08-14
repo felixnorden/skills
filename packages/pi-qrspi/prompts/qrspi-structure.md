@@ -2,6 +2,7 @@
 description: QRSPI Structure phase. Turns the approved design concept into a component-level structural outline, written to `.qrspi/outlines/`.
 argument-hint: "<design-path> [research-path] [slug]"
 ---
+
 Load the `planning-workflow` skill → `templates/outline.md`.
 
 ## Arguments
@@ -11,6 +12,12 @@ Load the `planning-workflow` skill → `templates/outline.md`.
 - `${3:-}` — slug: session identifier for artifact naming (optional; derive from the design document if absent).
 
 If `$1` is not provided, ask the user for it before proceeding.
+
+---
+
+## Orchestrated Mode
+
+When invoked as a QRSPI phase subagent from `/qrspi`: skip Step 1 (Clarify) and the Completion Gate interaction — you cannot ask the user directly. If a structural decision requires human input, resolve it from the research document when possible; otherwise state it as an explicit assumption in the Decisions Required section and return it in your output for the orchestrator to relay. Interactive steps apply only when run standalone.
 
 ---
 
@@ -38,8 +45,8 @@ Follow `templates/outline.md` from the `planning-workflow` skill:
 
 - Declare components, boundaries, and sequencing constraints
 - Every component declaration must map to at least one vertical slice in the subsequent plan
-- Sequencing constraints must state the *reason*, not just the dependency
-- 350 lines maximum
+- Sequencing constraints must state the _reason_, not just the dependency
+- Usually under 350 lines — no hard cap
 
 Write to `<worktree-root>/.qrspi/outlines/{slug}.md` (the package extension stamps the `YYYYMMDD-` prefix).
 

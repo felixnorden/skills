@@ -2,6 +2,7 @@
 description: QRSPI Plan phase. Turns the outline into a vertically-sliced, TDD-aligned implementation plan for a downstream build agent, written to `.qrspi/plans/`.
 argument-hint: "<outline-path> [research-path] [design-path] [slug]"
 ---
+
 Load the `planning-workflow` skill → `templates/plan.md`. Load the `tdd` skill.
 
 ## Arguments
@@ -12,6 +13,12 @@ Load the `planning-workflow` skill → `templates/plan.md`. Load the `tdd` skill
 - `${4:-}` — slug: session identifier for artifact naming (optional; derive from the outline if absent).
 
 If `$1` is not provided, ask the user for it before proceeding.
+
+---
+
+## Orchestrated Mode
+
+When invoked as a QRSPI phase subagent from `/qrspi`: skip Step 1 (Clarify) and the Completion Gate interaction — you cannot ask the user directly. State any ambiguity as an explicit assumption in the plan and return it in your output for the orchestrator to relay. Interactive steps apply only when run standalone.
 
 ---
 

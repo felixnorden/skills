@@ -3,22 +3,24 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-	cachedGitMetadata,
-	dateStamp,
-	fixFrontmatterDate,
-	fixFrontmatterGit,
-	hasFrontmatterKey,
-	invalidateGitMetadata,
-	normalizeArtifactPath,
-	readGitMetadata,
-	repositoryNameFromUrl,
-	slugify,
-} from "../extensions/qrspi-artifacts";
+  cachedGitMetadata,
+  dateStamp,
+  fixFrontmatterDate,
+  fixFrontmatterGit,
+  hasFrontmatterKey,
+  invalidateGitMetadata,
+  normalizeArtifactPath,
+  readGitMetadata,
+  repositoryNameFromUrl,
+  slugify,
+} from "../extensions/qrspi-artifacts.js";
 
 // Fixed clock so tests are deterministic
 const NOW = new Date("2026-08-14T12:00:00");
 const MISSING = () => false;
 const EXISTS = () => true;
+const fetchA = async () => ({ commit: "a" });
+const fetchB = async () => ({ commit: "b" });
 
 describe("dateStamp", () => {
   test("formats local date as YYYYMMDD", () => {
@@ -76,7 +78,8 @@ describe("fixFrontmatterGit", () => {
   const git = { commit: "abc123", branch: "main", repository: "skills" };
 
   test("replaces git metadata values in frontmatter", () => {
-    const content = "---\ngit_commit: { hash }\nbranch: { branch }\nrepository: { repo name }\n---\nBody";
+    const content =
+      "---\ngit_commit: { hash }\nbranch: { branch }\nrepository: { repo name }\n---\nBody";
     expect(fixFrontmatterGit(content, git)).toBe(
       "---\ngit_commit: abc123\nbranch: main\nrepository: skills\n---\nBody",
     );
@@ -129,7 +132,11 @@ describe("cachedGitMetadata", () => {
     let now = 1_000_000;
     const first = await cachedGitMetadata("/repo", () => now, fetch);
     const second = await cachedGitMetadata("/repo", () => now, fetch);
-    expect(first).toEqual({ commit: "abc", branch: "main", repository: "skills" });
+    expect(first).toEqual({
+      commit: "abc",
+      branch: "main",
+      repository: "skills",
+    });
     expect(second).toEqual(first);
     expect(fetches).toBe(1);
   });
@@ -149,8 +156,6 @@ describe("cachedGitMetadata", () => {
   });
 
   test("keeps per-cwd entries independent", async () => {
-    const fetchA = async () => ({ commit: "a" });
-    const fetchB = async () => ({ commit: "b" });
     const a = await cachedGitMetadata("/a", undefined, fetchA);
     const b = await cachedGitMetadata("/b", undefined, fetchB);
     expect(a.commit).toBe("a");
