@@ -1,0 +1,47 @@
+{
+  "name": "@ftr/pi-qrspi",
+  "version": "0.1.0",
+  "homepage": "https://github.com/felixnorden/skills/blob/main/packages/pi-qrspi/README.md",
+  "bugs": {
+    "url": "https://github.com/felixnorden/skills/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felixnorden/skills.git",
+    "path": "packages/pi-qrspi"
+  },
+  "type": "module",
+  "files": [
+    "prompts",
+    "extensions",
+    "skills/planning-workflow",
+    "skills/tdd"
+  ],
+  "scripts": {
+    "prepack": "rm -rf ./skills && mkdir -p ./skills && cp -R ../../skills/planning-workflow ./skills/ && cp -R ../../skills/tdd ./skills/ && rm -rf ./skills/planning-workflow/skills",
+    "postpack": "rm -rf ./skills && ln -s ../../skills ./skills",
+    "pack": "bun pm pack --destination ./dist",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^7.0.2",
+    "@earendil-works/pi-coding-agent": "0.84.1"
+  },
+  "pi": {
+    "prompts": [
+      "./prompts"
+    ],
+    "skills": [
+      "./skills/planning-workflow",
+      "./skills/tdd"
+    ],
+    "extensions": [
+      "./extensions"
+    ]
+  }
+}
