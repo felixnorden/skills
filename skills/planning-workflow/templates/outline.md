@@ -7,7 +7,7 @@ No implementation detail; this is architecture, not tactics.
 
 **Constraints**:
 
-- 350 lines maximum
+- Usually under 350 lines — no hard cap; the real constraint is that every line earns its place
 - No file paths, no function signatures, no pseudo-code
 - Every component declaration must map to at least one vertical slice in the subsequent plan
 - Sequencing constraints must state the _reason_, not just the dependency — the reason determines whether components can be partially parallelised

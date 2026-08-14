@@ -29,6 +29,25 @@ For TDD integration within each slice, load relevant skills before authoring the
 
 ---
 
+## Session Structure (Orchestrated)
+
+A QRSPI session runs with one orchestrator and per-phase agents. One phase at a time; every phase ends at a human checkpoint. The orchestrator never drafts artifacts — phase agents do that in fresh contexts, so exploration and drafting stay out of the orchestrator's context.
+
+**Orchestrator owns**: the Q phase, launching each phase agent, relaying user answers (Design phase), reading artifacts back from disk and presenting them in full at each checkpoint, approving or denying advancement, coordinating Iterate, and producing the session summary.
+
+**Phase agent owns**: loading the current phase's template, reading the prior artifacts, drafting and writing the artifact to `.qrspi/<kind>/<slug>.md`, and returning the inline summary.
+
+**Phase agent rules**:
+
+- Load only the template for the current phase. Do not draft artifacts for other phases.
+- Do not ask the user questions directly. Return clarifying questions, design options, or unresolved decisions in your final output; the orchestrator relays them.
+- Convert unresolved ambiguities into explicit assumptions in the artifact (Open Questions / Decisions Required sections) rather than blocking.
+- The package extension stamps the `YYYYMMDD-` prefix and the frontmatter on your write; write to `.qrspi/<kind>/<slug>.md` and let it normalize.
+
+**Artifact visibility**: the orchestrator reads each artifact back after the phase agent writes it and presents the full content — stamped frontmatter included — before asking for checkpoint approval. Approving blind is not part of this workflow.
+
+---
+
 ## Templates
 
 One template per phase. Each is self-contained: output schema + production instructions. Load only what the current phase requires.

@@ -4,7 +4,7 @@
 
 **Constraints**:
 
-- 150–250 lines
+- Usually 150–250 lines — no hard minimum or maximum; the real constraint is completeness, not length
 - No file paths, no function names, no pseudo-code, no code blocks
 - Architecture and boundaries only — no implementation detail
 - Stop when the solution shape is unambiguous; do not pad

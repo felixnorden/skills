@@ -6,7 +6,7 @@ Do not suggest improvements, critique, or plan — document only what exists.
 
 **Constraints**:
 
-- Document prose: up to 100 words per subsection, excluding the **Research Question** and **Summary** sections
+- Document prose: ~100 words per subsection as a guide (not a hard cap), excluding the **Research Question** and **Summary** sections
 - Detailed Findings:
   - succinct prose, sacrifice grammar for concision
   - one line per sentence

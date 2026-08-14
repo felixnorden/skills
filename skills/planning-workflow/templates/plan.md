@@ -4,7 +4,7 @@
 
 **Constraints**:
 
-- Prose under 800 words, excluding code blocks
+- Usually ~1,000 lines in total (prose plus code samples) — guidance, not a hard cap; the real constraints are self-containment and per-slice verification gates
 - Code samples are illustrative (locate insertion point, show pattern) — not complete implementations
 - Each phase must deliver something demonstrable at its verification gate
 - No phase may be a technical layer (e.g., "implement all models") — each phase is a behavior
