@@ -27,7 +27,7 @@ class UserNotFoundError extends Schema.TaggedErrorClass<UserNotFoundError>()(
 
 class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()(
   "DatabaseError",
-  { cause: Schema.Defect },
+  { cause: Schema.Defect() },
 ) {}
 
 export class UserService extends Context.Service<
@@ -120,21 +120,23 @@ const resilientFetch = (url: string) =>
 **Example Solution Pattern**:
 
 ```ts
-import { AiError } from "effect/unstable/ai"
+import { AiError } from "effect/unstable/ai";
 
 class AiGenerationError extends Schema.TaggedErrorClass<AiGenerationError>()(
   "AiGenerationError",
-  { reason: AiError.AiErrorReason }
+  { reason: AiError.AiErrorReason },
 ) {
   static fromAiError(error: AiError.AiError) {
-    return new AiGenerationError({ reason: error.reason })
+    return new AiGenerationError({ reason: error.reason });
   }
 }
 
 export class AiService extends Context.Service<
   AiService,
   {
-    generate: (prompt: string) => Effect.Effect<
+    generate: (
+      prompt: string,
+    ) => Effect.Effect<
       { readonly provider: string; readonly text: string },
       AiGenerationError
     >;
@@ -145,23 +147,26 @@ export class AiService extends Context.Service<
     Effect.gen(function* () {
       const FallbackPlan = ExecutionPlan.make(
         { provide: OpenAiLanguageModel.model("gpt-5.2"), attempts: 3 },
-        { provide: AnthropicLanguageModel.model("claude-opus-4-6"), attempts: 2 }
-      )
+        {
+          provide: AnthropicLanguageModel.model("claude-opus-4-6"),
+          attempts: 2,
+        },
+      );
 
-      const draftsModel = yield* FallbackPlan.withRequirements
+      const draftsModel = yield* FallbackPlan.withRequirements;
 
       const generate = Effect.fn("AiService.generate")(
         function* (prompt: string) {
-          const response = yield* LanguageModel.generateText({ prompt })
-          return { provider: response.provider, text: response.text }
+          const response = yield* LanguageModel.generateText({ prompt });
+          return { provider: response.provider, text: response.text };
         },
         Effect.withExecutionPlan(draftsModel),
-        Effect.mapError((error) => AiGenerationError.fromAiError(error))
-      )
+        Effect.mapError((error) => AiGenerationError.fromAiError(error)),
+      );
 
-      return AiService.of({ generate })
+      return AiService.of({ generate });
     }),
-  ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]))
+  ).pipe(Layer.provide([OpenAiClientLayer, AnthropicClientLayer]));
 }
 ```
 

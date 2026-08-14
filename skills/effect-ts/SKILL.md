@@ -1,148 +1,74 @@
 ---
-name: building-with-effect
-description: Build TypeScript programs with the Effect library - type-safe error handling, dependency injection, concurrency, resource management, and composable abstractions. Use when working with Effect, Schema, or any @effect/* ecosystem package.
+name: effect-ts
+description: Use this skill whenever working in a repository that uses Effect, even if the current task is in a new file or the user does not explicitly ask for Effect help. Apply it to any work that should follow the repository's Effect patterns, conventions, architecture, or supporting tooling. Also use it for questions about Effect patterns, services, layers, schemas, streams, runtimes, or typed error handling.
 ---
 
-# Building with Effect
+# Effect Expert
 
-Effect is a powerful TypeScript library for building complex, type-safe programs with composable abstractions for error handling, dependency injection, concurrency, and resource management.
+Expert guidance for programming with the Effect library, covering error handling, dependency injection, composability, and testing patterns.
 
-## Quick Start
+## Prerequisite
 
-**Using Effect.fn (Recommended)**
+Before doing any other Effect-related work, check that `./.repos/effect` exists at the root of the repository where the skill is being used.
 
-```ts
-import { Effect, Schema } from "effect";
+If it does not exist, stop and prompt the user with the setup task documented in `./references/setup.md`.
 
-// Define errors with Schema.TaggedErrorClass
-class FetchError extends Schema.TaggedErrorClass<FetchError>()("FetchError", {
-  message: Schema.String,
-}) {}
+## Research Strategy
 
-// Create functions with Effect.fn
-export const fetchUser = Effect.fn("fetchUser")(
-  function* (id: number) {
-    yield* Effect.logInfo("Fetching user:", id);
+Effect has many ways to accomplish the same task. Proactively research best practices when working with Effect patterns, especially for moderate to high complexity tasks.
 
-    // Always return when raising an error
-    return yield* new FetchError({ message: "Failed to fetch" });
-  },
-  // Add combinators as additional arguments (no .pipe needed)
-  Effect.catch((error) => Effect.logError(`Error: ${error}`)),
-  Effect.withSpan("fetchUser", { attributes: { method: "Effect.fn" } }),
-);
-```
+Use the local guides in `./references/` first. They are the preferred source for best practices, conventions, and common implementation patterns.
 
-**Generator Style**
+Only go directly to the vendored Effect repo when:
 
-```ts
-const program = Effect.gen(function* () {
-  const a = yield* Effect.succeed(10);
-  const b = yield* Effect.succeed(20);
-  return a + b;
-});
-```
+- the guides do not cover the question
+- you need exact API details or signatures
+- you need deeper implementation details
+- you need to verify a behavior against the source
 
-**Running Effects**
+### Research Sources
 
-```ts
-// As Promise
-Effect.runPromise(program).then(console.log);
+1. Local skill guides first. Start with the relevant files in `./references/` before doing deeper research.
+2. Codebase patterns second. Examine similar patterns in the current project before implementing. If Effect patterns already exist, follow them for consistency. If no patterns exist, skip this step.
+3. Effect source code last. For gaps in the guides, complex type errors, unclear behavior, or implementation details, examine the vendored Effect source at `./.repos/effect/packages/effect/src/`.
 
-// With NodeRuntime (recommended for apps)
-import { NodeRuntime } from "@effect/platform-node";
-NodeRuntime.runMain(program);
+### When To Research
 
-// Using Layer.launch as entry point
-Layer.launch(WorkerLayer).pipe(NodeRuntime.runMain);
-```
+- Always research for services, layers, or complex dependency injection.
+- Always research for error handling with multiple error types or complex error hierarchies.
+- Always research for stream-based operations and reactive patterns.
+- Always research for resource management with scoped effects and cleanup.
+- Always research for concurrent or performance-critical code.
+- Always research for unfamiliar testing patterns.
+- Research when needed for complex refactors from promises or try/catch into Effect.
+- Research when needed for new service dependencies or layer restructuring.
+- Research when needed for custom error types or extensions of existing error hierarchies.
+- Research when needed for integrations with external systems such as databases, APIs, or third-party services.
 
-## Degrees of Freedom
+### Research Approach
 
-Match the level of specificity to the task's fragility:
+- Focus on canonical, readable, and maintainable solutions rather than clever optimizations.
+- Verify suggested approaches against existing codebase patterns when those patterns exist.
+- When multiple approaches are possible, prefer the most idiomatic Effect solution supported by the codebase and the vendored source.
 
-**Low Freedom** (specific patterns, consistency critical)
+### Codebase Pattern Discovery
 
-These operations have a narrow safe path - follow exactly:
+When working in a project that uses Effect, check for existing patterns before implementing new code:
 
-- **Error definition**: Always use `Schema.TaggedErrorClass` with descriptive `_tag`
-- **Service structure**: Extend `Context.Service` with static `layer` property
-- **Effect.fn usage**: Always use `Effect.fn("name")` for functions returning Effects
-- **Resource cleanup**: Always use `acquireUseRelease` or `Effect.addFinalizer`
-- **Resource pattern selection**: Use `acquireUseRelease` for external resources, `Ref` for shared mutable state, `addFinalizer` for cleanup within existing scope
-- **Error recovery vs propagation**: Use `catchTags`/`orElse` to recover; use `return yield* new Error()` to propagate (ALWAYS use `return yield*` to signal the function stops)
+1. Search for Effect imports and existing module usage to understand current conventions.
+2. Identify how services and layers are structured in the project.
+3. Note how errors are defined and propagated.
+4. Examine how Effect code is tested in the project.
 
-**Medium Freedom** (preferred patterns, some variation acceptable)
+If no Effect patterns exist in the codebase, proceed using canonical patterns from the vendored Effect source and examples. Do not block on missing codebase patterns.
 
-These have recommended approaches but context matters:
+### Feature Discovery
 
-- **Combinator selection**: Choose based on need - `catchTag` for specific errors, `catchTags` for multiple, `catch` for all
-- **Layer composition**: Use `Layer.provide` for dependency injection, order matters for overrides
-- **Concurrency control**: Use `Effect.all` or `Effect.forEach` with appropriate `concurrency` option
-- **Error recovery**: Select retry schedules based on failure characteristics
+When you need to discover available Effect modules, packages, or capabilities, search `./references/features.md` first.
 
-**High Freedom** (multiple valid approaches, context-dependent)
-
-These depend on application needs:
-
-- **Application architecture**: Service boundaries, layer organization, entry point structure
-- **Testing strategies**: Test at service level, effect level, or integration level based on needs
-- **Performance optimization**: Caching strategies, batching decisions, bundle size tradeoffs
-- **Observability setup**: Logging granularity, tracing scope, metric selection
-
-## Core Type
-
-```ts
-Effect<Success, Error, Requirements>;
-```
-
-- **Success**: Value type on success
-- **Error**: Type-tracked errors
-- **Requirements**: Services needed (use `never` if none)
-
-## Key Operators
-
-**Transformation**
-
-- `map` - Transform success value
-- `flatMap` / `andThen` - Chain effects
-- `tap` - Side effects without changing value
-- `mapError` - Transform error type
-
-**Error Handling**
-
-- `catch` - Handle all errors (renamed from `catchAll` in earlier versions)
-- `catchTag` - Handle specific error types
-- `catchTags` - Handle multiple tagged errors at once
-- `catchReason` / `catchReasons` - Handle errors with reasons
-- `catchFilter` - Handle filtered errors (renamed from `catchSome` in earlier versions)
-- `orElse` - Fallback effect
-- `retry` - Retry with policy
-
-**Composition**
-
-- `all` - Run multiple effects
-- `forEach` - Map over collection
-- `zip` / `zipWith` - Combine effects
-- `provide` - Supply dependencies
-
-## Best Practices
-
-1. **Use Effect.fn** for functions that return Effects (not Effect.gen alone)
-2. **Define errors with Schema.TaggedErrorClass** for type safety
-3. **Use Context.Service** for dependency injection
-4. **Build layers explicitly** with `Layer.effect` and compose with `Layer.provide`
-5. **Use ExecutionPlan** for AI provider fallback strategies
-6. **Handle interruptions** with `acquireRelease` for resources
-7. **Use Layer.launch** as application entry point for long-running apps
-8. **Enable dual APIs** when appropriate (data-first + data-last)
-9. **Choose resource patterns deliberately**: See [Resource Pattern Selector](references/resource-management.md#resource-pattern-selector)
-10. **Use error recovery for resilience**: See [Error Handling Decision Tree](references/error-handling.md#error-handling-decision-tree)
-11. **Prefer Effect.forEach with concurrency**: See [Concurrency Anti-Patterns](references/concurrency.md#anti-patterns-to-avoid)
-
-## Workflows
-
-Use these checklists for complex multi-step tasks:
+- Use it to identify the right package or module for a task.
+- Use the listed repo paths to jump directly into the vendored source under `./.repos/effect`.
+- Use it before inventing custom abstractions when Effect may already provide the functionality.
 
 ### Creating a New Service
 
