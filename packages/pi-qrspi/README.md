@@ -13,7 +13,7 @@ This package is the Pi counterpart of the [opencode-qrspi](https://github.com/fe
 Install from npm, git, or a local path:
 
 ```bash
-pi install npm:@ftr/pi-qrspi
+pi install npm:@ftrdotdev/pi-qrspi
 pi install git:github.com/felixnorden/skills
 pi install /absolute/path/to/packages/pi-qrspi
 pi install ./packages/pi-qrspi   # local checkout

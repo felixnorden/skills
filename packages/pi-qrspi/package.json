@@ -1,5 +1,5 @@
 {
-  "name": "@ftr/pi-qrspi",
+  "name": "@ftrdotdev/pi-qrspi",
   "version": "0.1.0",
   "homepage": "https://github.com/felixnorden/skills/blob/main/packages/pi-qrspi/README.md",
   "bugs": {
