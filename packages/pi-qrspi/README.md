@@ -20,12 +20,25 @@ This package is the Pi version of the [opencode-qrspi](https://github.com/felixn
 
 ## Installation
 
+Install from npm, git, or a local path:
+
 ```bash
 pi install npm:@ftrdotdev/pi-qrspi
 pi install git:github.com/felixnorden/skills   # installs the whole skills repo
 pi install /absolute/path/to/packages/pi-qrspi
 pi install ./packages/pi-qrspi                 # local checkout
 ```
+
+### Install with npm
+
+The package is published on the npm registry. If your project already manages dependencies with npm, you can pin the version in your `package.json` and lockfile:
+
+```bash
+npm install --save-dev @ftrdotdev/pi-qrspi
+pi install -l ./node_modules/@ftrdotdev/pi-qrspi   # run from the project root
+```
+
+The `pi install -l` command registers the npm-managed copy in your project's `.pi/settings.json`. Pi then loads the prompts, skills, and extension from your project's `node_modules`. Pi asks you to trust the project the first time it loads project packages.
 
 ## Usage
 
