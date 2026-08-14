@@ -1,50 +1,54 @@
 # pi-qrspi
 
-A [Pi](https://pi.dev) package that implements the **QRSPI framework** — a structured planning workflow for coding agents.
+A planning workflow for [Pi](https://pi.dev) coding agents. The agent works in six phases. You approve each phase before the next one starts. Nothing gets implemented until you approve the plan.
 
-QRSPI stands for **Q**uestions → **R**esearch → **D**esign → **S**tructure → **P**lan → **I**terate. It is a phased approach to software planning that separates design decisions from implementation, ensuring each phase produces verifiable artifacts before the next begins.
+## The problem
 
-This package is the Pi counterpart of the [opencode-qrspi](https://github.com/felixnorden/skills/tree/main/packages/opencode-qrspi) plugin for OpenCode. It ships the same workflow as **prompt templates** and **skills** instead of plugin-registered commands and agents.
+AI agents plan badly when they plan alone. They rush to code. Their designs disappear when the session ends. Their plans drift from the code they describe.
 
----
+QRSPI fixes this. It keeps you in the loop at every step. It writes each phase to a file you can review and commit.
+
+## How it works
+
+QRSPI stands for **Q**uestions → **R**esearch → **D**esign → **S**tructure → **P**lan → **I**terate.
+
+Each phase produces an artifact: a file under `.qrspi/` in your project. The next phase reads the artifact from the previous phase.
+
+The agent pauses at every checkpoint and asks for your approval. It does not advance until you approve. If you request changes, the agent revises the phase output and shows it to you again.
+
+This package is the Pi version of the [opencode-qrspi](https://github.com/felixnorden/skills/tree/main/packages/opencode-qrspi) plugin for OpenCode. Both tools use the same `.qrspi/` artifact format, so you can switch between them without losing your research or plans.
 
 ## Installation
 
-Install from npm, git, or a local path:
-
 ```bash
 pi install npm:@ftrdotdev/pi-qrspi
-pi install git:github.com/felixnorden/skills
+pi install git:github.com/felixnorden/skills   # installs the whole skills repo
 pi install /absolute/path/to/packages/pi-qrspi
-pi install ./packages/pi-qrspi   # local checkout
+pi install ./packages/pi-qrspi                 # local checkout
 ```
-
----
 
 ## Usage
 
-### Full Workflow
+### Full workflow
 
-Run the complete QRSPI workflow with a single command:
+Run the complete workflow with one command:
 
 ```bash
 /qrspi add-payment-flow "Implement Stripe payment processing"
 ```
 
-This interactively guides you through each phase with a human checkpoint at every step:
+| Phase | Command | What it does | Artifact |
+| ----- | ------- | ------------ | -------- |
+| **Q** — Questions | `/qrspi` | Gathers goals, constraints, and out-of-scope items | none — inline |
+| **R** — Research | `/qrspi-research` | Maps the codebase; documents existing implementations | `.qrspi/research/{slug}.md` |
+| **D** — Design | `/qrspi-design` | Evaluates options; produces a design concept | `.qrspi/designs/{slug}.md` |
+| **S** — Structure | `/qrspi-structure` | Produces a component-level outline | `.qrspi/outlines/{slug}.md` |
+| **P** — Plan | `/qrspi-plan` | Produces a TDD-aligned implementation plan | `.qrspi/plans/{slug}.md` |
+| **I** — Iterate | `/qrspi-iterate` | Revises the plan from your feedback; updates only the affected slices | updates the plan file |
 
-| Phase             | Command             | What it does                                                 |
-| ----------------- | ------------------- | ------------------------------------------------------------ |
-| **Q** — Questions | `qrspi`             | Gathers goals, constraints, and out-of-scope items           |
-| **R** — Research  | `qrspi-research`    | Maps the codebase and documents existing implementations     |
-| **D** — Design    | `qrspi-design`      | Evaluates options and produces a design concept              |
-| **S** — Structure | `qrspi-structure`   | Produces a component-level structural outline                |
-| **P** — Plan      | `qrspi-plan`        | Creates a vertically-sliced, TDD-aligned implementation plan |
-| **I** — Iterate   | `qrspi-iterate`     | Surgically revises an existing plan based on feedback        |
+### Individual phases
 
-### Individual Phases
-
-You can also run phases independently. Arguments are positional:
+You can run each phase separately. Arguments are positional:
 
 ```bash
 # Research only
@@ -63,51 +67,62 @@ You can also run phases independently. Arguments are positional:
 /qrspi-iterate .qrspi/plans/20260101-auth-refactor.md "Add OAuth2 support"
 ```
 
-The OpenCode plugin equivalents use flags (`--slug`, `--research`, `--design`, `--outline`, `--plan`, `--scope`, `--ticket`) instead of positional arguments.
+The OpenCode plugin uses flags (`--slug`, `--research`, `--design`, `--outline`, `--plan`, `--scope`, `--ticket`) instead of positional arguments.
 
----
+## What's included
 
-## What's Included
+### Prompt templates
 
-### Prompt Templates
+Six prompt templates in `prompts/`, one per phase:
 
-Six prompt templates in `prompts/`, one per QRSPI phase. The `/qrspi` orchestrator delegates each phase to a subagent (fresh context) so intermediate noise does not pollute the parent session's context window.
+| Template | Command |
+| -------- | ------- |
+| `prompts/qrspi.md` | `/qrspi` (full workflow) |
+| `prompts/qrspi-research.md` | `/qrspi-research` |
+| `prompts/qrspi-design.md` | `/qrspi-design` |
+| `prompts/qrspi-structure.md` | `/qrspi-structure` |
+| `prompts/qrspi-plan.md` | `/qrspi-plan` |
+| `prompts/qrspi-iterate.md` | `/qrspi-iterate` |
 
-| Template                     | Command             | Phase |
-| ---------------------------- | ------------------- | ----- |
-| `prompts/qrspi.md`           | `/qrspi`            | Q → R → D → S → P |
-| `prompts/qrspi-research.md`  | `/qrspi-research`   | R — Research |
-| `prompts/qrspi-design.md`    | `/qrspi-design`     | D — Design |
-| `prompts/qrspi-structure.md` | `/qrspi-structure`  | S — Structure |
-| `prompts/qrspi-plan.md`      | `/qrspi-plan`       | P — Plan |
-| `prompts/qrspi-iterate.md`   | `/qrspi-iterate`    | I — Iterate |
+The `/qrspi` orchestrator runs each phase in a fresh subagent session, so earlier phases do not clutter your main session's context.
 
 ### Extension
 
-`extensions/qrspi-artifacts.ts` enforces the artifact naming convention at the tool layer. It intercepts every `write` and `edit` call and, for paths under `.qrspi/<artifact>/`:
+`extensions/qrspi-artifacts.ts` keeps artifact names consistent. It intercepts every `write` and `edit` call that targets a path under `.qrspi/`:
 
-- **Stamps the date** — filenames without a `YYYYMMDD-` prefix get today's date from the host clock (not the model's guess), so `Write to .qrspi/plans/add-payment-flow.md` becomes `.qrspi/plans/20260814-add-payment-flow.md`
-- **Stamps frontmatter dates** — a `date:` key in the YAML frontmatter of a new artifact is set to the real ISO datetime
-- **Stamps git metadata** — `git_commit`, `branch`, and `repository` keys in the frontmatter of a new artifact are filled from the real repository at `cwd` (research template requires them). Values are resolved lazily on the first artifact write and cached per working directory for 60s — the orchestrator session and every subagent share the cache through the extension process, so later writes (including from subagents) never re-spawn git. The cache is invalidated automatically when a bash command mutates git state (`commit`, `checkout`, `rebase`, `pull`, …)
-- **Slugifies** — `Add Payment Flow.md` → `20260814-add-payment-flow.md`, and replaces malformed date prefixes (`2026-8-14-…`) with the canonical form
-- **Respects existing files** — iterate-overwrite writes to an existing artifact path are left untouched
-- **Blocks traversal** — `..` escapes out of the `.qrspi/` namespace are rejected
+- **Adds the date** — a filename without a `YYYYMMDD-` prefix gets today's date from the host clock. Write to `.qrspi/plans/add-payment-flow.md` and you get `.qrspi/plans/20260101-add-payment-flow.md`
+- **Fills frontmatter dates** — a `date:` key in the YAML frontmatter of a new artifact is set to the real ISO datetime
+- **Fills git metadata** — `git_commit`, `branch`, and `repository` keys are filled from the repository at `cwd` (the research template requires them)
+- **Slugifies** — `Add Payment Flow.md` becomes `20260101-add-payment-flow.md`; malformed date prefixes (`2026-1-1-…`) are replaced with the canonical form
+- **Keeps existing files** — writes to an existing artifact path are left untouched (used by iterate)
+- **Blocks traversal** — paths that escape `.qrspi/` with `..` are rejected
 
 ### Skills
 
-- **`planning-workflow`** — Templates for each QRSPI phase (research, design-concept, outline, plan, iterate). Enforces the constraint: _no implementation detail in the design phase, no design decisions in the plan phase._
-- **`tdd`** — Test-driven development guidance including red-green-refactor workflow, test doubles, dependency injection, and the London/Chicago school mock boundaries.
+- **`planning-workflow`** — templates for each phase (research, design-concept, outline, plan, iterate). Enforces two rules: no implementation detail in the design phase, no design decisions in the plan phase.
+- **`tdd`** — test-driven development guidance: red-green-refactor workflow, test doubles, dependency injection, and London/Chicago school mock boundaries.
 
-Artifacts are written to `.qrspi/` directories (`.qrspi/research/`, `.qrspi/designs/`, `.qrspi/outlines/`, `.qrspi/plans/`), so they stay interchangeable between the pi and opencode packages. Unlike the tool-specific `.opencode/` convention, `.qrspi/` is meant to be committed — research and plans are project knowledge, not ephemeral state.
+## Artifacts
 
----
+All artifacts live under `.qrspi/` in your project:
+
+```
+.qrspi/research/   # R
+.qrspi/designs/    # D
+.qrspi/outlines/   # S
+.qrspi/plans/      # P
+```
+
+Commit these files. Research and plans are project knowledge, not temporary state. Unlike OpenCode's `.opencode/` directory, `.qrspi/` is meant to be shared.
 
 ## Development
 
-The package bundles the shared skills from the repo root (`skills/planning-workflow`, `skills/tdd`) via a symlink during development. When publishing, the `prepack` script copies the real skill directories into the tarball (npm and bun pack skip symlinks), and `postpack` restores the symlink:
+The package bundles shared skills from the repo root (`skills/planning-workflow`, `skills/tdd`) through a symlink during development. `npm pack` and `bun pm pack` skip symlinks, so the `prepack` script copies the real skill directories into the tarball. The `postpack` script restores the symlink.
+
+The git metadata cache resolves lazily on the first artifact write and caches per working directory for 60 seconds. The orchestrator session and its subagents share the cache, so later writes never re-run git. A bash command that changes git state (`commit`, `checkout`, `rebase`, `pull`, …) resets the cache.
 
 ```bash
-bun run pack   # or: npm pack
-bun test       # extension + prompt template tests
+bun run pack       # or: npm pack — builds the tarball into dist/
+bun test           # extension + prompt template tests
 bun run typecheck
 ```
