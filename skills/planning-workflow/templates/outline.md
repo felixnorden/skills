@@ -1,10 +1,13 @@
 # Structure Outline Template
 
-**Usage**: Produced during the QRSPI Structure (S) phase. Declares components, boundaries, and sequencing constraints. Plan Agent reads this before authoring the implementation plan. No implementation detail — this is architecture, not tactics.
+**Usage**: Produced during the QRSPI Structure (S) phase.
+Declares components, boundaries, and sequencing constraints.
+Plan Agent reads this before authoring the implementation plan.
+No implementation detail; this is architecture, not tactics.
 
 **Constraints**:
 
-- 250–350 lines maximum
+- 350 lines maximum
 - No file paths, no function signatures, no pseudo-code
 - Every component declaration must map to at least one vertical slice in the subsequent plan
 - Sequencing constraints must state the _reason_, not just the dependency — the reason determines whether components can be partially parallelised

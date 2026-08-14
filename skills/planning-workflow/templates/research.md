@@ -1,11 +1,18 @@
 # Research Document Template
 
-**Usage**: Produced during the QRSPI Research (R) phase by the Research Agent. Plan Agent reads this before entering the Design phase. Do not suggest improvements, critique, or plan — document only what exists.
+**Usage**: Produced during the QRSPI Research (R) phase by the Research Agent.
+Plan Agent reads this before entering the Design phase.
+Do not suggest improvements, critique, or plan — document only what exists.
 
 **Constraints**:
-- Document prose: 300–500 words
-- Detailed Findings: capped at 5 subsections
-- Code References: capped at 10 entries
+
+- Document prose: up to 100 words per subsection, excluding the **Research Question** and **Summary** sections
+- Detailed Findings:
+  - succinct prose, sacrifice grammar for concision
+  - one line per sentence
+- Code References:
+  - capped at 3 entries per finding
+  - order entries based on importance High -> Low
 - Inline summary: 5–10 lines, no duplication of document body
 
 ---
@@ -14,15 +21,15 @@
 
 **Path**: `<worktree-root>/.opencode/research/YYYYMMDD-{topic-slug}.md`
 
-````markdown
+```markdown
 ---
-date: {ISO datetime}
-git_commit: {hash}
-branch: {branch}
-repository: {repo name}
+date: { ISO datetime }
+git_commit: { hash }
+branch: { branch }
+repository: { repo name }
 topic: "{topic}"
-subagents_used: [{roles invoked: locator | analyzer | pattern-finder}]
-skills_consulted: [{skill names loaded, or "none"}]
+subagents_used: [{ roles invoked: locator | analyzer | pattern-finder }]
+skills_consulted: [{ skill names loaded, or "none" }]
 status: complete
 ---
 
@@ -40,7 +47,7 @@ status: complete
 
 ### {Component or Subsystem}
 
-{Responsibilities, interfaces, data structures, control flow, and integration points with file:line references. One subsection per distinct component. Cap at 5 subsections total.}
+{Responsibilities, interfaces, data structures, control flow, and integration points with file:line references. One subsection per distinct component.}
 
 ## Key Patterns
 
@@ -49,12 +56,12 @@ status: complete
 ## Code References
 
 - `path/to/file:line` — {description}
-- {… up to 10 entries}
+- {…}
 
 ## Open Questions
 
 {Gaps and ambiguities that could not be resolved from the codebase. Each item is either a plan-time assumption for Plan Agent to make explicit, or a trigger for further research.}
-````
+```
 
 ---
 
