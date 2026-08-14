@@ -1,5 +1,5 @@
 ---
-description: QRSPI Plan phase. Produces a vertically-sliced, TDD-aligned implementation plan for Build Agent.
+description: QRSPI Plan phase. Turns the outline into a vertically-sliced, TDD-aligned implementation plan for a downstream build agent, written to `.qrspi/plans/`.
 argument-hint: "<outline-path> [research-path] [design-path] [slug]"
 ---
 Load the `planning-workflow` skill → `templates/plan.md`. Load the `tdd` skill.

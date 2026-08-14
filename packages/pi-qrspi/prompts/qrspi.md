@@ -1,12 +1,13 @@
 ---
-description: Start a full QRSPI planning workflow. Guides Q → R → D → S → P interactively with a human checkpoint at each phase.
-argument-hint: "<topic> [slug] [ticket]"
+description: Start a full QRSPI planning workflow (Question → Research → Design → Structure → Plan) with a human checkpoint after each phase, and iterate on revision requests.
+argument-hint: '"<topic>" [slug] [ticket]'
 ---
+
 Load the `planning-workflow` skill (read its `SKILL.md`; templates live under `templates/`).
 
 ## Arguments
 
-- `$1` — topic to be planned (required). If passed as multiple unquoted words, join them.
+- `$1` — topic to be planned (required). If the topic contains spaces, wrap it in quotes (`/qrspi "add payment flow"`) — unquoted words split into separate arguments.
 - `${2:-}` — slug: short kebab-case identifier for the feature (e.g. `add-payment-flow`). If absent, derive one from the topic after the Q phase.
 - `${3:-}` — ticket: issue reference to attach to all artifacts (e.g. `ENG-123`). Optional.
 

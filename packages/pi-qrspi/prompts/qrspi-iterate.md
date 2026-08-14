@@ -1,13 +1,13 @@
 ---
-description: QRSPI Iterate phase. Surgically revises an existing plan based on feedback. Updates only affected slices.
-argument-hint: "<plan-path> <feedback>"
+description: QRSPI Iterate phase. Surgically revises an existing plan based on feedback, updating only the slices the feedback implicates.
+argument-hint: '<plan-path> "<feedback>"'
 ---
 Load the `planning-workflow` skill → `templates/iterate.md`. Load the `tdd` skill.
 
 ## Arguments
 
 - `$1` — plan path: path to the existing plan to revise (required).
-- `${@:2}` — feedback: the feedback string describing what needs to change (required). Pass it quoted to keep it as one argument.
+- `${@:2}` — feedback: the feedback string describing what needs to change (required). Everything after the plan path is joined as one feedback string; quoting is optional but recommended.
 
 If `$1` is not provided, ask the user for it.
 If no feedback string is present, ask the user: "What needs to change in the plan?"

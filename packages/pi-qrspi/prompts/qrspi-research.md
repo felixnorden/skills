@@ -1,12 +1,12 @@
 ---
-description: QRSPI Research phase. Documents what exists in the codebase for a given topic. Produces a research document and inline summary.
-argument-hint: "<topic> [slug] [scope-path]"
+description: QRSPI Research phase. Documents what exists in the codebase for a topic and produces a dated research artifact in `.qrspi/research/` with an inline summary.
+argument-hint: '"<topic>" [slug] [scope-path]'
 ---
 Load the `planning-workflow` skill → `templates/research.md`.
 
 ## Arguments
 
-- `$1` — research topic (required). If passed as multiple unquoted words, join them.
+- `$1` — research topic (required). If the topic contains spaces, wrap it in quotes (`/qrspi-research "payment flow"`) — unquoted words split into separate arguments.
 - `${2:-}` — slug: session identifier for artifact naming (e.g. `auth-refactor`). If absent, derive from the topic.
 - `${3:-}` — scope path: optional path to an existing scope document.
 

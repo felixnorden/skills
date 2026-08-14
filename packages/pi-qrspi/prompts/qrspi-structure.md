@@ -1,5 +1,5 @@
 ---
-description: QRSPI Structure phase. Produces a component-level structural outline from the approved design concept.
+description: QRSPI Structure phase. Turns the approved design concept into a component-level structural outline, written to `.qrspi/outlines/`.
 argument-hint: "<design-path> [research-path] [slug]"
 ---
 Load the `planning-workflow` skill → `templates/outline.md`.

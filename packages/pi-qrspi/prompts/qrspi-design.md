@@ -1,5 +1,5 @@
 ---
-description: QRSPI Design phase. Facilitates solution design discussion, evaluates options, and produces a design concept document.
+description: QRSPI Design phase. Turns the research document into a solution design concept with evaluated options, written to `.qrspi/designs/`.
 argument-hint: "<research-path> [slug] [scope-path]"
 ---
 Load the `planning-workflow` skill → `templates/design-concept.md`.
