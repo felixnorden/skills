@@ -22,7 +22,7 @@ export const agents: Record<"plot" | "research", Agent> = {
       grep: "allow",
       edit: {
         "*": "deny",
-        ".opencode/research/*": "allow",
+        ".qrspi/research/*": "allow",
       },
       skill: {
         "planning-workflow": "allow",
@@ -145,7 +145,7 @@ If no topic is provided: use tool \`tool:question\` — "What area of the codeba
   },
   plot: {
     description:
-      "Strategic codebase analysis and implementation planning. Invoke before any multi-file change, architectural decision, or work in an unfamiliar domain. Does not write or modify code outside .opencode/plans/.",
+      "Strategic codebase analysis and implementation planning. Invoke before any multi-file change, architectural decision, or work in an unfamiliar domain. Does not write or modify code outside .qrspi/plans/.",
     mode: "all",
     color: "secondary",
     permission: {
@@ -154,9 +154,9 @@ If no topic is provided: use tool \`tool:question\` — "What area of the codeba
       grep: "allow",
       edit: {
         "*": "deny",
-        ".opencode/plans/*": "allow",
-        ".opencode/designs/*": "allow",
-        ".opencode/outlines/*": "allow",
+        ".qrspi/plans/*": "allow",
+        ".qrspi/designs/*": "allow",
+        ".qrspi/outlines/*": "allow",
       },
       skill: {
         tdd: "allow",
@@ -310,7 +310,7 @@ Do not save or deliver a plan until every item is satisfied:
 After writing the plan, output this inline:
 
 \`\`\`
-Plan complete: .opencode/plans/{filename}
+Plan complete: .qrspi/plans/{filename}
 
 Slices:
 - {Slice 1 name} — {one line: what behavior it delivers}

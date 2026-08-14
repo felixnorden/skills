@@ -57,13 +57,13 @@ You can also run phases independently:
 /qrspi:research --slug auth-refactor "Authentication system"
 
 # Design from research
-/qrspi:design --slug auth-refactor --research .opencode/research/auth-refactor.md
+/qrspi:design --slug auth-refactor --research .qrspi/research/auth-refactor.md
 
 # Plan from outline and research
-/qrspi:plan --slug auth-refactor --outline .opencode/outlines/auth-refactor.md --research .opencode/research/auth-refactor.md
+/qrspi:plan --slug auth-refactor --outline .qrspi/outlines/auth-refactor.md --research .qrspi/research/auth-refactor.md
 
 # Iterate on an existing plan
-/qrspi:iterate --plan .opencode/plans/auth-refactor.md "Add OAuth2 support"
+/qrspi:iterate --plan .qrspi/plans/auth-refactor.md "Add OAuth2 support"
 ```
 
 ---

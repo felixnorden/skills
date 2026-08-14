@@ -19,7 +19,7 @@ Do not suggest improvements, critique, or plan — document only what exists.
 
 ## Document
 
-**Path**: `<worktree-root>/.opencode/research/YYYYMMDD-{topic-slug}.md`
+**Path**: `<worktree-root>/.qrspi/research/YYYYMMDD-{topic-slug}.md`
 
 ```markdown
 ---
@@ -70,7 +70,7 @@ status: complete
 Output this inline immediately after writing the document:
 
 ```
-Research complete: .opencode/research/{filename}.md
+Research complete: .qrspi/research/{filename}.md
 
 Key files:
 - {path} — {one line}

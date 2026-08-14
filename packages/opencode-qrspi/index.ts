@@ -15,7 +15,7 @@ export const qrspi: Plugin = async ({ worktree, client }) => {
       loadAgents(input);
     },
     "tool.execute.before": async ({ tool }, output) => {
-      // Redirect all QRSPI document paths to always live in the root `.opencode/<artifact>` directory
+      // Redirect all QRSPI document paths to always live in the root `.qrspi/<artifact>` directory
       if (tool === "write" || tool === "edit" || tool === "read") {
         const filePath = String(output.args.filePath);
         const newPath = redirect(filePath, worktree, matchQrspiPath);

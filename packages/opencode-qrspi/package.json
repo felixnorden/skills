@@ -27,7 +27,7 @@
     }
   },
   "scripts": {
-    "prepack": "cp -r ../../skills/ ./skills",
+    "prepack": "rm -rf ./skills && mkdir -p ./skills && cp -R ../../skills/planning-workflow ./skills/ && cp -R ../../skills/tdd ./skills/ && rm -rf ./skills/planning-workflow/skills",
     "postpack": "rm -rf ./skills",
     "pack": "bun pm pack --destination ./dist",
     "test": "bun test"

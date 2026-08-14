@@ -15,7 +15,7 @@
 1. Read the design concept and structure/outline silently.
 2. If more exploration is needed, read the research document and look for answers before exploring further.
 3. Write the document using the schema below.
-4. Write to `<worktree-root>/.opencode/plans/YYYYMMDD-{slug}.md`.
+4. Write to `<worktree-root>/.qrspi/plans/YYYYMMDD-{slug}.md`.
 5. Return the artifact path and a one-paragraph summary of the plan.
 
 ---

@@ -12,10 +12,10 @@ Ticket:   {ticket reference, or "none"}
 Date:     {YYYY-MM-DD}
 
 Artifacts:
-  Research: <worktree-root>/.opencode/research/{YYYYMMDD-slug.md}
-  Design:   <worktree-root>/.opencode/design/{YYYYMMDD-slug.md}
-  Outline:  <worktree-root>/.opencode/outline/{YYYYMMDD-slug.md}
-  Plan:     <worktree-root>/.opencode/plans/{YYYYMMDD-slug.md}
+  Research: <worktree-root>/.qrspi/research/YYYYMMDD-{slug}.md
+  Design:   <worktree-root>/.qrspi/designs/YYYYMMDD-{slug}.md
+  Outline:  <worktree-root>/.qrspi/outlines/YYYYMMDD-{slug}.md
+  Plan:     <worktree-root>/.qrspi/plans/YYYYMMDD-{slug}.md
 
 Next step: pass the plan path to Build Agent.
 ```

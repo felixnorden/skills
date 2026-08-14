@@ -18,14 +18,14 @@ No implementation detail; this is architecture, not tactics.
 1. Read the design concept and research document silently.
 2. Identify `Decisions Required Before Planning` implied by the design concept's open questions. For each: resolve from the research document if possible; use `question` if human input is required.
 3. Write the document using the schema below.
-4. Write to `<worktree-root>/.opencode/outlines/YYYYMMDD-{slug}.md`.
+4. Write to `<worktree-root>/.qrspi/outlines/YYYYMMDD-{slug}.md`.
 5. Return the artifact path and a one-paragraph summary of the component structure.
 
 ---
 
 ## Schema
 
-**Path**: `<worktree-root>/.opencode/outlines/YYYYMMDD-{slug}.md`
+**Path**: `<worktree-root>/.qrspi/outlines/YYYYMMDD-{slug}.md`
 
 ```markdown
 ---

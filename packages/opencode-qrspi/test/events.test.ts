@@ -2,43 +2,43 @@ import { describe, test, expect } from "bun:test";
 import { isNone, isSome, redirect, matchQrspiPath } from "../events";
 
 describe("matchQrspiPath", () => {
-  test("returns none for no .opencode dir", () => {
+  test("returns none for no .qrspi dir", () => {
     const res = matchQrspiPath("wrong/path");
     expect(isNone(res)).toBe(true);
   });
 
-  test("returns none for no artifact option in .opencode dir", () => {
-    const res = matchQrspiPath(".opencode/wrong/");
+  test("returns none for no artifact option in .qrspi dir", () => {
+    const res = matchQrspiPath(".qrspi/wrong/");
     expect(isNone(res)).toBe(true);
   });
 
-  test("returns some for artifact option in .opencode dir", () => {
-    const res = matchQrspiPath(".opencode/research/");
+  test("returns some for artifact option in .qrspi dir", () => {
+    const res = matchQrspiPath(".qrspi/research/");
     expect(isSome(res)).toBe(true);
   });
 
-  test("returns some for artifact option in .opencode dir (no lagging /)", () => {
-    const res = matchQrspiPath(".opencode/research");
+  test("returns some for artifact option in .qrspi dir (no lagging /)", () => {
+    const res = matchQrspiPath(".qrspi/research");
     expect(isSome(res)).toBe(true);
   });
 
-  test("returns some for artifact file (md) in .opencode dir", () => {
-    const res = matchQrspiPath(".opencode/research/test.md");
+  test("returns some for artifact file (md) in .qrspi dir", () => {
+    const res = matchQrspiPath(".qrspi/research/test.md");
     expect(isSome(res)).toBe(true);
   });
 
-  test("returns some for artifact file (txt) in .opencode dir", () => {
-    const res = matchQrspiPath(".opencode/research/test.txt");
+  test("returns some for artifact file (txt) in .qrspi dir", () => {
+    const res = matchQrspiPath(".qrspi/research/test.txt");
     expect(isSome(res)).toBe(true);
   });
 
   test("returns none for artifact path deeper than artifact option", () => {
-    const res = matchQrspiPath(".opencode/research/banana/");
+    const res = matchQrspiPath(".qrspi/research/banana/");
     expect(isNone(res)).toBe(true);
   });
 
   test("returns none for artifact file deeper than artifact option", () => {
-    const res = matchQrspiPath(".opencode/research/banana/test.md");
+    const res = matchQrspiPath(".qrspi/research/banana/test.md");
     expect(isNone(res)).toBe(true);
   });
 });
@@ -50,23 +50,23 @@ describe("redirect", () => {
   });
 
   test("returns none for no valid artifact path", () => {
-    const res = redirect("wrong/.opencode/path", "", matchQrspiPath);
+    const res = redirect("wrong/.qrspi/path", "", matchQrspiPath);
     expect(isNone(res)).toBe(true);
   });
 
   test("returns some for valid artifact path", () => {
-    const res = redirect("foo/.opencode/plans", "bar", matchQrspiPath);
+    const res = redirect("foo/.qrspi/plans", "bar", matchQrspiPath);
     expect(isSome(res)).toBe(true);
     if (res.status === "some") {
-      expect(res.value).toBe("bar/.opencode/plans");
+      expect(res.value).toBe("bar/.qrspi/plans");
     }
   });
 
   test("returns some for valid artifact file", () => {
-    const res = redirect("foo/.opencode/plans/test.md", "bar", matchQrspiPath);
+    const res = redirect("foo/.qrspi/plans/test.md", "bar", matchQrspiPath);
     expect(isSome(res)).toBe(true);
     if (res.status === "some") {
-      expect(res.value).toBe("bar/.opencode/plans/test.md");
+      expect(res.value).toBe("bar/.qrspi/plans/test.md");
     }
   });
 });

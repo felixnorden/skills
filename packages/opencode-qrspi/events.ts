@@ -1,5 +1,5 @@
 const artifactOptions = ["research", "designs", "outlines", "plans"];
-const qrspiArtifactRegEx = new RegExp(`.opencode/(?:${artifactOptions.join("|")})(?:(/|/[^/]+))?$`);
+const qrspiArtifactRegEx = new RegExp(`\.qrspi/(?:${artifactOptions.join("|")})(?:(/|/[^/]+))?$`);
 
 type Some<T> = {
   status: "some";
