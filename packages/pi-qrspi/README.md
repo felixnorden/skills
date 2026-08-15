@@ -18,6 +18,13 @@ The agent pauses at every checkpoint and asks for your approval. It does not adv
 
 This package is the Pi version of the [opencode-qrspi](https://github.com/felixnorden/skills/tree/main/packages/opencode-qrspi) plugin for OpenCode. Both tools use the same `.qrspi/` artifact format, so you can switch between them without losing your research or plans.
 
+## Credits
+
+The framework is inspired by **Harness Engineering** — the practice of customizing a coding agent's configuration (skills, agents, commands, hooks) to improve reliability and output quality. This concept was coined by [Viv Trivedy](https://x.com/Vtrivedy10) and popularized by [Dex Horthy](https://x.com/dexhorthy) and the team at [HumanLayer](https://humanlayer.dev).
+
+- **Blog post**: [Skill Issue: Harness Engineering for Coding Agents](https://humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents)
+- **Talk**: Dex Horthy on context engineering and agent harnesses ([YouTube](https://www.youtube.com/watch?v=YwZR6tc7qYg))
+
 ## Installation
 
 Install from npm, git, or a local path:
