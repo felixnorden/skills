@@ -17,7 +17,7 @@ If no feedback string is present, ask the user: "What needs to change in the pla
 
 ## Orchestrated Mode
 
-When invoked as a QRSPI phase subagent from `/qrspi`: the feedback arrives in the orchestrator's task, not from the user. Skip Step 1 (Clarify) and the interactive gate — state any assumption explicitly in the revision note and return the revision summary. Interactive steps apply only when run standalone.
+When invoked as a QRSPI phase subagent from `/qrspi`: the feedback arrives in the orchestrator's task, not from the user. Skip Step 1 (Clarify) and Step 5 (Completion Gate) — state any assumption explicitly in the revision note and return the revision summary. Interactive steps apply only when run standalone.
 
 ---
 
@@ -59,6 +59,13 @@ Revised: {YYYY-MM-DD} — {one-line summary of what changed}
 ```
 
 Write the revised plan to the same path, overwriting the original.
+
+### 5 — Completion Gate
+
+Preview the revised plan to the user with a user-facing preview tool (fall back to `read` only if none exists), state which slices changed, and ask the user to confirm the revision before finishing.
+
+- If confirmed: done.
+- If not confirmed: revise according to the feedback, then preview the revision and ask again for confirmation.
 
 ---
 

@@ -14,7 +14,7 @@ QRSPI stands for **Q**uestions → **R**esearch → **D**esign → **S**tructure
 
 Each phase produces an artifact: a file under `.qrspi/` in your project. The next phase reads the artifact from the previous phase.
 
-The agent pauses at every checkpoint and asks for your approval. It does not advance until you approve. If you request changes, the agent revises the phase output and shows it to you again. You never approve blind: after each phase writes its artifact, the orchestrator reads the file back and shows you the full content — stamped frontmatter included — before asking for approval.
+The agent pauses at every checkpoint and asks for your approval. It does not advance until you approve. If you request changes, the agent revises the phase output and shows it to you again. You never approve blind: after each phase writes its artifact, the orchestrator presents the full content to you — stamped frontmatter included — before asking for approval, rendered by a user-facing preview tool so it never enters the agent's context.
 
 This package is the Pi version of the [opencode-qrspi](https://github.com/felixnorden/skills/tree/main/packages/opencode-qrspi) plugin for OpenCode. Both tools use the same `.qrspi/` artifact format, so you can switch between them without losing your research or plans.
 
@@ -68,7 +68,7 @@ Run the complete workflow with one command:
 
 ### Orchestrated flow
 
-`/qrspi` is an orchestrator. It does not draft artifacts itself; each phase runs in a **separate fresh-context subagent**, so exploration and drafting stay out of your main session's context. The orchestrator owns the session: the Q phase, launching one phase agent at a time, relaying your answers to the Design phase, reading each artifact back and presenting it in full at every checkpoint, and producing the session summary.
+`/qrspi` is an orchestrator. It does not draft artifacts itself; each phase runs in a **separate fresh-context subagent**, so exploration and drafting stay out of your main session's context. The orchestrator owns the session: the Q phase, launching one phase agent at a time, relaying your answers to the Design phase, presenting each artifact in full at every checkpoint without loading it into its own context, and producing the session summary.
 
 Each phase agent is told exactly what to do: which template to follow, which prior artifacts to read, where to write (`.qrspi/<kind>/<slug>.md`), and what to return (the inline summary plus any open questions). Phase agents never ask you questions directly — they return questions and design options to the orchestrator, which relays them to you.
 
@@ -112,7 +112,7 @@ Six prompt templates in `prompts/`, one per phase:
 | `prompts/qrspi-plan.md`      | `/qrspi-plan`            |
 | `prompts/qrspi-iterate.md`   | `/qrspi-iterate`         |
 
-The `/qrspi` orchestrator runs each phase in a fresh subagent session, so earlier phases do not clutter your main session's context. After each phase, the orchestrator reads the artifact back from disk and presents the full content before the checkpoint — what you approve is exactly what was written, including the extension-stamped frontmatter. The phase prompts double as standalone commands; when run standalone they keep their interactive steps (clarify, options, completion gate), and when invoked by the orchestrator they run in orchestrated mode (no direct user interaction; questions relayed through the orchestrator).
+The `/qrspi` orchestrator runs each phase in a fresh subagent session, so earlier phases do not clutter your main session's context. After each phase, the orchestrator presents the full content to you before the checkpoint — what you approve is exactly what was written, including the extension-stamped frontmatter — rendered by a user-facing preview tool so it never enters the orchestrator's context. The phase prompts double as standalone commands; when run standalone they keep their interactive steps (clarify, options, completion gate), and when invoked by the orchestrator they run in orchestrated mode (no direct user interaction; questions relayed through the orchestrator).
 
 ### Extension
 

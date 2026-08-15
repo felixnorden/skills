@@ -75,10 +75,10 @@ Write to `<worktree-root>/.qrspi/plans/{slug}.md` (the package extension stamps 
 
 ### 7 — Completion Gate
 
-Ask the user to confirm the plan is sufficient before proceeding.
+Preview the written plan to the user with a user-facing preview tool (fall back to `read` only if none exists), then ask the user to confirm the plan is sufficient before proceeding.
 
 - If confirmed: finalize and save the plan.
-- If not confirmed: revise according to the requested changes, then re-present for confirmation.
+- If not confirmed: revise according to the requested changes, then preview the revision and ask again for confirmation.
 
 ---
 

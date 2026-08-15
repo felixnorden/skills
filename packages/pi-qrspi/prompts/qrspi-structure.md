@@ -52,10 +52,10 @@ Write to `<worktree-root>/.qrspi/outlines/{slug}.md` (the package extension stam
 
 ### 5 — Completion Gate
 
-Ask the user to confirm the outline is sufficient before proceeding.
+Preview the written outline to the user with a user-facing preview tool (fall back to `read` only if none exists), then ask the user to confirm the outline is sufficient before proceeding.
 
 - If confirmed: finalize and save the outline.
-- If not confirmed: revise according to the requested changes, then re-present for confirmation.
+- If not confirmed: revise according to the requested changes, then preview the revision and ask again for confirmation.
 
 ---
 
