@@ -1,12 +1,12 @@
 # Research Document Template
 
 **Usage**: Produced during the QRSPI Research (R) phase by the Research Agent.
-Plan Agent reads this before entering the Design phase.
-Do not suggest improvements, critique, or plan — document only what exists.
+Plan Agent reads this before the Design phase.
+Document only what exists. Do not suggest improvements, critique, or plan.
 
 **Constraints**:
 
-- Document prose: ~100 words per subsection as a guide (not a hard cap), excluding the **Research Question** and **Summary** sections
+- Document prose: ~100 words per subsection (guide, not a hard cap), excluding the **Research Question** and **Summary** sections
 - Detailed Findings:
   - succinct prose, sacrifice grammar for concision
   - one line per sentence
@@ -37,11 +37,11 @@ status: complete
 
 ## Research Question
 
-{Original topic as stated — verbatim, not reframed.}
+{Original topic verbatim, not reframed.}
 
 ## Summary
 
-{3–5 sentences: key components, their connections, and what matters for planning. Written for Plan Agent — what does a planner need to know about this area before designing a solution?}
+{3–5 sentences: key components, their connections, what matters for planning. Written for Plan Agent: what must a planner know before designing a solution?}
 
 ## Detailed Findings
 
@@ -51,7 +51,7 @@ status: complete
 
 ## Key Patterns
 
-{Conventions with file:line examples. Omit this section entirely if Pattern Finder was not invoked.}
+{Conventions with file:line examples. Omit this section if Pattern Finder was not invoked.}
 
 ## Code References
 

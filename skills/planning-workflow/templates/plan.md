@@ -1,19 +1,19 @@
 # Implementation Plan Template
 
-**Usage**: Produced during the QRSPI Plan (P) phase. Load `skill:tdd` before authoring any "Tests First" section. Each phase is a vertical slice — one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
+**Usage**: Produced during the QRSPI Plan (P) phase. Load `skill:tdd` before authoring any "Tests First" section. Each phase is a vertical slice: one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
 
 **Constraints**:
 
-- Usually ~1,000 lines in total (prose plus code samples) — guidance, not a hard cap; the real constraints are self-containment and per-slice verification gates
-- Code samples are illustrative (locate insertion point, show pattern) — not complete implementations
+- Usually ~1,000 lines in total (prose plus code samples), not a hard cap; the real constraints are self-containment and per-slice verification gates
+- Code samples are illustrative (locate insertion point, show pattern), not complete implementations
 - Each phase must deliver something demonstrable at its verification gate
-- No phase may be a technical layer (e.g., "implement all models") — each phase is a behavior
+- No phase may be a technical layer (e.g., "implement all models"); each phase is a behavior
 - In verification gates, use tools over bash commands where available
 
 ## How to Produce This Document
 
-1. Read the design concept and structure/outline silently.
-2. If more exploration is needed, read the research document and look for answers before exploring further.
+1. Read the design concept and outline silently.
+2. If more exploration is needed, look for answers in the research document first.
 3. Write the document using the schema below.
 4. Write to `<worktree-root>/.qrspi/plans/YYYYMMDD-{slug}.md`.
 5. Return the artifact path and a one-paragraph summary of the plan.
@@ -27,13 +27,13 @@
 **Status**: ready
 **Design concept**: {path to design concept artifact}
 **Research artifact**: {path to research artifact}
-**Issue**: {link — omit if no issue is referenced}
+**Issue**: {link; omit if no issue is referenced}
 
 ---
 
 ## Overview
 
-{What we are implementing and why — 2–4 sentences. Reference the design concept by name, not by repeating its content.}
+{What we are implementing and why, in 2–4 sentences. Reference the design concept by name, not by repeating its content.}
 
 ## Skills Consulted
 
@@ -50,7 +50,7 @@
 
 ## Desired End State
 
-{Specification of the completed feature and how to verify it is correct from the outside — what a caller or user observes.}
+{Specification of the completed feature and how to verify it is correct from the outside: what a caller or user observes.}
 
 ## Slice Order Rationale
 
@@ -66,16 +66,16 @@
 
 ### What this slice delivers
 
-{One paragraph: what Build Agent will be able to demonstrate at the end of this slice. Written as an observable outcome — what a caller sees, not what code was written.}
+{One paragraph: what Build Agent can demonstrate at the end of this slice. Written as an observable outcome: what a caller sees, not what code was written.}
 
 ### Tests First (Red)
 
-{Before writing any implementation, Build Agent writes these tests. They must fail at the start of this slice for the right behavioral reason — not a compilation error.}
+{Before writing any implementation, Build Agent writes these tests. They must fail at the start of this slice for the right behavioral reason, not a compilation error.}
 
 Load `skill:tdd` → `references/test-doubles.md` and `assets/test-template.md` for double selection and scaffold.
 
 - **{Test name following "subject does what when condition" convention}**
-  - Arrange: {what to set up — subject, doubles, inputs}
+  - Arrange: {what to set up: subject, doubles, inputs}
   - Act: {what to invoke}
   - Assert: {what observable outcome to verify}
 
@@ -133,7 +133,7 @@ Automated:
 
 Manual:
 
-- [ ] {Observable behavior to confirm from the outside — what a caller or user sees}
+- [ ] {Observable behavior to confirm from the outside: what a caller or user sees}
 
 ---
 

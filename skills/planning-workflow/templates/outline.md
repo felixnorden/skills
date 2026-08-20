@@ -7,10 +7,10 @@ No implementation detail; this is architecture, not tactics.
 
 **Constraints**:
 
-- Usually under 350 lines — no hard cap; the real constraint is that every line earns its place
+- Usually under 350 lines (no hard cap); every line must earn its place
 - No file paths, no function signatures, no pseudo-code
 - Every component declaration must map to at least one vertical slice in the subsequent plan
-- Sequencing constraints must state the _reason_, not just the dependency — the reason determines whether components can be partially parallelised
+- Sequencing constraints must state the _reason_, not just the dependency. The reason determines whether components can be parallelised
 - If the design concept has unresolved open questions that affect structure, stop and flag them before writing
 
 ## How to Produce This Document
@@ -42,8 +42,8 @@ status: draft
 
 ### {Component name}
 
-**Responsibility**: {one sentence — what this component owns}
-**Interface**: {what it exposes — inputs, outputs, events emitted; no implementation detail}
+**Responsibility**: {one sentence stating what this component owns}
+**Interface**: {what it exposes: inputs, outputs, events emitted; no implementation detail}
 **Dependencies**: {other components it calls or receives from; external dependencies it crosses}
 
 ### {Next component}
@@ -62,7 +62,7 @@ status: draft
 
 ## Sequencing Constraints
 
-{Which components must exist — or have their interface defined — before others can be built. This feeds directly into the vertical slice ordering in the plan.}
+{Which components must exist, or have their interface defined, before others can be built. This feeds the vertical slice ordering in the plan.}
 
 | Component   | Depends on        | Reason |
 | ----------- | ----------------- | ------ |
@@ -72,7 +72,7 @@ status: draft
 
 ## Decisions Required Before Planning
 
-{Structural unknowns the planner must either resolve or state as explicit assumptions. These are not design questions — design is closed. These are questions about how the structure maps to implementation.}
+{Structural unknowns the planner must resolve or state as explicit assumptions. Design is closed; these concern how structure maps to implementation.}
 
 - {e.g., Does the notification component own its retry logic or delegate it to the queue infrastructure?}
 - {e.g., What is the wire format at the gateway boundary?}
