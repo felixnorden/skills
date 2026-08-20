@@ -12,9 +12,9 @@
 ## How to Produce This Document
 
 1. Read the research document silently. Do not summarise it back.
-2. Identify what is still ambiguous about the solution shape. Use `question` with at most 3 questions at once. Do not proceed until resolved.
+2. Identify what is still ambiguous about the solution shape. Return up to 3 questions in your output for the orchestrator to relay. Do not proceed until the orchestrator returns the answers.
 3. Present 2–3 distinct design options. For each state: what it optimises for, what it gives up, and which constraints from the scope it satisfies.
-4. Use `question`: "Does this direction feel right, or should we adjust?"
+4. Return the direction question ("Does this direction feel right, or should we adjust?") for the orchestrator to relay.
 5. Once direction is agreed, write the document using the schema below.
 6. Write to `<worktree-root>/.qrspi/designs/YYYYMMDD-{slug}.md`.
 7. Return the artifact path and a one-paragraph summary of the chosen direction.

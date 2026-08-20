@@ -1,6 +1,6 @@
 # Iterate Template
 
-**Usage**: Used during the QRSPI Iterate (I) phase to revise an existing plan. Updates only the affected slices; never regenerates the full plan. Load relevant skills (e.g., TDD) alongside this template.
+**Usage**: Used during the QRSPI Iterate (I) phase to revise an existing plan. Updates only the affected slices; never regenerates the full plan. Load the test-writing skill (see the plan template) when you must regenerate a Tests First section.
 
 **Constraints**:
 
@@ -20,7 +20,7 @@
    This feedback requires a design change. Return to the D phase before revising the plan.
    Reason: {specific design decision affected}
    ```
-4. For each implicated slice, rewrite it completely. Leave all other slices verbatim.
+4. For each implicated slice, rewrite it completely, regenerating its Tests First section and Verification Gate for the new behavior. Leave all other slices verbatim.
 5. Add a revision note to the plan header:
    ```
    Revised: {YYYY-MM-DD} — {one-line summary of what changed}

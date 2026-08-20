@@ -30,8 +30,4 @@ Run the skill when starting a new feature, designing a solution before implement
 
 A QRSPI session follows the phases Q, R, D, S, P, I, one at a time. Every phase ends at a human checkpoint. An orchestrator runs the session, relays user answers, and previews each artifact. Phase agents load only the current phase's template and write the artifact to .qrspi/<kind>/<slug>.md. Load relevant skills before authoring any Tests First section. A plan requires an approved design concept; if none exists, complete the Design phase first.
 
-## Provenance
-
-This skill is vendored from the npm package @ftrdotdev/pi-qrspi.
-
 See SKILL.md for the full agent-facing instructions.

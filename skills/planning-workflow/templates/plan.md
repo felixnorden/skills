@@ -1,6 +1,6 @@
 # Implementation Plan Template
 
-**Usage**: Produced during the QRSPI Plan (P) phase. Load `skill:tdd` before authoring any "Tests First" section. Each phase is a vertical slice: one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
+**Usage**: Produced during the QRSPI Plan (P) phase. Before authoring any "Tests First" section, load the test-writing skill — the one covering test doubles, Arrange/Act/Assert, and the red-green-refactor loop. Load it once at the start of the plan; it applies to every slice below. If no such skill is loaded, the Tests First blocks below are the minimum contract. Each phase is a vertical slice: one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
 
 **Constraints**:
 
@@ -72,7 +72,7 @@
 
 {Before writing any implementation, Build Agent writes these tests. They must fail at the start of this slice for the right behavioral reason, not a compilation error.}
 
-Load `skill:tdd` → `references/test-doubles.md` and `assets/test-template.md` for double selection and scaffold.
+Use the test-writing skill loaded at the top of this plan for double selection and test scaffold. If none was loaded, follow the test-structure block below.
 
 - **{Test name following "subject does what when condition" convention}**
   - Arrange: {what to set up: subject, doubles, inputs}

@@ -25,7 +25,7 @@ Each slice:
 
 **IMPORTANT**: Horizontal slicing, grouping changes by technical layer across multiple behaviors, is the primary anti-pattern. A plan where Phase 1 is "all models", Phase 2 is "all services", Phase 3 is "all controllers" cannot be verified incrementally and produces no working software until the final phase.
 
-Load relevant skills before authoring any Tests First section.
+Load the test-writing skill (test doubles, Arrange/Act/Assert, red-green-refactor) before authoring any Tests First section. If no such skill exists, the Tests First blocks in the plan template are the minimum contract.
 
 ---
 
@@ -35,6 +35,10 @@ A QRSPI session runs with one orchestrator and per-phase agents. One phase at a 
 
 **Orchestrator owns**: the Q phase, launching each phase agent, relaying user answers (Design phase), previewing each artifact to the user at its checkpoint, approving or denying advancement, coordinating Iterate, and producing the session summary.
 
+**Q phase**: runs first, before Research, owned by the orchestrator (the main agent).
+
+The orchestrator asks the user the scope questions directly. These answers define the scope goal statement. The design artifact takes its problem statement from the scope goal; the research topic also comes from Q.
+
 **Phase agent owns**: loading the current phase's template, reading the prior artifacts, drafting and writing the artifact to `.qrspi/<kind>/<slug>.md`, and returning the inline summary.
 
 **Phase agent rules**:
@@ -42,9 +46,9 @@ A QRSPI session runs with one orchestrator and per-phase agents. One phase at a 
 - Load only the template for the current phase. Do not draft artifacts for other phases.
 - Do not ask the user questions directly. Return clarifying questions, design options, or unresolved decisions in your final output; the orchestrator relays them.
 - Convert unresolved ambiguities into explicit assumptions in the artifact (Open Questions / Decisions Required sections) rather than blocking.
-- The package extension stamps the `YYYYMMDD-` prefix and the frontmatter on your write; write to `.qrspi/<kind>/<slug>.md` and let it normalize.
+- Write to `.qrspi/<kind>/YYYYMMDD-{slug}.md` and include any frontmatter the template specifies.
 
-**Artifact visibility**: the orchestrator previews each artifact to the user after the phase agent writes it, full content and stamped frontmatter included, using a user-facing preview tool so the artifact never enters the orchestrator's context. Fall back to `read` only if no user-facing preview tool exists. Do not approve blind.
+**Artifact visibility**: the orchestrator previews each artifact to the user after the phase agent writes it, full content and frontmatter included, using a user-facing preview tool so the artifact never enters the orchestrator's context. Fall back to `read` only if no user-facing preview tool exists. Do not approve blind.
 
 ---
 

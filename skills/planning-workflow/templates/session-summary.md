@@ -1,6 +1,6 @@
 # Session Summary Template
 
-**Usage**: Output by the QRSPI orchestration command after all phases are approved. Lists all artifact paths produced in the session.
+**Usage**: Produced by the orchestrator after all phases are approved. Lists all artifact paths produced in the session.
 
 ---
 

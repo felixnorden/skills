@@ -28,7 +28,6 @@ git_commit: { hash }
 branch: { branch }
 repository: { repo name }
 topic: "{topic}"
-subagents_used: [{ roles invoked: locator | analyzer | pattern-finder }]
 skills_consulted: [{ skill names loaded, or "none" }]
 status: complete
 ---
