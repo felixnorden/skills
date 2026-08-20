@@ -1,33 +1,24 @@
 # Writing for agents
 
-I wrote this skill out of mild frustration. Every agent-facing doc I read padded its claims with "crucial" and "groundbreaking", hedged them with "may potentially", and buried the instruction under filler. Humans can't verify that. Agents can't parse it. This skill is the clean-up: prose a machine reads once and a human can check line by line.
+A skill for writing content that other agents ingest and that humans can verify. It removes superlatives, hedges, filler, ambiguous terminology, and unverifiable claims. It follows Simplified Technical English (STE) in a light form.
 
-It follows Simplified Technical English (STE) in a light form.
+SKILL.md is the instruction file agents load when the skill runs. This README is for a person who wants to understand the skill without reading the full agent-facing instructions. It explains why the skill exists, how it is built, and how to extend it. Read it before changing the skill.
 
-SKILL.md is the instruction file agents load at runtime. This README is for you. It explains why the skill exists, how it is built, and how to extend it. Read it before you edit the skill.
+## What it does
 
-## The problem
+The skill writes prose that a machine parses once and a human checks line by line. It produces short sentences in the active voice, one meaning per word, no superlatives, and no filler. Every factual claim carries proof: a number, a name, or a source. It covers 22 patterns grouped as verifiability, language, and style, and audits output against a 9-point checklist.
 
-Writing for humans and writing for machines overlap, but they are not the same job.
+## What problem it solves
 
-People tolerate padding. We fill in meaning from context and tone. Agents don't. Give an agent "request", "call", "invocation", and "query" for one concept, and it has to guess or learn the mapping by extra training. A person checking machine behavior faces the same wall: a claim with no number, no name, and no source cannot be checked at all.
+Writing for humans and writing for machines overlap, but they are not the same job. People tolerate padding and infer meaning from context and tone. Agents do not. An agent that reads "request", "call", "invocation", and "query" for one concept must guess or learn the mapping. A person cannot check a claim that carries no number, name, or source.
 
-This skill sits in the overlap: text that agents parse reliably and that humans can audit. It treats the two readers as one need, not a trade-off.
-
-## Two readers, one need
-
-The skill is written for two readers.
-
-- Agents ingest the content first. They need consistent terms, short sentences, and statements that carry their own context.
-- Humans verify it second. They need proof on every claim.
-
-Both want the same thing: specific, unambiguous, consistent text. The skill never trades one reader for the other. If a line only works when a human reads it emotionally, out it goes.
+The skill targets the overlap: text that agents parse reliably and that humans can audit. It treats the two readers as one need, not a trade-off. If a line only works when a human reads it emotionally, it is removed.
 
 ## The standard: STE
 
 Simplified Technical English (ASD-STE100) is a controlled language built for maintenance manuals. It has two halves: a controlled vocabulary of about 900 approved words and 65 writing rules. ASD, the AeroSpace and Defence Industries Association of Europe, publishes it.
 
-This skill takes the rules, not the dictionary:
+The skill takes the rules, not the dictionary:
 
 - Max 20 words per sentence.
 - One instruction per sentence, imperative mood.
@@ -35,35 +26,35 @@ This skill takes the rules, not the dictionary:
 - Active voice.
 - Plain words over fancy synonyms.
 
-Why not the full dictionary? It is tuned to aircraft maintenance and it is heavy to maintain. The rules are the part that transfers. The word list is not.
+The full dictionary is tuned to aircraft maintenance and heavy to maintain. The rules transfer; the word list does not.
 
-`references/ste-rules.md` holds the rules in detail plus a worked before/after rewrite. `references/offender-wordlist.md` holds the word tables. Read ste-rules first; it is the one that teaches the standard.
+`references/ste-rules.md` holds the rules in detail plus a worked before/after rewrite. `references/offender-wordlist.md` holds the word tables. Start with ste-rules.md; it explains the standard.
 
-## What it has to do with unslop
+## How it relates to unslop
 
-Unslop is a sibling skill by the same author. It cuts AI tells from writing meant for humans and adds human voice. The two skills share a plain-speech core: both ban filler, em dashes, hedging, synonym cycling, and fancy synonyms. They part ways on one axis: voice.
+Unslop is a related skill that cuts AI tells from writing meant for humans and adds human voice. The two skills share a plain-speech core: both ban filler, em dashes, hedging, synonym cycling, and fancy synonyms. They part ways on one axis: voice.
 
 - Unslop adds soul: opinions, rhythm, first person. It wants the writing to sound like a person wrote it.
-- This skill does not add soul. For prose an agent will ingest, flatness is a feature, not a tell. Predictable beats charming.
+- This skill does not add soul. For prose an agent will ingest, flatness is a feature, not a tell.
 
-So they complement each other. Human-facing text gets both: this skill for clarity and proof, unslop for voice. Agent-internal text gets this skill alone. There is no case where they fight.
+So the skills complement each other. Human-facing text gets both: this skill for clarity and proof, unslop for voice. Agent-internal text gets this skill alone.
 
 ## Design decisions
 
-Four choices were settled before I wrote the skill, and each was confirmed during planning.
+Four choices were fixed before the skill was written.
 
 | Decision | Choice | Why |
 |---|---|---|
 | Scope | Agent-facing artifacts only | Matches "ingested by agents"; keeps the skill focused |
-| STE strictness | Principles plus a compact wordlist | The full dictionary is heavy; the rules transfer, the word list doesn't |
+| STE strictness | Principles plus a compact wordlist | The full dictionary is heavy; the rules transfer, the word list does not |
 | Relationship to unslop | Complementary | Same plain-speech core, different goal for voice |
-| Verifiability | A hard rule | "Every claim carries proof" is core principle 4, and it is the rule I care about most |
+| Verifiability | A hard rule | "Every claim carries proof" is core principle 4 |
 
 ## Name and aliases
 
-The canonical name is `writing-for-agents`. Four alternatives sit in `metadata.aliases`: `agent-facing-writing`, `clear-agent-prose`, `ste-style-writing`, and `plain-agent-writing`. Honest caveat: the agent skills spec does not read aliases. Loaders match on keywords in the description, so treat the aliases as a courtesy, not a promise.
+The canonical name is `writing-for-agents`. Four alternatives sit in `metadata.aliases`: `agent-facing-writing`, `clear-agent-prose`, `ste-style-writing`, and `plain-agent-writing`. The agent skills spec does not read aliases. Loaders match on keywords in the description, so the aliases are a courtesy, not a promise.
 
-## File layout
+## How it is structured
 
 ```
 skills/writing-for-agents/
@@ -76,9 +67,9 @@ skills/writing-for-agents/
 
 Repo rules apply: references one level deep, forward slashes, sentence case headings, and a table of contents for any reference over 100 lines.
 
-## Using the skill
+## How to use it
 
-Invoke it when writing or editing skill files, documentation, tool descriptions, prompts, or handoff notes.
+Invoke the skill when writing or editing skill files, documentation, tool descriptions, prompts, or handoff notes.
 
 The process in SKILL.md is short:
 
@@ -87,31 +78,33 @@ The process in SKILL.md is short:
 3. Rewrite. Preserve meaning.
 4. Audit against the 9-point checklist.
 
-Three audit questions matter more than the rest. Does every claim carry proof? Is each concept named by exactly one term? Would any sentence survive unchanged in an unrelated project? If yes to that last one, cut it.
+Three audit questions carry the most weight. Does every claim carry proof? Is each concept named by exactly one term? Would any sentence survive unchanged in an unrelated project? If yes to the last one, cut it.
 
-## Extending the skill
+## How to extend it
 
 Most changes land in one of two files.
 
 - `references/offender-wordlist.md`: add a row to the matching table. Word on the left, plain fix on the right.
 - `SKILL.md`: add a numbered pattern under the right group, then add a matching checklist line.
 
-Then keep it consistent. One term per concept applies to the skill's own prose too. When you add a word, use it only in the sense you listed.
+Keep the skill consistent. One term per concept applies to the skill's own prose too. When a word is added, use it only in the sense it is listed.
 
 ## How the skill was verified
 
-I ran the skill on its own text. The checks are in the record.
+The skill is written against its own rules. These checks ran during authoring.
 
-- The frontmatter YAML parses. The description is double-quoted because ": " inside it is a YAML mapping separator. The unquoted original would have broken every strict loader.
+- The frontmatter YAML parses. The description is double-quoted because ": " inside it is a YAML mapping separator. An unquoted description would break a strict loader.
 - The description is 315 chars, under the 1024 cap.
 - SKILL.md is 95 lines, under the 500 cap.
 - References are one level deep.
 - No em dashes, en dashes, or curly quotes.
 - An offender scan of the skill's own prose found nothing. One scanner hit was a false positive: "very" inside "every".
-- An unslop pass over the body caught four things I then fixed: a parenthetical, a passive construction, a "not just" phrase, and a second passive construction.
+- An unslop pass over the body caught four items that were then fixed: a parenthetical, a passive construction, a "not just" phrase, and a second passive construction.
 
-The skill audits its own writing. That is the point, and it makes the skill trustworthy: it either follows its rules or it does not ship.
+The skill audits its own writing. That is the point.
 
-## Origin
+## Provenance
 
-The standard this skill adapts: ASD-STE100, Simplified Technical English, published by ASD. The skill uses its rules. It leaves the controlled dictionary alone.
+Original skill in this repository.
+
+See SKILL.md for the full agent-facing instructions.
