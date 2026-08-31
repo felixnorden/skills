@@ -45,7 +45,7 @@ Four choices were fixed before the skill was written.
 
 | Decision | Choice | Why |
 |---|---|---|
-| Scope | Agent-facing artifacts only | Matches "ingested by agents"; keeps the skill focused |
+| Scope | Documents read by humans and agents | The body already covers both readers; the description carries the trigger list |
 | STE strictness | Principles plus a compact wordlist | The full dictionary is heavy; the rules transfer, the word list does not |
 | Relationship to unslop | Complementary | Same plain-speech core, different goal for voice |
 | Verifiability | A hard rule | "Every claim carries proof" is core principle 4 |
@@ -69,7 +69,13 @@ Repo rules apply: references one level deep, forward slashes, sentence case head
 
 ## How to use it
 
-Invoke the skill when writing or editing skill files, documentation, tool descriptions, prompts, or handoff notes.
+The skill triggers from its description. Load it when writing or editing plans, specs, design documents, PRDs, API docs, READMEs, changelogs, handoff notes, tool descriptions, or prompts. Do not load it for chat replies, where the global STE rule already applies. Invoke it manually with `/skill:writing-for-agents` when the trigger misses.
+
+## How it triggers
+
+The description in SKILL.md is the trigger. It is the only text always in context. pi injects it at session start. The model loads SKILL.md when its current task matches a description keyword. Imperative phrasing and an artifact-type list raise the match rate. The aliases in metadata do not load; the description does.
+
+To add a trigger, add the artifact type to the description. To remove a false trigger, name the exclusion in the description. When a trigger misses in practice, the description lacks the keyword the task carries.
 
 The process in SKILL.md is short:
 
@@ -94,7 +100,7 @@ Keep the skill consistent. One term per concept applies to the skill's own prose
 The skill is written against its own rules. These checks ran during authoring.
 
 - The frontmatter YAML parses. The description is double-quoted because ": " inside it is a YAML mapping separator. An unquoted description would break a strict loader.
-- The description is 315 chars, under the 1024 cap.
+- The description is 372 chars, under the 1024 cap. It names 10 artifact types, one exclusion (chat replies), and an imperative trigger verb. It is a trigger spec, not a summary.
 - SKILL.md is 95 lines, under the 500 cap.
 - References are one level deep.
 - No em dashes, en dashes, or curly quotes.
@@ -102,6 +108,8 @@ The skill is written against its own rules. These checks ran during authoring.
 - An unslop pass over the body caught four items that were then fixed: a parenthetical, a passive construction, a "not just" phrase, and a second passive construction.
 
 The skill audits its own writing. That is the point.
+
+Trigger evidence lives in the session log. A `read` tool call on `skills/writing-for-agents/SKILL.md` in a log proves the skill loaded. When a document-writing turn shows no such call, the description missed a keyword.
 
 ## Provenance
 

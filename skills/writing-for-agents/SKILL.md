@@ -1,6 +1,6 @@
 ---
 name: writing-for-agents
-description: "Writes clear, concise, verifiable prose for content other agents ingest. Use when writing or editing skill files, documentation, tool descriptions, prompts, or handoff notes. Follows Simplified Technical English (STE): short sentences, one meaning per word, active voice, no superlatives, every claim carries proof."
+description: "Writes prose that humans and agents both verify: short sentences, one term per concept, active voice, no superlatives, every claim carries proof. Apply automatically when writing or editing plans, specs, design documents, PRDs, API docs, READMEs, changelogs, handoff notes, tool descriptions, or prompts. Do not apply to chat replies. Follows Simplified Technical English."
 metadata:
   aliases: agent-facing-writing, clear-agent-prose, ste-style-writing, plain-agent-writing
 ---
