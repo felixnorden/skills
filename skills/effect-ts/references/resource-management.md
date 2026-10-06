@@ -1,5 +1,20 @@
 # Resource Management
 
+## Contents
+
+- Basic Pattern
+- Resource Pattern Selector
+- Scope
+- Scope.provide
+- Additive Scopes
+- Pool Pattern
+- Layers with Resources (v4: Context pattern)
+- Finalizers
+- Ensuring Cleanup
+- Common Patterns
+- Resource Leak Prevention
+- Best Practices
+
 Safe resource acquisition and cleanup in Effect v4.
 
 See related examples in [effect-smol/ai-docs/src/01_effect/04_resources/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/04_resources/)

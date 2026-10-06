@@ -90,8 +90,3 @@ type Encoded = (typeof schema)["Encoded"]
 // make: { readonly a: string }  ──▶  { readonly a: string }
 Schema.flip(schema).make
 ```
-
-## See Also
-
-- [schema-transformations.md](schema-transformations.md) - Transformations between schemas
-- [schema-constructors.md](schema-constructors.md) - Constructor behavior

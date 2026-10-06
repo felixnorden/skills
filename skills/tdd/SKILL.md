@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Guides test-driven development of software components using the red-green-refactor loop. Covers test doubles, dependency injection, test structure, and naming. Use when writing new features test-first, adding tests to existing code, designing a component's interface through tests, or when the user mentions TDD, unit tests, mocks, stubs, or test structure.
+description: Writes tests before implementation with the red-green-refactor loop, and designs interfaces through failing tests. Use when writing a new feature test-first, adding tests to existing code, or when the user mentions TDD, unit tests, test doubles, mocks, stubs, or test structure. Do not use to fix a failing suite, raise coverage, write end-to-end tests, or answer general testing questions.
 ---
 
 # Test-Driven Development

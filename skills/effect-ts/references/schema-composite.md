@@ -541,9 +541,3 @@ const schema = Schema.Union([
   Schema.TaggedStruct("B", { b: Schema.Finite })
 ])
 ```
-
-## See Also
-
-- [schema-elementary.md](schema-elementary.md) - Primitives, Literals, Strings, Numbers, Dates
-- [schema-recursive.md](schema-recursive.md) - Recursive schemas
-- [schema-validation.md](schema-validation.md) - Adding runtime checks

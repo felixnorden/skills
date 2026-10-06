@@ -1,13 +1,6 @@
 ---
 name: foundry-chisel
-description: >
-  Evaluates and prototypes Solidity expressions interactively using Chisel — Foundry's
-  built-in REPL. Covers all REPL commands (!save, !load, !list, !fork, !source, !traces,
-  !rawstack, !memdump), session management and caching, forking a live network from within
-  the REPL, exporting sessions to forge-std Script files, and fetching verified contract
-  interfaces from Etherscan (!fetch). Gives access to the full vm.* cheatcode API inside
-  the REPL. Activates when a user wants to test a Solidity snippet, prototype an expression,
-  inspect a live contract interactively, or use any chisel command prefixed with !.
+description: Evaluates and prototypes Solidity interactively in Chisel, the Foundry REPL. Covers session management and caching, the !save, !load, !list, !fork, !source, !traces, !rawstack, and !memdump commands, forking a live network, exporting sessions to forge-std Script files, and fetching verified interfaces from Etherscan. Use when the user wants to test a Solidity snippet, prototype an expression, inspect a live contract interactively, or use a chisel command prefixed with !.
 ---
 
 # foundry-chisel

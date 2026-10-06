@@ -299,8 +299,3 @@ console.log(String(Schema.decodeUnknownExit(email)("a@b.com")))
 Success(["a","@","b.com"])
 */
 ```
-
-## See Also
-
-- [schema-composite.md](schema-composite.md) - Structs, Tuples, Arrays, Records, Unions
-- [schema-validation.md](schema-validation.md) - Adding runtime checks with filters

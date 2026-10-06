@@ -1,5 +1,14 @@
 # HTTP API — Request Handling
 
+## Contents
+
+- Query Parameters
+- Request Headers
+- Multipart Requests
+- Request Encoding
+- Accessing the Raw Request
+- Streaming Requests
+
 ## Query Parameters
 
 Query parameters are the `?key=value` pairs appended to a URL. Use `Schema.optionalKey()` for optional params:

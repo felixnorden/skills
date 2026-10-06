@@ -1,14 +1,6 @@
 ---
 name: foundry-anvil
-description: >
-  Runs and configures a local Ethereum development node using Anvil — Foundry's fast in-process
-  EVM. Covers starting Anvil with custom flags, forking mainnet or other networks at a specific
-  block (anvil --fork-url), state persistence (dump/load state), mining control (anvil_mine,
-  interval mining, no-mining mode), account impersonation (anvil_impersonateAccount), time
-  manipulation (evm_increaseTime, evm_setNextBlockTimestamp), balance and storage manipulation
-  via custom RPC methods, and all anvil_ and evm_ namespace JSON-RPC methods. Activates when
-  a user needs a local EVM node, wants to fork a live network for testing, or asks about any
-  Anvil startup flag or custom RPC method.
+description: Runs and configures a local Ethereum node with Anvil, the Foundry in-process EVM. Covers startup flags, forking mainnet at a block or transaction, state dump and load, mining and interval modes, account impersonation, time and balance manipulation, and the anvil_ and evm_ JSON-RPC methods. Use when the user needs a local EVM node, wants to fork a live network for testing, or asks about an Anvil flag or custom RPC method. Not for cast or forge commands, Hardhat Network, or Ganache.
 ---
 
 # foundry-anvil

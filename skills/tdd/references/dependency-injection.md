@@ -1,5 +1,11 @@
 # Dependency Injection
 
+## Contents
+
+- Patterns
+- Choosing a Pattern
+- Depth of Injection
+
 Dependency injection (DI) is the practice of supplying a component's dependencies from outside rather than having the component create or locate them itself. It is the primary mechanism that makes code testable without resorting to global state, monkey-patching, or mocking internals.
 
 The core rule: a unit under test should never instantiate its own collaborators that cross a boundary. If it does, you cannot substitute a double in tests.

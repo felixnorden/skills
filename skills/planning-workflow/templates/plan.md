@@ -1,6 +1,6 @@
 # Implementation Plan Template
 
-**Usage**: Produced during the QRSPI Plan (P) phase. Before authoring any "Tests First" section, load the test-writing skill — the one covering test doubles, Arrange/Act/Assert, and the red-green-refactor loop. Load it once at the start of the plan; it applies to every slice below. If no such skill is loaded, the Tests First blocks below are the minimum contract. Each phase is a vertical slice: one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
+**Usage**: Produced during the QRSPI Plan (P) phase. Before authoring any "Tests First" section, load the `tdd` skill, which covers test doubles, Arrange/Act/Assert, and the red-green-refactor loop. Load it once at the start of the plan; it applies to every slice below. If that skill is not installed, the Tests First blocks below are the minimum contract. Each phase is a vertical slice: one complete, observable behavior end-to-end. Build Agent executes phases in order; each Verification Gate must pass before the next phase begins.
 
 **Constraints**:
 
@@ -9,6 +9,21 @@
 - Each phase must deliver something demonstrable at its verification gate
 - No phase may be a technical layer (e.g., "implement all models"); each phase is a behavior
 - In verification gates, use tools over bash commands where available
+
+## Contents
+
+- How to Produce This Document
+- Overview
+- Skills Consulted
+- Research Summary
+- Current State Analysis
+- Desired End State
+- Slice Order Rationale
+- Out of Scope
+- Slice 1
+- Slice 2
+- Risk Register
+- Final Verification
 
 ## How to Produce This Document
 
@@ -72,7 +87,7 @@
 
 {Before writing any implementation, Build Agent writes these tests. They must fail at the start of this slice for the right behavioral reason, not a compilation error.}
 
-Use the test-writing skill loaded at the top of this plan for double selection and test scaffold. If none was loaded, follow the test-structure block below.
+Use the `tdd` skill loaded at the top of this plan for double selection and test scaffold. If it is not installed, follow the test-structure block below.
 
 - **{Test name following "subject does what when condition" convention}**
   - Arrange: {what to set up: subject, doubles, inputs}

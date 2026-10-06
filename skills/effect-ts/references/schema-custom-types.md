@@ -177,8 +177,3 @@ console.log(String(Schema.decodeUnknownExit(schema)({ value: "a" })));
 // Failure(Cause([Fail(SchemaError(Expected a finite number, got NaN
 //   at ["value"]))]))
 ```
-
-## See Also
-
-- [schema-composite.md](schema-composite.md) - Using schemas in structs and arrays
-- [schema-serialization.md](schema-serialization.md) - JSON serialization for custom types

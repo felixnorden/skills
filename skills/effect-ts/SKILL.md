@@ -1,6 +1,6 @@
 ---
 name: effect-ts
-description: Use this skill whenever working in a repository that uses Effect, even if the current task is in a new file or the user does not explicitly ask for Effect help. Apply it to any work that should follow the repository's Effect patterns, conventions, architecture, or supporting tooling. Also use it for questions about Effect patterns, services, layers, schemas, streams, runtimes, or typed error handling.
+description: Guides Effect programming in a repository that uses Effect, covering error handling, dependency injection, composability, and testing patterns. Use when working anywhere in an Effect repository, even in a new file or without an explicit Effect request, or when the user mentions Effect services, layers, schemas, streams, runtimes, or typed error handling.
 ---
 
 # Effect Expert
@@ -61,14 +61,6 @@ When working in a project that uses Effect, check for existing patterns before i
 4. Examine how Effect code is tested in the project.
 
 If no Effect patterns exist in the codebase, proceed using canonical patterns from the vendored Effect source and examples. Do not block on missing codebase patterns.
-
-### Feature Discovery
-
-When you need to discover available Effect modules, packages, or capabilities, search `./references/features.md` first.
-
-- Use it to identify the right package or module for a task.
-- Use the listed repo paths to jump directly into the vendored source under `./.repos/effect`.
-- Use it before inventing custom abstractions when Effect may already provide the functionality.
 
 ### Creating a New Service
 
@@ -252,6 +244,9 @@ Dive deeper into specific topics and patterns:
 - **[CLI](references/cli.md)** - CLI application building
 - **[Cluster](references/cluster.md)** - Distributed entities
 - **[Migration Guide](references/migration.md)** - Migrating from Effect v3 to v4
+- **Schema guides**: [elementary](references/schema-elementary.md), [composite](references/schema-composite.md), [recursive](references/schema-recursive.md), [custom types](references/schema-custom-types.md), [validation](references/schema-validation.md), [constructors](references/schema-constructors.md), [transformations](references/schema-transformations.md), [flipping](references/schema-flipping.md), [classes](references/schema-classes.md), [serialization](references/schema-serialization.md), [tooling](references/schema-tooling.md), [representation](references/schema-representation.md), [error handling](references/schema-error-handling.md), [middlewares](references/schema-middlewares.md), [advanced](references/schema-advanced.md), [integrations](references/schema-integrations.md)
+- **HTTP guides**: [API](references/http-api.md), [request](references/http-request.md), [response](references/http-response.md), [errors](references/http-errors.md), [security](references/http-security.md), [OpenAPI](references/http-openapi.md), [client](references/http-client.md)
+- **Data type guides**: [Result](references/data-type-result.md), [Cause](references/data-type-cause.md), [Chunk](references/data-type-chunk.md), [Match](references/data-type-match.md)
 
 ## Anti-Patterns to Avoid
 
@@ -285,21 +280,4 @@ Dive deeper into specific topics and patterns:
 
 ## Example Files
 
-Browse detailed examples in the [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/) directory:
-
-- **[Effect Basics](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/01_basics/)** - Creating effects, pipe composition
-- **[Services](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/02_services/)** - Context.Service, Layer composition
-- **[Error Handling](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/03_errors/)** - catchTags, catchReason, error hierarchies
-- **[Resources](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/04_resources/)** - acquireRelease, Scope
-- **[PubSub](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/01_effect/06_pubsub/)** - Event broadcasting
-- **[Streams](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/02_stream/)** - Creating, consuming, encoding
-- **[Integration](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/03_integration/)** - ManagedRuntime for non-Effect code
-- **[Batching](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/05_batching/)** - RequestResolver patterns
-- **[Schedules](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/06_schedule/)** - Retry and repeat strategies
-- **[Observability](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/08_observability/)** - Logging, tracing, metrics
-- **[Testing](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/09_testing/)** - @effect/vitest patterns
-- **[HTTP](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/50_http-client/)** - HttpClient and HttpApi
-- **[Child Process](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/60_child-process/)** - Process management
-- **[CLI](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/70_cli/)** - CLI application building
-- **[AI](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/71_ai/)** - Language models, tools, chat
-- **[Cluster](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/80_cluster/)** - Distributed entities
+Browse runnable examples in the [effect-smol ai-docs tree](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/): Effect basics, services, errors, resources, streams, integration, batching, schedules, observability, testing, HTTP, child process, CLI, AI, and cluster.

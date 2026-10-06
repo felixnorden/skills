@@ -1,5 +1,11 @@
 # Test Template
 
+## Contents
+
+- London School — Double at Module Boundaries
+- Chicago School — Real Collaborators, Double Only Infrastructure
+- Builder Reference
+
 Language-agnostic pseudo-code scaffold for a well-formed test suite. Two variants are shown: London school (doubles at boundaries) and Chicago school (real collaborators, double only external infrastructure). Choose based on the guidance in SKILL.md.
 
 ---

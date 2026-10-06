@@ -1,5 +1,24 @@
 # Migrating from Effect v3 to v4
 
+## Contents
+
+- Overview
+- Effect.fn Migration (New in v4)
+- Schema.TaggedErrorClass Migration (New in v4)
+- Package Changes
+- Services Migration
+- Error Handling Migration
+- Concurrency Migration
+- FiberRef Migration
+- Scope Migration
+- Cause Migration
+- Data Types Migration
+- Schema Migration
+- Runtime Changes
+- Quick Reference Tables
+- Migration Checklist
+- Getting Help
+
 This guide helps you migrate your Effect applications from v3 to v4.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
@@ -646,13 +665,9 @@ Equal.equals(obj, { a: 1 }); // false
 
 ## Schema Migration
 
-> **See also**: The [Schema Quick Start & Index](schema.md) provides a comprehensive topic index for all Schema documentation.
+> **See also**: the Schema topic index in SKILL.md covers all Schema documentation.
 >
-> For detailed API reference, see:
-> - [schema-validation.md](schema-validation.md) - refinement→check changes
-> - [schema-composite.md](schema-composite.md) - propertySignature changes  
-> - [schema-transformations.md](schema-transformations.md) - transformation changes
-> - [schema-classes.md](schema-classes.md) - brand/class changes
+> For detailed API reference, see the schema-validation, schema-composite, schema-transformations, and schema-classes guides listed in SKILL.md.
 
 ### Import Changes
 

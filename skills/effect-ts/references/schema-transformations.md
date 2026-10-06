@@ -287,8 +287,3 @@ console.log(Schema.decodeUnknownSync(schema)({ a: "1" }));
 console.log(Schema.encodeSync(schema)({ a: 1, b: "default_value" }));
 // Output: { a: "1" }
 ```
-
-## See Also
-
-- [schema-elementary.md](schema-elementary.md) - String transformations (trim, toLowerCase, etc.)
-- [schema-composite.md](schema-composite.md) - Struct transformations

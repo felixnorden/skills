@@ -181,7 +181,3 @@ if (r._tag === "Failure") {
   }
 }
 ```
-
-## See Also
-
-- [error-handling.md](../error-handling.md) - Schema.TaggedErrorClass for error definitions

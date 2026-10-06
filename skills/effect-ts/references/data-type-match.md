@@ -5,6 +5,13 @@ description: Comprehensive reference for Effect Match module - type-safe pattern
 
 # Match - Pattern Matching
 
+## Contents
+
+- Quickstart
+- Core API
+- Extended API Reference
+- Examples
+
 > **Reference for Effect v4.0.0-beta.76.** APIs may change before the final v4 release.
 
 Type-safe, exhaustive pattern matching for TypeScript. Replaces fragile `if/else` chains and `switch` statements with a composable, data-last API that narrows types at every step.
@@ -254,7 +261,3 @@ const parse = Match.value(input).pipe(
   Match.result, // Result<number, NoSuchElementError>
 );
 ```
-
-## See Also
-
-- [data-types.md](data-types.md) - Overview of all Effect data types

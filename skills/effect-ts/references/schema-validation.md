@@ -302,8 +302,3 @@ export const makeGreaterThan = <T>(options: {
   };
 };
 ```
-
-## See Also
-
-- [schema-elementary.md](schema-elementary.md) - Built-in filter functions like isMinLength, isMaxLength
-- [schema-constructors.md](schema-constructors.md) - Constructor behavior with branded/refined schemas

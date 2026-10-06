@@ -1,5 +1,24 @@
 # Effect Data Types
 
+## Contents
+
+- Option
+- Result (formerly Either in v3)
+- Chunk
+- HashSet
+- HashMap
+- Cause & Exit
+- Duration
+- Stream
+- Data
+- Redacted
+- Match
+- Queue
+- Deferred
+- Ref
+- Equality (v4: Structural by Default)
+- Best Practices
+
 Common data structures in Effect v4.0.0-beta.76.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
@@ -112,7 +131,7 @@ Result.match(result, {
 });
 ```
 
-**See [data-type-result.md](data-type-result.md) for comprehensive reference** — covering all API surface including generators, do notation, filtering, transposing, Effect interoperability, and more.
+**See the Result reference in SKILL.md for the full API surface** - covering generators, do notation, filtering, transposing, Effect interoperability, and more.
 
 ## Chunk
 
@@ -127,7 +146,7 @@ Chunk.map(chunk, (n) => n * 2);
 Chunk.toArray(chunk);
 ```
 
-**See [data-type-chunk.md](data-type-chunk.md) for comprehensive reference** — covering 60+ APIs including constructors, transforms, access, queries, set operations, and extended reference tables.
+**See the Chunk reference in SKILL.md for the full API surface** - covering 60+ APIs including constructors, transforms, access, queries, set operations, and extended reference tables.
 
 ## HashSet
 
@@ -243,7 +262,7 @@ Exit.isSuccess(exit);
 Exit.isFailure(exit);
 ```
 
-**See [data-type-cause.md](data-type-cause.md) for comprehensive reference** — covering all Cause and Exit APIs including built-in error types (`NoSuchElementError`, `TimeoutError`, etc.), reason guards, extractors, transforms, and Exit filtering.
+**See the Cause reference in SKILL.md for the full API surface** - covering all Cause and Exit APIs including built-in error types (`NoSuchElementError`, `TimeoutError`, etc.), reason guards, extractors, transforms, and Exit filtering.
 
 ## Duration
 
@@ -474,7 +493,7 @@ Match.type<User | Admin | Guest>().pipe(
 );
 ```
 
-**See [data-type-match.md](data-type-match.md) for comprehensive reference** — covering all Match APIs including `whenOr`, `whenAnd`, `discriminator`, `type refinements`, and more.
+**See the Match reference in SKILL.md for the full API surface** - covering all Match APIs including `whenOr`, `whenAnd`, `discriminator`, `type refinements`, and more.
 
 ## Queue
 

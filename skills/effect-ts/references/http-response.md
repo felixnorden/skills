@@ -1,5 +1,14 @@
 # HTTP API — Response Handling
 
+## Contents
+
+- Status Codes
+- Response Encoding
+- Response Headers
+- Cookies
+- Redirects
+- Streaming Responses
+
 ## Status Codes
 
 Default is `200 OK`. Use `HttpApiSchema.status()` to customize:

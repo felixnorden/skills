@@ -1,5 +1,17 @@
 # Observability - Logging, Metrics, Tracing
 
+## Contents
+
+- Logging
+- Logging Template for Effect.fn
+- Metrics
+- Tracing
+- OpenTelemetry Integration
+- Context References (v4: replaces FiberRef)
+- Common Patterns
+- Testing Observability
+- Best Practices
+
 Built-in observability primitives in Effect v4.
 
 See related examples in [effect-smol/ai-docs/src/08_observability/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/08_observability/)

@@ -1,5 +1,14 @@
 # HTTP API — Client & Web Handler
 
+## Contents
+
+- Generated Client
+- Top-Level Groups
+- Client Middleware
+- Web Handler (Serverless)
+- Client with Middleware
+- Error Handling
+
 ## Generated Client
 
 Create a typed client from your API definition using `HttpApiClient.make`:

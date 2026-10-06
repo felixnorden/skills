@@ -175,8 +175,3 @@ new Elysia({ adapter: node() })
   })
   .listen(3000)
 ```
-
-## See Also
-
-- [schema-serialization.md](schema-serialization.md) - Serialization formats
-- [error-handling.md](../error-handling.md) - Error handling patterns

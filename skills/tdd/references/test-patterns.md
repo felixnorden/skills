@@ -1,5 +1,14 @@
 # Test Patterns
 
+## Contents
+
+- Structure: Arrange / Act / Assert
+- Naming
+- One Behavior Per Test
+- Assertion Quality
+- Fixture Patterns
+- Test Pyramid
+
 Patterns for structuring, naming, and asserting in tests. The goal throughout is that each test reads as an unambiguous specification of a behavior, fails with a message that diagnoses the problem without requiring a debugger, and survives refactors that leave the behavior intact.
 
 ---

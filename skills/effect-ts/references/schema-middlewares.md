@@ -96,7 +96,3 @@ const provided = Schema.revealCodec(
 console.log(String(Schema.decodeUnknownExit(provided)(null)));
 // Success("b")
 ```
-
-## See Also
-
-- [schema-constructors.md](schema-constructors.md) - Default values in constructors

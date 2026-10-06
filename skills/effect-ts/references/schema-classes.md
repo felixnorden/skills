@@ -18,7 +18,7 @@ Schema supports two kinds of nominal types: _opaque structs_ for lightweight dis
   - [Existing Classes](#existing-classes)
   - [Class with Schema.Class](#class-with-schemaclass)
 
-> **See also**: For TaggedErrorClass usage in error handling, see [error-handling.md](error-handling.md)
+> **See also**: For TaggedErrorClass usage in error handling, see the error-handling guide listed in SKILL.md.
 
 ## Opaque Structs
 
@@ -249,8 +249,3 @@ const another = Person.make({ name: "John", age: 30 })
 console.log(person === another)
 // false (different instances, but equal values)
 ```
-
-## See Also
-
-- [error-handling.md](error-handling.md) - Schema.TaggedErrorClass for error definitions
-- [core-patterns.md](core-patterns.md) - Effect+Schema patterns

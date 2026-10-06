@@ -150,8 +150,3 @@ It:
 - keeps recursive definitions separate (they must be emitted using `Schema.suspend`)
 - sanitizes reference names into valid JavaScript identifiers
 - collects extra artifacts that must be emitted (enums, symbols, imports)
-
-## See Also
-
-- [schema-tooling.md](schema-tooling.md) - JSON Schema generation
-- [schema-serialization.md](schema-serialization.md) - Serialization formats

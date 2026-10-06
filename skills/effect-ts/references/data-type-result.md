@@ -422,9 +422,3 @@ const effect = Effect.fromResult(Result.succeed(42));
 - `all` short-circuits on the first `Failure`; later elements are not inspected
 - `getOrThrow` throws the raw failure value `E`; use `getOrThrowWith` for custom error objects
 - Unlike `Effect`, `Result` evaluates eagerly and synchronously
-
-## See Also
-
-- [data-types.md](data-types.md) - Overview of all data types (Option, Chunk, HashSet, etc.)
-- [error-handling.md](error-handling.md) - Error handling patterns with Effect
-- [core-patterns.md](core-patterns.md) - Effect.gen and Effect.fn patterns

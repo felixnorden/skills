@@ -1,5 +1,18 @@
 # Services & Layers
 
+## Contents
+
+- Overview
+- Services
+- Layers
+- Context (Context Replacement)
+- Service References (FiberRef Replacement)
+- Layer Patterns
+- Testing Patterns
+- Advanced Patterns
+- Best Practices
+- External Examples
+
 Dependency injection and context management with Context (v4).
 
 ## Overview

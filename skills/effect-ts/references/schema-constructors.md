@@ -201,8 +201,3 @@ const schema = Schema.Struct({
 SchemaParser.makeEffect(schema)({}).pipe(Effect.runPromise).then(console.log)
 // { a: -1 }
 ```
-
-## See Also
-
-- [schema-validation.md](schema-validation.md) - Filter and refinement functions
-- [schema-classes.md](schema-classes.md) - Class-based constructors with make

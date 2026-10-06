@@ -1,5 +1,11 @@
 # Test Doubles
 
+## Contents
+
+- The Five Types
+- Decision Guide
+- Where to Draw the Mock Boundary
+
 Test doubles are controlled replacements for real dependencies in tests. The word "mock" is colloquially used for all of them, but the types are meaningfully distinct — using the wrong one produces tests that are either too brittle or too blind.
 
 Taxonomy from Meszaros, _xUnit Test Patterns_.

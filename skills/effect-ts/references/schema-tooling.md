@@ -291,7 +291,3 @@ const patched = differ.patch(oldValue, jsonPatch)
 console.log(patched)
 // { id: 1, name: 'b', price: 2 }
 ```
-
-## See Also
-
-- [schema-serialization.md](schema-serialization.md) - JSON serialization with toCodecJson

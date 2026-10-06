@@ -1,5 +1,14 @@
 # HTTP API — Middleware & Security
 
+## Contents
+
+- Middleware
+- Security Schemes
+- Security Middleware Implementation
+- Security Annotations
+- Setting Security Cookies
+- Cookie-Based Authentication
+
 ## Middleware
 
 Define middleware as a class extending `HttpApiMiddleware.Service`. Middleware runs shared logic before/around handlers.
@@ -195,4 +204,4 @@ const AuthLive = Layer.succeed(Auth, {
 })
 ```
 
-For quick unvalidated access, read cookies directly from `ctx.request.cookies`. These won't appear in OpenAPI spec. See [http-request.md](http-request.md).
+For quick unvalidated access, read cookies directly from `ctx.request.cookies`. These won't appear in OpenAPI spec. See the HTTP request guide listed in SKILL.md.

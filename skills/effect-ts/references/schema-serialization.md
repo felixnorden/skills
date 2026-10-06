@@ -275,8 +275,3 @@ console.log(
 </root>
 */
 ```
-
-## See Also
-
-- [schema-classes.md](schema-classes.md) - toCodecJson for custom classes
-- [schema-tooling.md](schema-tooling.md) - JSON Schema generation from schemas

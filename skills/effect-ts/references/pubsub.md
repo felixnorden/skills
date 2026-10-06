@@ -1,5 +1,19 @@
 # PubSub
 
+## Contents
+
+- Overview
+- Creating a PubSub
+- Service Pattern with PubSub
+- Publishing Events
+- Subscribing to Events
+- Advanced Patterns
+- Best Practices
+- Integration with Services
+- Testing with PubSub
+- Common Use Cases
+- Migration from Other Patterns
+
 Event broadcasting and subscription with PubSub.
 
 See full example: [PubSub Service](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/06_pubsub/10_pubsub.ts)

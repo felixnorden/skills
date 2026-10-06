@@ -1,5 +1,17 @@
 # Cluster
 
+## Contents
+
+- Overview
+- Setup
+- Defining Entities
+- Running Cluster
+- Using Entities
+- Persistence
+- Best Practices
+- Common Patterns
+- Testing
+
 Building distributed applications with Effect Cluster.
 
 See related examples in [effect-smol/ai-docs/src/80_cluster/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/80_cluster/)

@@ -1,5 +1,20 @@
 # Schedules
 
+## Contents
+
+- Overview
+- Schedule Constructors
+- Using Schedules
+- Production Patterns
+- Schedule Transformations
+- Repeating Operations
+- Combining Schedules
+- Schedule with Effects
+- Testing Schedules
+- Common Use Cases
+- Best Practices
+- Quick Reference
+
 Working with Effect Schedules for retries, repeats, and polling.
 
 See related examples in [effect-smol/ai-docs/src/06_schedule/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/06_schedule/)

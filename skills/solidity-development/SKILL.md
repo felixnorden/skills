@@ -7,16 +7,6 @@ description: Comprehensive Solidity smart contract development best practices co
 
 This skill provides production-grade patterns for Solidity smart contract development based on industry-leading implementations from OpenZeppelin and Solady. Apply these practices when developing, reviewing, or auditing smart contracts.
 
-## When to Use This Skill
-
-Activate this knowledge when the user:
-
-- Writes or reviews Solidity smart contracts
-- Discusses Ethereum, EVM, or blockchain development
-- Mentions gas optimization, security audits, or upgradeable contracts
-- References OpenZeppelin, Solady, or standard token implementations
-- Asks about smart contract best practices or security patterns
-
 ## Core Philosophy: Security, Performance, Documentation
 
 Production smart contract development balances three pillars:
@@ -35,6 +25,12 @@ The choice between OpenZeppelin (security-first) and Solady (optimization-first)
 | DeFi protocols (new) | OpenZeppelin | Security paramount, gas costs secondary |
 | NFT collections | OpenZeppelin or Solady | Depends on mint volume and optimization needs |
 
+Libraries in detail:
+
+- **OpenZeppelin**: high-value protocols (DeFi, DAOs), standard token implementations (ERC20, ERC721, ERC1155), and upgradeability (UUPS, Transparent Proxy).
+- **Solady**: layer 2 applications, account abstraction, high-frequency operations, and factory patterns that deploy many instances.
+- **Hybrid**: OpenZeppelin for security-critical patterns and Solady for gas-sensitive operations, such as SafeTransferLib.
+
 ## Degrees of Freedom
 
 Match the level of specificity to the task's fragility:
@@ -45,7 +41,7 @@ These operations have narrow safe paths:
 - **Reentrancy protection**: Always follow CEI pattern, use ReentrancyGuard for complex flows
 - **Access control**: Use Ownable2Step for single admin, validate all ownership transfers
 - **Upgradeable contracts**: Always disable initializers in constructors, implement _authorizeUpgrade
-- **Custom errors**: Mandatory replacement of require strings (2025 standard)
+- **Custom errors**: Replace require strings with custom errors
 
 **Medium Freedom** (preferred patterns, context matters)
 
@@ -97,7 +93,7 @@ See [references/security/upgrades.md](references/security/upgrades.md) for compr
 
 ## Gas Optimization Fundamentals
 
-### Custom Errors (Mandatory in 2025)
+### Custom Errors
 
 Replace expensive `require` strings with custom errors for 50-100 gas savings per revert. Custom errors use minimal 4-byte selectors.
 
@@ -115,7 +111,7 @@ Replace expensive `require` strings with custom errors for 50-100 gas savings pe
 
 | Optimization | Gas Saved | When to Apply |
 | ------------------------ | ------------------ | ------------------------- |
-| Custom errors vs strings | ~50-100 per revert | Always (mandatory 2025) |
+| Custom errors vs strings | ~50-100 per revert | Always |
 | Unchecked increment | ~30-40 per loop | Safe arithmetic only |
 | Calldata vs memory | ~60 per 32 bytes | External functions |
 | Storage packing | 20,000 per slot | Frequently accessed data |
@@ -148,22 +144,6 @@ See [references/performance/solady-patterns.md](references/performance/solady-pa
 
 See [references/documentation/natspec-standards.md](references/documentation/natspec-standards.md) for comprehensive standards.
 
-## Common Pitfalls to Avoid
-
-### Security
-
-- **Unprotected initializers**: Always use `initializer` modifier and access control
-- **Unsafe external calls**: Follow CEI pattern - state changes before external calls
-
-### Performance
-
-- **Unbounded loops**: Can exceed gas limits - use pagination and bounded iterations
-- **Expensive require strings**: Use custom errors instead
-
-### Documentation
-
-- **Missing NatSpec**: Every public/external function requires complete documentation
-
 ## Testing Standards
 
 **Minimum test coverage requirements**:
@@ -178,11 +158,9 @@ Use Foundry/Forge for testing with patterns including `vm.expectRevert`, fuzz te
 
 ## Workflows
 
-Use these checklists for complex multi-step tasks:
+Use these checklists for complex multi-step tasks.
 
 ### Smart Contract Security Audit
-
-Copy this checklist and track progress:
 
 ```
 Security Audit Progress:
@@ -195,59 +173,17 @@ Security Audit Progress:
 - [ ] Step 7: Check for common pitfalls
 ```
 
-**Step 1: Review access control**
+**Step 1: Access control.** Ownable2Step for a single admin, a modifier on every restricted function, role hierarchies configured, no missing checks. See [references/security/access-control.md](references/security/access-control.md).
 
-Verify:
-- [ ] Ownable2Step used for single admin (not basic Ownable)
-- [ ] All restricted functions have appropriate modifiers
-- [ ] Role hierarchies properly configured
-- [ ] No missing onlyOwner/onlyRole checks
+**Step 2: Reentrancy.** CEI in every function that makes an external call, state updates before calls, a guard where CEI is insufficient, no unprotected external calls in loops. See [references/security/reentrancy.md](references/security/reentrancy.md).
 
-See [references/security/access-control.md](references/security/access-control.md)
+**Step 3: Upgrade safety.** `_disableInitializers()` in the constructor, `_authorizeUpgrade` with access control, append-only storage layout, ERC-7201 namespaced storage. See [references/security/upgrades.md](references/security/upgrades.md).
 
-**Step 2: Check for reentrancy**
+**Step 4: Gas.** Custom errors instead of require strings, packed storage, calldata for external parameters, unchecked arithmetic where safe. See [references/performance/gas-optimization.md](references/performance/gas-optimization.md).
 
-Verify:
-- [ ] CEI pattern followed in all external call functions
-- [ ] State updates before external calls
-- [ ] ReentrancyGuard used where CEI insufficient
-- [ ] No external calls in loops without protection
-
-See [references/security/reentrancy.md](references/security/reentrancy.md)
-
-**Step 3: Verify upgradeable contract safety**
-
-Verify:
-- [ ] _disableInitializers() called in constructor
-- [ ] _authorizeUpgrade properly implemented with access control
-- [ ] Storage layout preserved (only append, never insert/delete)
-- [ ] ERC-7201 namespaced storage used
-
-See [references/security/upgrades.md](references/security/upgrades.md)
-
-**Step 4: Analyze gas optimization**
-
-Check:
-- [ ] Custom errors used instead of require strings
-- [ ] Storage variables packed efficiently
-- [ ] Calldata used for external function parameters
-- [ ] Unchecked arithmetic where safe
-
-See [references/performance/gas-optimization.md](references/performance/gas-optimization.md)
-
-**Step 5: Review documentation**
-
-Verify:
-- [ ] All public/external functions have NatSpec
-- [ ] @notice, @dev, @param, @return tags complete
-- [ ] @custom:security-contact included
-- [ ] Complex logic documented in @dev
-
-See [references/documentation/natspec-standards.md](references/documentation/natspec-standards.md)
+**Step 5: Documentation.** NatSpec on every public and external function, complete `@notice`, `@dev`, `@param`, and `@return` tags, a security contact, and complex logic explained in `@dev`. See [references/documentation/natspec-standards.md](references/documentation/natspec-standards.md).
 
 ### Gas Optimization Review
-
-Copy this checklist:
 
 ```
 Gas Optimization Progress:
@@ -260,11 +196,9 @@ Gas Optimization Progress:
 - [ ] Step 7: Benchmark and compare gas usage
 ```
 
-See [references/performance/gas-optimization.md](references/performance/gas-optimization.md)
+See [references/performance/gas-optimization.md](references/performance/gas-optimization.md).
 
 ### Upgradeable Contract Deployment
-
-Copy this checklist:
 
 ```
 Deployment Progress:
@@ -277,147 +211,9 @@ Deployment Progress:
 - [ ] Step 7: Verify _authorizeUpgrade access control
 ```
 
-See [references/security/upgrades.md](references/security/upgrades.md)
+See [references/security/upgrades.md](references/security/upgrades.md).
 
-## Common Workflows
-
-These examples show input/output patterns for common scenarios:
-
-### Converting from Require Strings to Custom Errors
-
-**Input**: Existing contract with require strings
-```solidity
-function transfer(address to, uint256 amount) external {
-    require(balanceOf[msg.sender] >= amount, "Insufficient balance");
-    require(to != address(0), "Invalid address");
-    // ...
-}
-```
-
-**Output**: Optimized contract with custom errors
-```solidity
-error InsufficientBalance(uint256 available, uint256 required);
-error InvalidAddress();
-
-function transfer(address to, uint256 amount) external {
-    if (balanceOf[msg.sender] < amount) {
-        revert InsufficientBalance(balanceOf[msg.sender], amount);
-    }
-    if (to == address(0)) {
-        revert InvalidAddress();
-    }
-    // ...
-}
-```
-
-### Adding Reentrancy Protection
-
-**Input**: Vulnerable withdrawal function
-```solidity
-function withdraw(uint256 amount) external {
-    require(balances[msg.sender] >= amount);
-    (bool success, ) = msg.sender.call{value: amount}("");
-    require(success);
-    balances[msg.sender] -= amount; // State update after external call!
-}
-```
-
-**Output**: Protected function with CEI pattern
-```solidity
-function withdraw(uint256 amount) external nonReentrant {
-    uint256 balance = balances[msg.sender];
-    require(balance >= amount, "Insufficient balance");
-    
-    balances[msg.sender] = balance - amount; // Effects before interactions
-    
-    (bool success, ) = msg.sender.call{value: amount}("");
-    require(success, "Transfer failed");
-}
-```
-
-### Implementing Access Control
-
-**Input**: Contract with no access control
-```solidity
-contract Unprotected {
-    uint256 public value;
-    
-    function setValue(uint256 newValue) external {
-        value = newValue; // Anyone can call!
-    }
-}
-```
-
-**Output**: Protected contract with Ownable2Step
-```solidity
-import "@openzeppelin/contracts/access/Ownable2Step.sol";
-
-contract Protected is Ownable2Step {
-    uint256 public value;
-    
-    constructor(address initialOwner) Ownable(initialOwner) {}
-    
-    function setValue(uint256 newValue) external onlyOwner {
-        value = newValue;
-    }
-}
-```
-
-### Making Contract Upgradeable
-
-**Input**: Standard contract
-```solidity
-contract Token is ERC20 {
-    constructor() ERC20("MyToken", "MTK") {
-        _mint(msg.sender, 1000000 * 10**18);
-    }
-}
-```
-
-**Output**: UUPS upgradeable contract
-```solidity
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
-contract Token is ERC20Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-    
-    function initialize(address initialOwner) public initializer {
-        __ERC20_init("MyToken", "MTK");
-        __Ownable_init(initialOwner);
-        __UUPSUpgradeable_init();
-        _mint(initialOwner, 1000000 * 10**18);
-    }
-    
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-}
-```
-
-## Quick Reference: Which Library to Use
-
-### OpenZeppelin
-
-- High-value protocols (DeFi, DAOs) where security is paramount
-- Extensive documentation and audits required
-- Standard token implementations (ERC20, ERC721, ERC1155)
-- Upgradeability required (UUPS, Transparent Proxy)
-
-### Solady
-
-- Layer 2 applications where gas optimization is critical
-- Account abstraction and high-frequency operations
-- Deploying many instances (factory patterns)
-- Teams with assembly expertise
-
-### Hybrid Approach
-
-Combine OpenZeppelin for security-critical patterns (AccessControl) with Solady for gas-sensitive operations (SafeTransferLib).
-
-## Anti-Patterns to Avoid
+## Common Pitfalls and Anti-Patterns
 
 - **External calls before state updates** - Violates CEI pattern, enables reentrancy
 - **Missing access control** - Functions that should be restricted are public
@@ -429,48 +225,14 @@ Combine OpenZeppelin for security-critical patterns (AccessControl) with Solady 
 - **Magic numbers** - Hardcoded values without explanation
 - **No events for state changes** - Makes monitoring and debugging difficult
 - **Ignoring return values** - Silent failures from external calls
-
-## Troubleshooting
-
-**Compilation Errors**
-
-- "Stack too deep" - Use structs or scoping to reduce local variables
-- "Contract size exceeds limit" - Enable optimizer, split into libraries
-- "Identifier not found" - Check imports and version compatibility
-
-**Deployment Failures**
-
-- "Out of gas" - Increase gas limit, optimize contract size
-- "Invalid opcode" - Check constructor arguments and initialization
-- "Proxy implementation not set" - Verify deployment order for upgradeable contracts
-
-**Runtime Issues**
-
-- "Reentrancy detected" - Ensure CEI pattern and proper guard usage
-- "Access control violation" - Verify role/ownership assignments
-- "Storage corruption after upgrade" - Check storage layout compatibility
-
-**Gas Estimation Problems**
-
-- Use `forge test --gas-report` for accurate measurements
-- Enable optimizer with `optimizer: true` and `optimizerRuns: 200`
-- Test on target network (L1 vs L2 have different costs)
-
-**Testing Failures**
-
-- "Assertion failed" - Check test setup and state initialization
-- "Revert reason mismatch" - Verify exact error message or custom error selector
-- "Fork test fails" - Ensure RPC endpoint is valid and block number exists
+- **Expensive require strings** - Use custom errors instead
 
 ## Reference Files
-
-For detailed guidance on specific topics:
 
 - **Security**: [references/security/reentrancy.md](references/security/reentrancy.md), [references/security/access-control.md](references/security/access-control.md), [references/security/upgrades.md](references/security/upgrades.md)
 - **Performance**: [references/performance/gas-optimization.md](references/performance/gas-optimization.md), [references/performance/solady-patterns.md](references/performance/solady-patterns.md)
 - **Documentation**: [references/documentation/natspec-standards.md](references/documentation/natspec-standards.md)
-
-See [references/REFERENCES.md](references/REFERENCES.md) for complete documentation structure.
+- **Workflows**: [references/workflows/refactoring-patterns.md](references/workflows/refactoring-patterns.md) (before/after fixes), [references/workflows/troubleshooting.md](references/workflows/troubleshooting.md) (compiler, deployment, runtime, gas, and test failures)
 
 ## Version Compatibility
 
@@ -478,7 +240,7 @@ This skill assumes:
 
 - Solidity 0.8.20+ (or 0.8.24+ for transient storage)
 - OpenZeppelin Contracts v5.x
-- Solady latest version
+- Solady (recent release)
 - Foundry for testing and development
 
 Always verify compatibility for your specific use case.

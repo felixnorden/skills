@@ -70,18 +70,4 @@ const ApiLive = HttpApiBuilder.layer(Api).pipe(
 Layer.launch(ApiLive).pipe(NodeRuntime.runMain)
 ```
 
-## Topic Index
-
-| Topic | File |
-|-------|------|
-| API definition, routing, endpoints, params, prefixing | [http-api.md](http-api.md) |
-| Query params, headers, multipart, request encoding | [http-request.md](http-request.md) |
-| Status codes, response encoding, headers, cookies, redirects, streaming | [http-response.md](http-response.md) |
-| Custom errors, predefined HttpApiError types | [http-errors.md](http-errors.md) |
-| Middleware, security schemes | [http-security.md](http-security.md) |
-| OpenAPI annotations, top-level groups | [http-openapi.md](http-openapi.md) |
-| Generated clients, web handler | [http-client.md](http-client.md) |
-
-## See Also
-
-- [migration.md](migration.md) - package migration notes
+Topic routing for the HTTP guides is listed in SKILL.md under References.

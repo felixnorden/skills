@@ -1,5 +1,20 @@
 # Streams
 
+## Contents
+
+- Overview
+- Creating Streams
+- Transforming Streams
+- Consuming Streams
+- Encoding/Decoding
+- Error Handling
+- Pipeline Example
+- External Examples
+- Best Practices
+- Integration with PubSub
+- Testing Streams
+- Common Patterns
+
 Working with Effect Streams for pull-based sequences of values over time.
 
 ## Overview

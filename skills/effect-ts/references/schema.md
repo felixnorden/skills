@@ -175,29 +175,5 @@ const encoded = yield* Schema.encodeEffect(OutputSchema)(input);
 
 ---
 
-## Topic Index
-
-| Topic | File |
-|-------|------|
-| Primitives, Literals, Strings, Numbers, Dates, Template Literals | [schema-elementary.md](schema-elementary.md) |
-| Structs, Tuples, Arrays, Records, Unions | [schema-composite.md](schema-composite.md) |
-| Recursive schemas, suspend | [schema-recursive.md](schema-recursive.md) |
-| declare, declareConstructor | [schema-custom-types.md](schema-custom-types.md) |
-| Filters, refinements, branding | [schema-validation.md](schema-validation.md) |
-| make, defaults | [schema-constructors.md](schema-constructors.md) |
-| decodeTo/encodeTo, SchemaTransformation | [schema-transformations.md](schema-transformations.md) |
-| Schema.flip | [schema-flipping.md](schema-flipping.md) |
-| Opaque, Class, TaggedClass, ErrorClass, TaggedErrorClass | [schema-classes.md](schema-classes.md) |
-| JSON, FormData, URLSearchParams, XML codecs | [schema-serialization.md](schema-serialization.md) |
-| JSON Schema, Arbitraries, Equivalence, Optics, Differ | [schema-tooling.md](schema-tooling.md) |
-| Portable representation, AST | [schema-representation.md](schema-representation.md) |
-| Formatters, hooks, i18n | [schema-error-handling.md](schema-error-handling.md) |
-| catchDecoding, fallbacks | [schema-middlewares.md](schema-middlewares.md) |
-| Type model, hierarchy | [schema-advanced.md](schema-advanced.md) |
-| TanStack Form, Elysia | [schema-integrations.md](schema-integrations.md) |
-
-## See Also
-
-- [error-handling.md](error-handling.md) - Schema.TaggedErrorClass for error definitions
-- [core-patterns.md](core-patterns.md) - Effect+Schema patterns
+Topic routing for the Schema guides is listed in SKILL.md under References.
 

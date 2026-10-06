@@ -94,8 +94,3 @@ const U: Schema.Codec<U> = Schema.Union([A, B])
 ```
 
 `URef` factors the recursive edge (`U -> U`) into one shared `Schema.suspend` value. Reusing it across members avoids duplicating the lazy reference and makes the intent clear: every variant points back to the same union schema.
-
-## See Also
-
-- [schema-composite.md](schema-composite.md) - Structs, Tuples, Arrays, Records, Unions
-- [schema-classes.md](schema-classes.md) - Recursive Opaque Structs

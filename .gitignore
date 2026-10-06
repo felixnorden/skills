@@ -8,3 +8,8 @@ node_modules
 .qrspi/
 
 .pi/
+
+# Eval raw artifacts: reproducible output, kept out of git
+evals/**/runs/
+evals/**/outputs/
+evals/**/results.json

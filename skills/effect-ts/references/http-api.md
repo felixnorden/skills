@@ -1,5 +1,15 @@
 # HTTP API — Definition & Routing
 
+## Contents
+
+- Building Blocks
+- Defining an API
+- Routing
+- Path Parameters
+- Catch-All Endpoints
+- Prefixing
+- Handler Implementation
+
 ## Building Blocks
 
 The `HttpApi` modules let you describe your HTTP API once and use that description to run a server, generate documentation, and create a type-safe client.

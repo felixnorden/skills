@@ -1,14 +1,6 @@
 ---
 name: foundry-cast
-description: >
-  Interacts with Ethereum and EVM-compatible chains from the command line using Cast — Foundry's
-  Swiss Army knife CLI. Covers reading on-chain data (cast call, cast balance, cast block,
-  cast storage, cast code), sending transactions (cast send, cast publish, cast mktx), ABI
-  encoding and decoding (cast calldata, cast decode-calldata, cast abi-encode, cast 4byte),
-  wallet operations (cast wallet new, cast wallet sign, cast wallet import), type conversions
-  (cast keccak, cast from-wei, cast to-hex, cast format-units), ENS resolution, Etherscan
-  lookups, and all 80+ cast subcommands. Activates when a user wants to inspect chain state,
-  craft or decode a transaction, or interact with a deployed contract without writing Solidity.
+description: Reads and writes EVM chain state from the command line with Cast, the Foundry CLI. Covers reading chain data, sending and signing transactions, ABI encode and decode, wallet operations, unit and hash conversions, ENS resolution, and Etherscan lookups. Use when the user inspects chain state, crafts or decodes a transaction, or calls a deployed contract from the shell. Not for Solidity development, local node operation, or pipeline setup.
 ---
 
 # foundry-cast

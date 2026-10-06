@@ -169,7 +169,3 @@ declare const User: Schema.Codec<
   never // Encoding does not require any services
 >
 ```
-
-## See Also
-
-- [schema-classes.md](schema-classes.md) - Using Schema.Opaque and Schema.Class

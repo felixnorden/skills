@@ -1,6 +1,6 @@
 ---
 name: planning-workflow
-description: Guides structured software planning through reusable templates. Covers design concepts, implementation plans with vertical slices, and agent configuration. Use when starting a new feature, designing a solution before implementation, producing a phased plan for a build agent, or when the user mentions planning, design phase, implementation plan, QRSPI, or vertical slices.
+description: Produces software planning artifacts, including design concepts, structure outlines, and phased plans split into vertical slices. Use when the user asks for a planning document, design concept, structure outline, phased plan, or QRSPI session, or when the user mentions vertical slices. Do not use when the user asks to write, change, or debug code or tests.
 ---
 
 # Planning Workflow
@@ -25,7 +25,7 @@ Each slice:
 
 **IMPORTANT**: Horizontal slicing, grouping changes by technical layer across multiple behaviors, is the primary anti-pattern. A plan where Phase 1 is "all models", Phase 2 is "all services", Phase 3 is "all controllers" cannot be verified incrementally and produces no working software until the final phase.
 
-Load the test-writing skill (test doubles, Arrange/Act/Assert, red-green-refactor) before authoring any Tests First section. If no such skill exists, the Tests First blocks in the plan template are the minimum contract.
+Load the `tdd` skill (test doubles, Arrange/Act/Assert, red-green-refactor) before authoring any Tests First section. If that skill is not installed, the Tests First blocks in the plan template are the minimum contract.
 
 ---
 

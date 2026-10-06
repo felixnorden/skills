@@ -1,5 +1,14 @@
 # Child Process
 
+## Contents
+
+- Overview
+- Setup
+- Basic Usage
+- Command Options
+- Best Practices
+- Common Patterns
+
 Working with child processes in Effect.
 
 See related examples in [effect-smol/ai-docs/src/60_child-process/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/60_child-process/)

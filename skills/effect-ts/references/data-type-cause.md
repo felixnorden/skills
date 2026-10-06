@@ -5,6 +5,11 @@ description: Comprehensive reference for Effect Cause and Exit modules - structu
 
 # Cause & Exit - Failure Representation
 
+## Contents
+
+- Cause
+- Exit
+
 > **Reference for Effect v4.0.0-beta.76.** APIs may change before the final v4 release.
 
 ## Cause
@@ -224,8 +229,3 @@ Exit.failCause(cause); // create from a Cause
 Exit.die(defect);
 Exit.interrupt(fiberId);
 ```
-
-## See Also
-
-- [data-types.md](data-types.md) - Overview of all Effect data types
-- [error-handling.md](error-handling.md) - Error handling patterns with Effect

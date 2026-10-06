@@ -5,6 +5,21 @@ description: Comprehensive reference for Effect Chunk module - immutable, high-p
 
 # Chunk - Immutable, Performant Arrays
 
+## Contents
+
+- Quickstart
+- Constructors
+- Operations
+- Transform
+- Access
+- Queries
+- Utilities
+- Reduce / Fold
+- Generation
+- Set Operations
+- Convert
+- Equivalence
+
 > **Reference for Effect v4.0.0-beta.76.** APIs may change before the final v4 release.
 
 An immutable, high-performance sequence data structure optimized for functional programming patterns. A `Chunk<A>` is a persistent data structure that supports efficient append, prepend, and concatenation operations.
@@ -156,7 +171,3 @@ Chunk.toReadonlyArray(chunk); // ReadonlyArray<A>
 const eq = Chunk.makeEquivalence(Equivalence.strictEqual<number>());
 eq(chunk1, chunk2); // boolean
 ```
-
-## See Also
-
-- [data-types.md](data-types.md) - Overview of all Effect data types

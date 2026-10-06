@@ -1,5 +1,15 @@
 # HTTP API — OpenAPI & Documentation
 
+## Contents
+
+- Serving Documentation
+- OpenAPI Annotations
+- Response Descriptions
+- Top-Level Groups
+- Schema Annotations
+- Additional Schemas
+- Transform Final Spec
+
 ## Serving Documentation
 
 Add Scalar or Swagger UI via layer:

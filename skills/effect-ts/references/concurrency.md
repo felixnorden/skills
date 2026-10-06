@@ -1,5 +1,20 @@
 # Concurrency Patterns
 
+## Contents
+
+- Basic Concurrency
+- Fibers
+- Racing
+- Coordination
+- Interruption
+- Timeouts
+- Scheduling
+- Context References
+- Batching
+- Patterns
+- Anti-Patterns to Avoid
+- Best Practices
+
 Fibers, parallelism, racing, and coordination in Effect v4.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)

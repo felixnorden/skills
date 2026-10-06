@@ -1,6 +1,6 @@
 # Iterate Template
 
-**Usage**: Used during the QRSPI Iterate (I) phase to revise an existing plan. Updates only the affected slices; never regenerates the full plan. Load the test-writing skill (see the plan template) when you must regenerate a Tests First section.
+**Usage**: Used during the QRSPI Iterate (I) phase to revise an existing plan. Updates only the affected slices; never regenerates the full plan. Load the `tdd` skill (see the plan template) when you must regenerate a Tests First section.
 
 **Constraints**:
 

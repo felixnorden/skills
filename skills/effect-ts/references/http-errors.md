@@ -1,5 +1,13 @@
 # HTTP API — Error Handling
 
+## Contents
+
+- Custom Error Responses
+- Predefined Error Types
+- NoContent Variants
+- HttpApiDecodeError
+- Error Response Format
+
 ## Custom Error Responses
 
 Define error schemas with `HttpApiSchema.status()`:

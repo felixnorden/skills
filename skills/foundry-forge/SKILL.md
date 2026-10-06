@@ -1,13 +1,6 @@
 ---
 name: foundry-forge
-description: >
-  Compiles, tests, fuzzes, debugs, and deploys Solidity smart contracts using Forge — the core
-  build and test tool in the Foundry suite. Covers writing and running Forge tests, cheatcodes
-  (vm.prank, vm.warp, vm.expectRevert, and the full vm.* API), fuzz and invariant testing,
-  forge script deployments and multi-chain broadcasts, contract verification on Etherscan, gas
-  snapshots, forge coverage, and all forge CLI subcommands. Also covers forge-std imports:
-  Test.sol, Script.sol, StdAssertions, StdCheats, StdStorage. Activates when Solidity test
-  code or a forge script is present, or when any Forge or forge-std topic is mentioned.
+description: Runs Solidity tests, fuzz campaigns, scripts, and deployments with Forge, the Foundry build and test tool. Covers forge test and vm.* cheatcodes, invariant testing, forge script broadcasts, Etherscan verification, gas snapshots, and forge-std imports. Use when the user writes or runs Solidity test code in a Foundry project, or mentions Foundry, Forge, forge-std, a vm.* cheatcode, or a forge subcommand. Not for Hardhat, Truffle, general EVM or gas theory, or CI and pipeline configuration.
 ---
 
 # foundry-forge
@@ -18,9 +11,9 @@ CLI reference: https://www.getfoundry.sh/reference/forge/forge
 
 ## Reference freshness
 
-Foundry ships frequently. Core APIs in `references/` reflect the stable release as of this
-skill's last update. If a user asks about a cheatcode, flag, or forge-std function not found
-here, **web-fetch the live docs before answering — never fabricate a signature**:
+Foundry ships frequently. The `references/` files cover the core stable API. If a user asks
+about a cheatcode, flag, or forge-std function that is not here, **web-fetch the live docs
+before answering. Never fabricate a signature**:
 - Cheatcode: `https://www.getfoundry.sh/reference/cheatcodes/<name>`
 - forge-std: `https://www.getfoundry.sh/reference/forge-std/<name>`
 - CLI flag: `https://www.getfoundry.sh/reference/forge/<subcommand>`

@@ -26,7 +26,7 @@ In Effect, errors are defined using `Schema.TaggedErrorClass` which provides:
 
 ## Defining Errors
 
-> **See also**: [schema-classes.md](schema-classes.md) for Schema.Class, Schema.TaggedClass, and Schema.TaggedErrorClass definitions.
+> **See also**: the Schema classes guide in SKILL.md for Schema.Class, Schema.TaggedClass, and Schema.TaggedErrorClass definitions.
 
 ### TaggedErrorClass
 

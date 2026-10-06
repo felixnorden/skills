@@ -4,7 +4,7 @@ Essential patterns for Effect development.
 
 See full example: [Creating Effects](https://github.com/Effect-TS/effect-smol/blob/main/ai-docs/src/01_effect/01_basics/10_creating-effects.ts)
 
-> **See also**: [schema-classes.md](schema-classes.md) for Schema.Opaque, Schema.Class, and Schema.TaggedErrorClass definitions.
+> **See also**: the Schema classes guide in SKILL.md for Schema.Opaque, Schema.Class, and Schema.TaggedErrorClass definitions.
 
 ## Contents
 

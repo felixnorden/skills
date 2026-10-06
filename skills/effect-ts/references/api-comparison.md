@@ -1,5 +1,14 @@
 # API Comparison
 
+## Contents
+
+- Effect vs Promise
+- Effect vs fp-ts
+- Effect vs ZIO
+- Common Equivalents
+- Key v4 Changes
+- Summary
+
 Effect v4 vs Promise, fp-ts, and ZIO.
 
 See related examples in [effect-smol/ai-docs/src/](https://github.com/Effect-TS/effect-smol/tree/main/ai-docs/src/)
