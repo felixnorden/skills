@@ -1,9 +1,6 @@
 {
   "name": "skills",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
