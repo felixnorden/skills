@@ -1,0 +1,40 @@
+{
+  "erc20-test-suite": {
+    "The answer delivers a Forge test file that covers transfer and approve.": {
+      "result": "PASS",
+      "evidence": "'test/MinimalERC20.t.sol | 13 tests: unit, fuzz, revert', with unit tests for transfer and for approve."
+    },
+    "The revert test uses vm.expectRevert.": {
+      "result": "PASS",
+      "evidence": "'Each uses vm.expectRevert with the exact custom error and arguments.'"
+    },
+    "The fuzz test constrains inputs with bound() or vm.assume().": {
+      "result": "PASS",
+      "evidence": "'input clamped with bound(), then asserts exact debit/credit' and 'I used bound() instead of vm.assume() for numeric ranges.'"
+    }
+  },
+  "panic-0x11": {
+    "The answer tells the user to re-run with -vvv or -vvvv to read the trace.": {
+      "result": "PASS",
+      "evidence": "'forge test --match-test <NAME> -vvv' and 'Use -vvvv if the failure happens in setUp().'"
+    },
+    "The answer names arithmetic overflow or underflow as the cause of panic(0x11).": {
+      "result": "PASS",
+      "evidence": "'panic code 0x11 = arithmetic overflow or underflow'."
+    },
+    "The answer suggests bound() for numeric fuzz inputs.": {
+      "result": "PASS",
+      "evidence": "'Clamp the input with bound()' and 'amount = bound(amount, 1, 1000 ether).'"
+    }
+  },
+  "deploy-and-verify": {
+    "The answer runs forge script with --broadcast.": {
+      "result": "PASS",
+      "evidence": "'forge script script/Deploy.s.sol --broadcast --slow --rpc-url $RPC_URL'."
+    },
+    "The answer includes --verify for Etherscan verification.": {
+      "result": "PASS",
+      "evidence": "'--verify --etherscan-api-key $ETHERSCAN_API_KEY' and the separate forge verify-contract fallback."
+    }
+  }
+}

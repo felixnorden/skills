@@ -1,0 +1,47 @@
+{
+  "skill": "foundry-anvil",
+  "trigger_cases": [
+    { "query": "Start a local Ethereum node for my tests.", "should_trigger": true, "split": "train" },
+    { "query": "Fork mainnet at block 19000000.", "should_trigger": true, "split": "train" },
+    { "query": "How do I impersonate a whale account locally?", "should_trigger": true, "split": "train" },
+    { "query": "Advance the block timestamp by one day.", "should_trigger": true, "split": "train" },
+    { "query": "Dump and load Anvil state between test runs.", "should_trigger": true, "split": "train" },
+    { "query": "Mine a block on demand instead of per transaction.", "should_trigger": true, "split": "train" },
+    { "query": "Set a custom balance for an address on the dev node.", "should_trigger": true, "split": "train" },
+    { "query": "What does the anvil_setStorageAt RPC method do?", "should_trigger": true, "split": "validation" },
+    { "query": "Use interval mining with a 12 second block time.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Write a Solidity contract for an ERC-20 token.", "should_trigger": false, "split": "train" },
+    { "query": "Deploy my contract to mainnet with forge script.", "should_trigger": false, "split": "train" },
+    { "query": "Explain how proof of stake consensus works.", "should_trigger": false, "split": "train" },
+    { "query": "Configure my Hardhat Network node.", "should_trigger": false, "split": "train" },
+    { "query": "Read the balance of an address on mainnet with cast.", "should_trigger": false, "split": "train" },
+    { "query": "Optimize this Postgres query.", "should_trigger": false, "split": "validation" },
+    { "query": "Write a React hook for wallet connection.", "should_trigger": false, "split": "validation" },
+    { "query": "Explain EIP-1559 fee mechanics.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "impersonate-whale",
+      "prompt": "Impersonate a whale address on a local fork and send a token transfer from it.",
+      "assertions": [
+        "The answer calls anvil_impersonateAccount for the whale address.",
+        "The answer sends the transaction with --unlocked and --from set to the whale."
+      ]
+    },
+    {
+      "id": "fork-at-block",
+      "prompt": "Fork mainnet for my tests, but pin the state to a specific block.",
+      "assertions": [
+        "The answer uses anvil --fork-url together with --fork-block-number."
+      ]
+    },
+    {
+      "id": "state-between-runs",
+      "prompt": "Keep the node state between two test runs.",
+      "assertions": [
+        "The answer uses anvil --dump-state and --load-state, or --state."
+      ]
+    }
+  ]
+}

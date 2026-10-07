@@ -1,0 +1,48 @@
+{
+  "skill": "foundry-chisel",
+  "trigger_cases": [
+    { "query": "Try out this Solidity snippet in a REPL.", "should_trigger": true, "split": "train" },
+    { "query": "Save my Chisel session and load it later.", "should_trigger": true, "split": "train" },
+    { "query": "Fork mainnet inside the REPL.", "should_trigger": true, "split": "train" },
+    { "query": "Fetch a verified contract interface from Etherscan in Chisel.", "should_trigger": true, "split": "train" },
+    { "query": "Inspect the stack and memory after a call.", "should_trigger": true, "split": "train" },
+    { "query": "Export my Chisel session as a script.", "should_trigger": true, "split": "train" },
+    { "query": "What does the !traces command do?", "should_trigger": true, "split": "train" },
+    { "query": "Prototype this math expression in Solidity.", "should_trigger": true, "split": "validation" },
+    { "query": "Use vm.prank inside Chisel.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Write a Forge test for the transfer function.", "should_trigger": false, "split": "train" },
+    { "query": "Start a local node and impersonate an account.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Solidity contract for staking.", "should_trigger": false, "split": "train" },
+    { "query": "Deploy my contract with forge script.", "should_trigger": false, "split": "train" },
+    { "query": "Read the balance of an address on mainnet.", "should_trigger": false, "split": "train" },
+    { "query": "Explain EIP-1559.", "should_trigger": false, "split": "validation" },
+    { "query": "Set up CI for my repository.", "should_trigger": false, "split": "validation" },
+    { "query": "Write a React hook for wallet connection.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "session-roundtrip",
+      "prompt": "Show how to save a Chisel session and reload it in a later run.",
+      "assertions": [
+        "The answer uses !save to write the session.",
+        "The answer uses !load to restore the session."
+      ]
+    },
+    {
+      "id": "fork-in-repl",
+      "prompt": "Show how to fork mainnet inside Chisel and then call a deployed contract.",
+      "assertions": [
+        "The answer uses !fork with an RPC URL.",
+        "The answer calls the deployed contract from the REPL after forking."
+      ]
+    },
+    {
+      "id": "export-session",
+      "prompt": "Show how to export a Chisel session into a forge-std script.",
+      "assertions": [
+        "The answer exports the session to a Script file."
+      ]
+    }
+  ]
+}

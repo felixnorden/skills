@@ -1,0 +1,40 @@
+{
+  "slop-paragraph": {
+    "No superlative or intensifier remains (extremely, cutting-edge, seamless).": {
+      "result": "PASS",
+      "evidence": "The produced rewrite is 'The system processes [N] records per second. It retries a failed write [N] times and recovers within [N] seconds. It scales to [N] nodes.' The three words appear only inside quoted defects."
+    },
+    "No metaphor noun remains (leverages).": {
+      "result": "PASS",
+      "evidence": "The rewrite names the action directly. 'leverages' appears only in the list of defects to remove."
+    },
+    "The result replaces each quality claim with a measure or an explicit slot, and invents no fact.": {
+      "result": "PASS",
+      "evidence": "'processes [N] records per second' and 'It retries a failed write [N] times'. The output refuses to invent a number."
+    }
+  },
+  "install-section": {
+    "Every sentence is 20 words or fewer.": {
+      "result": "PASS",
+      "evidence": "The longest sentence is 'The -g flag installs acme globally, so the acme command runs from any directory.' (15 words)."
+    },
+    "Instructions use the imperative mood.": {
+      "result": "PASS",
+      "evidence": "'Install the acme CLI with npm:' and 'Install npm before you run the command.'"
+    },
+    "The install command is present.": {
+      "result": "PASS",
+      "evidence": "The fenced block contains `npm install -g acme`."
+    }
+  },
+  "term-consistency": {
+    "One term is used for one concept throughout.": {
+      "result": "PASS",
+      "evidence": "Case 1 keeps 'request' and drops 'query', 'invocation', and 'caller'."
+    },
+    "No synonym cycling remains (request, call, invocation, query).": {
+      "result": "PASS",
+      "evidence": "Case 1: 'The client sends a request to the service. The service handles the request.'"
+    }
+  }
+}

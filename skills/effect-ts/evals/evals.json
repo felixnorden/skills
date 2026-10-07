@@ -1,0 +1,53 @@
+{
+  "skill": "effect-ts",
+  "trigger_cases": [
+    { "query": "Add a new service to my Effect project.", "should_trigger": true, "split": "train" },
+    { "query": "How do I structure layers for this dependency?", "should_trigger": true, "split": "train" },
+    { "query": "My Effect program has a type error about requirements.", "should_trigger": true, "split": "train" },
+    { "query": "Write a test for this Effect service.", "should_trigger": true, "split": "train" },
+    { "query": "Convert this try/catch code to Effect.", "should_trigger": true, "split": "train" },
+    { "query": "Define a tagged error for this service.", "should_trigger": true, "split": "train" },
+    { "query": "Work in this repo and follow the existing Effect patterns.", "should_trigger": true, "split": "train" },
+    { "query": "How do I stream rows from this database with Effect?", "should_trigger": true, "split": "validation" },
+    { "query": "Set up retries with a schedule for this call.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Write a React component for the dashboard.", "should_trigger": false, "split": "train" },
+    { "query": "Fix this CSS layout.", "should_trigger": false, "split": "train" },
+    { "query": "Explain how TCP works.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Python script to parse a CSV.", "should_trigger": false, "split": "train" },
+    { "query": "Set up a Postgres database.", "should_trigger": false, "split": "train" },
+    { "query": "Explain Kubernetes autoscaling.", "should_trigger": false, "split": "validation" },
+    { "query": "Write a Rust CLI tool.", "should_trigger": false, "split": "validation" },
+    { "query": "Draft a marketing email.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "new-service",
+      "prompt": "Show the Effect code for a service that reads a user from a database, with a typed error and a layer.",
+      "files": ["skills/effect-ts/evals/fixture/.repos/effect"],
+      "assertions": [
+        "The answer defines the service with Context.Service.",
+        "The answer defines the error with Schema.TaggedErrorClass.",
+        "The answer builds the implementation with Layer.effect."
+      ]
+    },
+    {
+      "id": "catch-tags",
+      "prompt": "Show how to handle two specific error types plus a final fallback in Effect.",
+      "files": ["skills/effect-ts/evals/fixture/.repos/effect"],
+      "assertions": [
+        "The answer uses Effect.catchTags for the specific errors.",
+        "The answer adds a final fallback with Effect.catch."
+      ]
+    },
+    {
+      "id": "test-service",
+      "prompt": "Show how to test an Effect service with a provided test layer.",
+      "files": ["skills/effect-ts/evals/fixture/.repos/effect"],
+      "assertions": [
+        "The answer provides the test layer with Effect.provide.",
+        "The answer uses Effect.gen or the @effect/vitest it.effect helper in the test."
+      ]
+    }
+  ]
+}

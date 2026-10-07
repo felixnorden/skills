@@ -1,0 +1,48 @@
+{
+  "skill": "planning-workflow",
+  "trigger_cases": [
+    { "query": "I want to plan a new feature before writing any code.", "should_trigger": true, "split": "train" },
+    { "query": "Help me design the solution for our sync engine.", "should_trigger": true, "split": "train" },
+    { "query": "Produce a phased plan I can hand to a build agent.", "should_trigger": true, "split": "train" },
+    { "query": "Split this work into vertical slices.", "should_trigger": true, "split": "train" },
+    { "query": "Run a QRSPI session for this refactor.", "should_trigger": true, "split": "train" },
+    { "query": "Write a design concept for the new auth model.", "should_trigger": true, "split": "train" },
+    { "query": "I need a structure outline before planning the implementation.", "should_trigger": true, "split": "train" },
+    { "query": "What should the research document cover for this change?", "should_trigger": true, "split": "validation" },
+    { "query": "Turn this approved design into an implementation plan.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Implement the login feature now.", "should_trigger": false, "split": "train" },
+    { "query": "Fix the failing test in the payment service.", "should_trigger": false, "split": "train" },
+    { "query": "Write unit tests for this parser.", "should_trigger": false, "split": "train" },
+    { "query": "Review my pull request.", "should_trigger": false, "split": "train" },
+    { "query": "Rename these variables to match our style guide.", "should_trigger": false, "split": "train" },
+    { "query": "Deploy the current build to staging.", "should_trigger": false, "split": "validation" },
+    { "query": "Summarize the architecture document for me.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "layer-vs-slice",
+      "prompt": "Here is my plan: Phase 1 is all database models, Phase 2 is all services, Phase 3 is all controllers. What is wrong with it, and how should it change?",
+      "assertions": [
+        "The answer identifies the plan as horizontal, layer-by-layer slicing.",
+        "The answer asks for behavior-level vertical slices instead."
+      ]
+    },
+    {
+      "id": "no-design-in-plan",
+      "prompt": "Write the implementation plan for adding CSV export, and include the database schema choice you think is best.",
+      "assertions": [
+        "The answer keeps the schema choice out of the plan or flags it as a design-phase decision.",
+        "The answer records the schema decision in the design artifact, not in the plan."
+      ]
+    },
+    {
+      "id": "test-first-section",
+      "prompt": "Draft the Tests First section for a slice that adds a discount code to checkout.",
+      "assertions": [
+        "The answer writes the test before the implementation and states that it fails first.",
+        "The answer points to the tdd skill for the test structure."
+      ]
+    }
+  ]
+}

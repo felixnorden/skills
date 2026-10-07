@@ -1,0 +1,32 @@
+{
+  "reentrancy-fix": {
+    "The answer applies the Checks-Effects-Interactions order, updating state before the external call.": {
+      "result": "PASS",
+      "evidence": "'2. EFFECTS: debit before any external call' placed ahead of '3. INTERACTIONS', with the bug named as a CEI violation."
+    },
+    "The answer adds a reentrancy guard or explains when CEI alone is sufficient.": {
+      "result": "PASS",
+      "evidence": "'nonReentrant' on the function and 'Keep CEI as the primary defense. The guard is a second layer, not a replacement.'"
+    }
+  },
+  "library-choice": {
+    "The answer recommends OpenZeppelin for a high-value protocol.": {
+      "result": "PASS",
+      "evidence": "'Recommendation: OpenZeppelin' and 'High-value protocols (>$10M TVL) | OpenZeppelin'."
+    },
+    "The answer gives audits or battle-tested security as the reason.": {
+      "result": "PASS",
+      "evidence": "'Extensive audits and battle-tested code. Solady optimizes for gas, not for maximum audit coverage.'"
+    }
+  },
+  "natspec": {
+    "The answer includes the @notice and @dev tags.": {
+      "result": "PASS",
+      "evidence": "'@notice Transfers amount tokens from the caller to to' and '@dev Implements an ERC20 transfer with a pause check'."
+    },
+    "The answer documents each parameter and the return value.": {
+      "result": "PASS",
+      "evidence": "'@param to', '@param amount', and '@return success True if the transfer succeeded'."
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "tdd",
+  "trigger_cases": [
+    { "query": "Add a feature to the invoice service test-first.", "should_trigger": true, "split": "train" },
+    { "query": "Write unit tests for this parser before the implementation.", "should_trigger": true, "split": "train" },
+    { "query": "Design the interface for a new notifier by writing tests.", "should_trigger": true, "split": "train" },
+    { "query": "Where should the mock boundary be for the payment gateway?", "should_trigger": true, "split": "train" },
+    { "query": "This test setup is painful; help me refactor it.", "should_trigger": true, "split": "train" },
+    { "query": "I keep writing tests that pass for the wrong reason.", "should_trigger": true, "split": "train" },
+    { "query": "How should I structure the arrange section for this service?", "should_trigger": true, "split": "validation" },
+    { "query": "Should I mock the clock in this unit test?", "should_trigger": true, "split": "validation" },
+    { "query": "Walk me through red green refactor for this change.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Run the existing test suite and fix the failures.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Playwright end-to-end test for the login flow.", "should_trigger": false, "split": "train" },
+    { "query": "What is the difference between TDD and BDD?", "should_trigger": false, "split": "train" },
+    { "query": "Set up continuous integration for this repository.", "should_trigger": false, "split": "train" },
+    { "query": "Increase the test coverage number for this module.", "should_trigger": false, "split": "train" },
+    { "query": "Write a database migration for the new column.", "should_trigger": false, "split": "validation" },
+    { "query": "Fix this flaky integration test against the real database.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "order-tax",
+      "prompt": "Write the first test for an order total that adds 20 percent tax for the EU region. The Order type has a region and a pricing service.",
+      "assertions": [
+        "The test fails first for a behavioral reason, not a compile error or a harness error.",
+        "The test uses Arrange, Act, Assert.",
+        "No internal class is mocked; only a boundary collaborator is doubled."
+      ]
+    },
+    {
+      "id": "five-mocks",
+      "prompt": "My test class needs five mocks to run. What does that signal?",
+      "assertions": [
+        "The answer names a design signal, such as too many responsibilities or the wrong boundary.",
+        "The answer names the dependency-structure signal and a design remedy, such as decompose the class or move the boundary."
+      ]
+    },
+    {
+      "id": "which-double",
+      "prompt": "Which test double should I use for the system clock in a unit test?",
+      "assertions": [
+        "The answer injects a clock abstraction at a boundary.",
+        "The answer does not mock a domain entity."
+      ]
+    }
+  ]
+}

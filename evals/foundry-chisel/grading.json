@@ -1,0 +1,28 @@
+{
+  "export-session": {
+    "The answer exports the session to a Script file.": {
+      "result": "PASS",
+      "evidence": "'!export (alias !ex) writes a forge-std Script file. The default path is script/ChiselScript.s.sol' with the generated contract shown."
+    }
+  },
+  "fork-in-repl": {
+    "The answer uses !fork with an RPC URL.": {
+      "result": "PASS",
+      "evidence": "'!fork https://eth-mainnet.g.alchemy.com/v2/<KEY>', plus chisel --fork-url --fork-block-number as option A."
+    },
+    "The answer calls the deployed contract from the REPL after forking.": {
+      "result": "PASS",
+      "evidence": "'!fetch 0x6B17... IERC20' then 'dai.totalSupply()' and 'dai.balanceOf(...)' in the REPL."
+    }
+  },
+  "session-roundtrip": {
+    "The answer uses !save to write the session.": {
+      "result": "PASS",
+      "evidence": "'!save demo-session' and 'Saved session to cache with ID = demo-session'."
+    },
+    "The answer uses !load to restore the session.": {
+      "result": "PASS",
+      "evidence": "'!load demo-session' then 'x + 1' returns 43, plus the on-disk cache path."
+    }
+  }
+}

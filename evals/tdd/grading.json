@@ -1,0 +1,36 @@
+{
+  "order-tax": {
+    "The test fails first for a behavioral reason, not a compile error or a harness error.": {
+      "result": "PASS",
+      "evidence": "'Expected red reason: Order.calculateTotal is not implemented ... This is the missing-behavior failure, not a harness fault.'"
+    },
+    "The test uses Arrange, Act, Assert.": {
+      "result": "PASS",
+      "evidence": "'Asserts calculateTotal() returns 120.00: one behavior, Arrange/Act/Assert.'"
+    },
+    "No internal class is mocked; only a boundary collaborator is doubled.": {
+      "result": "PASS",
+      "evidence": "'Stubs PricingService at the boundary so the price is fixed at 100.00.'"
+    }
+  },
+  "five-mocks": {
+    "The answer names a design signal, such as too many responsibilities or the wrong boundary.": {
+      "result": "PASS",
+      "evidence": "'The class has too many responsibilities.'"
+    },
+    "The answer names the dependency-structure signal and a design remedy, such as decompose the class or move the boundary.": {
+      "result": "PASS",
+      "evidence": "'Decompose the class.' and 'Push the boundary out.'"
+    }
+  },
+  "which-double": {
+    "The answer injects a clock abstraction at a boundary.": {
+      "result": "PASS",
+      "evidence": "'Define a Clock interface (one method, now()), inject it, and in tests pass the double.'"
+    },
+    "The answer does not mock a domain entity.": {
+      "result": "PASS",
+      "evidence": "'Never a mock' and 'Avoid patching global time.'"
+    }
+  }
+}

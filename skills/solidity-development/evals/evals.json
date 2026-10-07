@@ -1,0 +1,49 @@
+{
+  "skill": "solidity-development",
+  "trigger_cases": [
+    { "query": "Review this Solidity contract for security issues.", "should_trigger": true, "split": "train" },
+    { "query": "Add reentrancy protection to my withdrawal function.", "should_trigger": true, "split": "train" },
+    { "query": "Should I use OpenZeppelin or Solady here?", "should_trigger": true, "split": "train" },
+    { "query": "Make my ERC-20 upgradeable.", "should_trigger": true, "split": "train" },
+    { "query": "Write NatSpec for this public function.", "should_trigger": true, "split": "train" },
+    { "query": "How do I optimize gas in this loop?", "should_trigger": true, "split": "train" },
+    { "query": "Audit the access control on this contract.", "should_trigger": true, "split": "train" },
+    { "query": "Convert these require strings to custom errors.", "should_trigger": true, "split": "validation" },
+    { "query": "Explain the checks-effects-interactions pattern.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Write a React component for the dashboard.", "should_trigger": false, "split": "train" },
+    { "query": "Explain how TCP handshakes work.", "should_trigger": false, "split": "train" },
+    { "query": "Set up a Postgres database.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Python script to parse a CSV.", "should_trigger": false, "split": "train" },
+    { "query": "Fix this CSS layout.", "should_trigger": false, "split": "train" },
+    { "query": "Explain Kubernetes pod autoscaling.", "should_trigger": false, "split": "validation" },
+    { "query": "Write a Rust CLI tool.", "should_trigger": false, "split": "validation" },
+    { "query": "Draft a marketing email.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "reentrancy-fix",
+      "prompt": "Fix the reentrancy bug in this function and explain the fix:\n\nfunction withdraw(uint256 amount) external {\n    require(balances[msg.sender] >= amount);\n    (bool ok, ) = msg.sender.call{value: amount}(\"\");\n    require(ok);\n    balances[msg.sender] -= amount;\n}",
+      "assertions": [
+        "The answer applies the Checks-Effects-Interactions order, updating state before the external call.",
+        "The answer adds a reentrancy guard or explains when CEI alone is sufficient."
+      ]
+    },
+    {
+      "id": "library-choice",
+      "prompt": "Should I use OpenZeppelin or Solady for a new DeFi protocol with more than $10M in total value locked?",
+      "assertions": [
+        "The answer recommends OpenZeppelin for a high-value protocol.",
+        "The answer gives audits or battle-tested security as the reason."
+      ]
+    },
+    {
+      "id": "natspec",
+      "prompt": "Write the NatSpec block for an external function that transfers tokens.",
+      "assertions": [
+        "The answer includes the @notice and @dev tags.",
+        "The answer documents each parameter and the return value."
+      ]
+    }
+  ]
+}

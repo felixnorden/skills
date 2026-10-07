@@ -1,0 +1,52 @@
+{
+  "skill": "writing-for-agents",
+  "trigger_cases": [
+    { "query": "Write the README for this CLI tool.", "should_trigger": true, "split": "train" },
+    { "query": "Draft a PRD for the billing feature.", "should_trigger": true, "split": "train" },
+    { "query": "Turn these meeting notes into a design doc.", "should_trigger": true, "split": "train" },
+    { "query": "Rewrite the tool descriptions for our MCP server.", "should_trigger": true, "split": "train" },
+    { "query": "Add a changelog entry for v2.1.", "should_trigger": true, "split": "train" },
+    { "query": "Clean up the wording in this API reference.", "should_trigger": true, "split": "train" },
+    { "query": "Write a handoff note for the next agent that picks this up.", "should_trigger": true, "split": "validation" },
+    { "query": "Tighten the prompt in this skill file.", "should_trigger": true, "split": "validation" },
+    { "query": "Make this spec read more clearly for the next agent.", "should_trigger": true, "split": "validation" },
+    { "query": "Polish the wording of our contribution guide.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Give me a quick summary of this repository.", "should_trigger": false, "split": "train" },
+    { "query": "Write a launch tweet announcing the release.", "should_trigger": false, "split": "train" },
+    { "query": "Fix the grammar in my personal essay.", "should_trigger": false, "split": "train" },
+    { "query": "Explain what Simplified Technical English means.", "should_trigger": false, "split": "train" },
+    { "query": "Summarize this pull request for me.", "should_trigger": false, "split": "train" },
+    { "query": "Write a short story about a robot.", "should_trigger": false, "split": "validation" },
+    { "query": "Draft a reply to this customer email.", "should_trigger": false, "split": "validation" },
+    { "query": "Translate this README into French.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "slop-paragraph",
+      "prompt": "Rewrite this paragraph for a README: 'The system is extremely robust and leverages cutting-edge techniques to facilitate seamless data processing at scale.'",
+      "assertions": [
+        "No superlative or intensifier remains (extremely, cutting-edge, seamless).",
+        "No metaphor noun remains (leverages).",
+        "The result replaces each quality claim with a measure or an explicit slot, and invents no fact."
+      ]
+    },
+    {
+      "id": "install-section",
+      "prompt": "Write a README section that explains how to install the acme CLI. The install command is `npm install -g acme`.",
+      "assertions": [
+        "Every sentence is 20 words or fewer.",
+        "Instructions use the imperative mood.",
+        "The install command is present."
+      ]
+    },
+    {
+      "id": "term-consistency",
+      "prompt": "Rewrite this spec sentence so an agent cannot confuse the terms: 'The client sends a request, then the caller issues a query and the service handles the invocation.'",
+      "assertions": [
+        "One term is used for one concept throughout.",
+        "No synonym cycling remains (request, call, invocation, query)."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "skill": "foundry-cast",
+  "trigger_cases": [
+    { "query": "Read the balance of an address on mainnet.", "should_trigger": true, "split": "train" },
+    { "query": "Decode this transaction calldata.", "should_trigger": true, "split": "train" },
+    { "query": "Send a transaction from the command line.", "should_trigger": true, "split": "train" },
+    { "query": "Look up a contract's ABI on Etherscan.", "should_trigger": true, "split": "train" },
+    { "query": "Convert wei to ether in the shell.", "should_trigger": true, "split": "train" },
+    { "query": "Sign a message with my local keystore account.", "should_trigger": true, "split": "train" },
+    { "query": "Read a storage slot from a deployed contract.", "should_trigger": true, "split": "train" },
+    { "query": "Compute the keccak256 of this string from the CLI.", "should_trigger": true, "split": "validation" },
+    { "query": "Resolve an ENS name from the command line.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Write a Forge test for the transfer function.", "should_trigger": false, "split": "train" },
+    { "query": "Start a local node and impersonate an account.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Solidity contract for staking.", "should_trigger": false, "split": "train" },
+    { "query": "Explain how the EVM stack machine works.", "should_trigger": false, "split": "train" },
+    { "query": "Set up CI for my repository.", "should_trigger": false, "split": "train" },
+    { "query": "Deploy my contract with forge script.", "should_trigger": false, "split": "validation" },
+    { "query": "Explain EIP-1559.", "should_trigger": false, "split": "validation" },
+    { "query": "Write a React hook for wallet connection.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "decode-calldata",
+      "prompt": "Explain how to decode transaction calldata for a transfer(address,uint256) call using cast.",
+      "assertions": [
+        "The answer uses cast decode-calldata or cast 4byte-calldata for the selector.",
+        "The answer names cast calldata or cast abi-encode for the encoding side."
+      ]
+    },
+    {
+      "id": "read-storage",
+      "prompt": "Show the cast commands to read a storage slot and the ETH balance of a contract at a given address.",
+      "assertions": [
+        "The answer uses cast storage for the slot.",
+        "The answer uses cast balance for the balance."
+      ]
+    },
+    {
+      "id": "sign-message",
+      "prompt": "Sign a message with a local keystore account and verify the signature.",
+      "assertions": [
+        "The answer uses cast wallet sign.",
+        "The answer checks the signature with cast wallet verify or an equivalent recovery step."
+      ]
+    }
+  ]
+}

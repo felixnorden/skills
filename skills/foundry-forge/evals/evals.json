@@ -1,0 +1,51 @@
+{
+  "skill": "foundry-forge",
+  "trigger_cases": [
+    { "query": "Write a Forge test for my ERC-20 contract.", "should_trigger": true, "split": "train" },
+    { "query": "How do I prank a caller in a Foundry test?", "should_trigger": true, "split": "train" },
+    { "query": "Set up fuzz testing with a fixed seed.", "should_trigger": true, "split": "train" },
+    { "query": "Write an invariant test with a handler contract.", "should_trigger": true, "split": "train" },
+    { "query": "Deploy this contract with forge script and verify it on Etherscan.", "should_trigger": true, "split": "train" },
+    { "query": "Why does my forge test revert with panic(0x11)?", "should_trigger": true, "split": "train" },
+    { "query": "Generate a gas snapshot and check it in CI.", "should_trigger": true, "split": "train" },
+    { "query": "How do I use StdStorage to set a mapping value?", "should_trigger": true, "split": "validation" },
+    { "query": "Add a CREATE2 deployment to my forge script.", "should_trigger": true, "split": "validation" },
+
+    { "query": "Write a React component for the dashboard.", "should_trigger": false, "split": "train" },
+    { "query": "Explain how the EVM gas model works.", "should_trigger": false, "split": "train" },
+    { "query": "Set up a CI pipeline with GitHub Actions.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Hardhat deployment script.", "should_trigger": false, "split": "train" },
+    { "query": "Optimize this SQL query.", "should_trigger": false, "split": "train" },
+    { "query": "Write a Rust unit test.", "should_trigger": false, "split": "validation" },
+    { "query": "Explain EIP-1559.", "should_trigger": false, "split": "validation" },
+    { "query": "Format my JSON config.", "should_trigger": false, "split": "validation" }
+  ],
+  "output_cases": [
+    {
+      "id": "erc20-test-suite",
+      "prompt": "Write a Forge test suite for a minimal ERC-20 with transfer and approve. Include a fuzz test and a revert test.",
+      "assertions": [
+        "The answer delivers a Forge test file that covers transfer and approve.",
+        "The revert test uses vm.expectRevert.",
+        "The fuzz test constrains inputs with bound() or vm.assume()."
+      ]
+    },
+    {
+      "id": "panic-0x11",
+      "prompt": "My forge test fails with panic(0x11). How do I find the cause and fix it?",
+      "assertions": [
+        "The answer tells the user to re-run with -vvv or -vvvv to read the trace.",
+        "The answer names arithmetic overflow or underflow as the cause of panic(0x11).",
+        "The answer suggests bound() for numeric fuzz inputs."
+      ]
+    },
+    {
+      "id": "deploy-and-verify",
+      "prompt": "Deploy my contract with forge script, broadcast to mainnet, and verify the source.",
+      "assertions": [
+        "The answer runs forge script with --broadcast.",
+        "The answer includes --verify for Etherscan verification."
+      ]
+    }
+  ]
+}

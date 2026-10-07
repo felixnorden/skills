@@ -1,0 +1,32 @@
+{
+  "decode-calldata": {
+    "The answer uses cast decode-calldata or cast 4byte-calldata for the selector.": {
+      "result": "PASS",
+      "evidence": "'cast decode-calldata \"transfer(address,uint256)\" 0xa9059cbb...' and 'cast 4byte-calldata 0xa9059cbb...' to look the selector up."
+    },
+    "The answer names cast calldata or cast abi-encode for the encoding side.": {
+      "result": "PASS",
+      "evidence": "'DATA=$(cast calldata \"transfer(address,uint256)\" 0xd8dA... 1ether)' and the note that cast abi-encode omits the selector."
+    }
+  },
+  "read-storage": {
+    "The answer uses cast storage for the slot.": {
+      "result": "PASS",
+      "evidence": "'cast storage <ADDR> <SLOT>' with --rpc-url and --block variants."
+    },
+    "The answer uses cast balance for the balance.": {
+      "result": "PASS",
+      "evidence": "'cast balance <ADDR>' and 'cast balance <ADDR> --ether'."
+    }
+  },
+  "sign-message": {
+    "The answer uses cast wallet sign.": {
+      "result": "PASS",
+      "evidence": "'cast wallet sign \"hello\" --keystore /tmp/ks/test-signer --password ...'."
+    },
+    "The answer checks the signature with cast wallet verify or an equivalent recovery step.": {
+      "result": "PASS",
+      "evidence": "'cast wallet verify --address 0x4D40... \"hello\" 0x254c...' with exit codes 0 and 1."
+    }
+  }
+}

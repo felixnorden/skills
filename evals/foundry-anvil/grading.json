@@ -1,0 +1,24 @@
+{
+  "fork-at-block": {
+    "The answer uses anvil --fork-url together with --fork-block-number.": {
+      "result": "PASS",
+      "evidence": "'anvil --fork-url \"$MAINNET_RPC\" --fork-block-number \"$FORK_BLOCK\"' and a cast block-number check."
+    }
+  },
+  "impersonate-whale": {
+    "The answer calls anvil_impersonateAccount for the whale address.": {
+      "result": "PASS",
+      "evidence": "'cast rpc anvil_impersonateAccount 0x28C6...1d60'."
+    },
+    "The answer sends the transaction with --unlocked and --from set to the whale.": {
+      "result": "PASS",
+      "evidence": "'cast send $USDC \"transfer(address,uint256)\" $RECIP 1000000000 --from 0x28C6...1d60 --unlocked'."
+    }
+  },
+  "state-between-runs": {
+    "The answer uses anvil --dump-state and --load-state, or --state.": {
+      "result": "PASS",
+      "evidence": "'Use --state. Anvil loads that file on start and writes it on exit.' Also lists --dump-state and --load-state."
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "new-service": {
+    "The answer defines the service with Context.Service.": {
+      "result": "PASS",
+      "evidence": "'export class Database extends Context.Service<...>' and 'export class UserRepository extends Context.Service<...>'."
+    },
+    "The answer defines the error with Schema.TaggedErrorClass.": {
+      "result": "PASS",
+      "evidence": "'export class DatabaseError extends Schema.TaggedErrorClass<DatabaseError>()' and 'UserNotFoundError'."
+    },
+    "The answer builds the implementation with Layer.effect.": {
+      "result": "PASS",
+      "evidence": "'static readonly layer: Layer.Layer<Database> = Layer.effect(...)' and Layer.effect for UserRepository."
+    }
+  },
+  "catch-tags": {
+    "The answer uses Effect.catchTags for the specific errors.": {
+      "result": "PASS",
+      "evidence": "'Effect.catchTags({ NotFoundError: ..., RateLimitError: ... })'."
+    },
+    "The answer adds a final fallback with Effect.catch.": {
+      "result": "PASS",
+      "evidence": "'Effect.catch((error) => Effect.succeed(defaultUser))' as step 2 after catchTags."
+    }
+  },
+  "test-service": {
+    "The answer provides the test layer with Effect.provide.": {
+      "result": "PASS",
+      "evidence": "'.pipe(Effect.provide(CheckoutTestLayer))' and 'Provide the test layer at the test boundary with Effect.provide'."
+    },
+    "The answer uses Effect.gen or the @effect/vitest it.effect helper in the test.": {
+      "result": "PASS",
+      "evidence": "'it.effect(\"charges the full total\", () => ...)' and 'layer(CheckoutTestLayer)(\"Checkout\", (it) => ...)'."
+    }
+  }
+}

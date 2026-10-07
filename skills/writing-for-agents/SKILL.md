@@ -1,6 +1,6 @@
 ---
 name: writing-for-agents
-description: "Writes and edits prose that agents and humans both verify: short sentences, one term per concept, active voice, and proof for every claim. Use when writing or editing plans, specs, design documents, PRDs, API docs, READMEs, changelogs, handoff notes, guides, tool descriptions, or prompts. Do not use for chat replies, summaries, translations, or marketing copy."
+description: "Writes and edits prose that agents and humans both verify: short sentences, one term per concept, active voice, and proof for every claim. Use when writing or editing plans, specs, design docs, PRDs, API docs, READMEs, changelogs, handoff notes, meeting notes, guides, tool descriptions, or prompts. Do not use for chat replies, summaries, translations, or marketing copy."
 ---
 
 # Writing for agents

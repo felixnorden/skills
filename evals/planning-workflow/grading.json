@@ -1,0 +1,32 @@
+{
+  "layer-vs-slice": {
+    "The answer identifies the plan as horizontal, layer-by-layer slicing.": {
+      "result": "PASS",
+      "evidence": "'the plan is horizontally sliced' and 'The names are layer names, not behavior names.'"
+    },
+    "The answer asks for behavior-level vertical slices instead.": {
+      "result": "PASS",
+      "evidence": "'Cut vertical slices: one complete, observable behavior, end-to-end.'"
+    }
+  },
+  "no-design-in-plan": {
+    "The answer keeps the schema choice out of the plan or flags it as a design-phase decision.": {
+      "result": "PASS",
+      "evidence": "'A database schema choice is a design decision. The plan phase forbids design decisions. So the schema choice went into the design concept's Key Decisions table.'"
+    },
+    "The answer records the schema decision in the design artifact, not in the plan.": {
+      "result": "PASS",
+      "evidence": "'My schema recommendation (in the design concept)' and 'Slice 3 realizes this schema; it does not re-decide it.'"
+    }
+  },
+  "test-first-section": {
+    "The answer writes the test before the implementation and states that it fails first.": {
+      "result": "PASS",
+      "evidence": "'Before writing implementation, Build Agent writes these tests' and 'confirm each test fails on the missing behavior.'"
+    },
+    "The answer points to the tdd skill for the test structure.": {
+      "result": "PASS",
+      "evidence": "'Skill conventions loaded (planning-workflow, plan.md template, tdd).' Uses the tdd school and double selection."
+    }
+  }
+}
