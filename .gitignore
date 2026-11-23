@@ -13,3 +13,6 @@ node_modules
 evals/**/runs/
 evals/**/outputs/
 evals/**/results.json
+
+# Fetched vitest docs cache: input to the leaf generator, never committed
+.vitest-docs/

@@ -2,6 +2,9 @@
   "name": "skills",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "bun test"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^7.0.2"

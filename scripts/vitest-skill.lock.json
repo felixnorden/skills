@@ -1,0 +1,375 @@
+{
+  "tag": "v5.1.1",
+  "commit": "161e25f663a838f6a30890f8a6827ff83ff1b3c7",
+  "docs": [
+    {
+      "path": "api/browser/assertions.md",
+      "sha256": "sha256:b602aa3cb093cb3a1ddd6f5c88f81579550b61b757400b948a3c8f401f6e2f8c"
+    },
+    {
+      "path": "api/browser/commands.md",
+      "sha256": "sha256:2d49dc2f20ce99c2889109b1a80174742d6556295c0df3c13a88c3c7451354dd"
+    },
+    {
+      "path": "api/browser/context.md",
+      "sha256": "sha256:8d7c40543b6450657a16087254c2f3879402ec75b78c5953fefc1747a59e0bba"
+    },
+    {
+      "path": "api/browser/locators.md",
+      "sha256": "sha256:7fea7a4020ab39ddd342ea5ba7dfad40324516abffd4b2e04454c9dd37cdb39f"
+    },
+    {
+      "path": "api/expect.md",
+      "sha256": "sha256:7ef500da4f87cdfdaf04153ae86055539994ba5ef48c55123f34d0cea9267f0d"
+    },
+    {
+      "path": "api/vi.md",
+      "sha256": "sha256:c079645af8baa69bf4c7eb1e4479bbdf227e72fdd1a32d1a47b809dae6639b6b"
+    },
+    {
+      "path": "config/allowonly.md",
+      "sha256": "sha256:3d0eb03afd7080b94782fcb21efb007ba152daf1fbbcebd7c353f7648dc557b1"
+    },
+    {
+      "path": "config/benchmark.md",
+      "sha256": "sha256:a4626a055dfde6187b086ee9ef165db34191514daab21059cac1a0f5a5040e43"
+    },
+    {
+      "path": "config/browser/importmapmocks.md",
+      "sha256": "sha256:a57ab018c51ab09ae52ddbfced2bd4a5215b5b3188a15f4047d3cfe201262f77"
+    },
+    {
+      "path": "config/browser/locators.md",
+      "sha256": "sha256:8e285fa34554ec6ca59a50fcb8b05b6bf434ec089ab2736fa732816faa54a065"
+    },
+    {
+      "path": "config/browser/playwright.md",
+      "sha256": "sha256:cec18ecf9c5ad20e869a13593690a2ad43eb62012b1d68fb387ef8e7c759e250"
+    },
+    {
+      "path": "config/browser/preview.md",
+      "sha256": "sha256:a1d40979b8cf83dbe0b82880133313f664f4a4d9c6798c0ae23850c554f4da7a"
+    },
+    {
+      "path": "config/browser/provider.md",
+      "sha256": "sha256:035f0b90776f196719a67ff3f3158553a981a23ef2bc768d3643fae26742ed55"
+    },
+    {
+      "path": "config/browser/trace.md",
+      "sha256": "sha256:a84b65e4e7fe94db95010ef738a9de1f618d46bb30deafca1f0b187224153660"
+    },
+    {
+      "path": "config/browser/webdriverio.md",
+      "sha256": "sha256:50d4bc0b9634aef26e6de3612e917b55112f4b827c664902f853899299913527"
+    },
+    {
+      "path": "config/cache.md",
+      "sha256": "sha256:bb0f2bb707d546375cedbb597308048db83d157bb955419a48349324a9586729"
+    },
+    {
+      "path": "config/changed.md",
+      "sha256": "sha256:cad1cdad87d06ba6fb88e1f44a5116128d2a22e0fb5436a5c25dbdd434f79606"
+    },
+    {
+      "path": "config/clearmocks.md",
+      "sha256": "sha256:e559960aeb8fc59fb35e1118c89a5b27535abfb66dc0d164bd4a74a46074afde"
+    },
+    {
+      "path": "config/coverage.md",
+      "sha256": "sha256:643f9da8da0ee1d2c08fd46f80ec04df949539c56d457cb41e1892a6696b7b3d"
+    },
+    {
+      "path": "config/detectasyncleaks.md",
+      "sha256": "sha256:503032fc54c071c75a05f82ca3b91013a32d5b272c1fa125217bd6cde147e762"
+    },
+    {
+      "path": "config/environment.md",
+      "sha256": "sha256:7575d43c547912c2fb9dfe682636dec6902287c223f85f407d0a6fdc399d7a3c"
+    },
+    {
+      "path": "config/expandsnapshotdiff.md",
+      "sha256": "sha256:03c39d9c9ae77a85b8ee7ed23e9e542d7fcc1b3018d37d3cb2050bfabee32662"
+    },
+    {
+      "path": "config/faketimers.md",
+      "sha256": "sha256:4cd6d80c3e3ba64b8e37053b50881292d91b6d1168582031951e6f14f80811b9"
+    },
+    {
+      "path": "config/fileparallelism.md",
+      "sha256": "sha256:8a995504010a50828527f996642f956a520e8d5572e29b68bf022bd7b2d9af1c"
+    },
+    {
+      "path": "config/fsmodulecache.md",
+      "sha256": "sha256:5942d0f1e667dc94d3d6248f1fcd78fba209b98afae906c3d691cbca6931b1da"
+    },
+    {
+      "path": "config/globals.md",
+      "sha256": "sha256:b8af27d4be9d7dfcc29c6fe743afe72572ea5a9c188e2612e8a1945f31666bb4"
+    },
+    {
+      "path": "config/hooktimeout.md",
+      "sha256": "sha256:4d6e6ebf2ecca4d56d0247e0bb96f34bfa55ccae2819d8cf7ee0a8f4ee6b9ee8"
+    },
+    {
+      "path": "config/index.md",
+      "sha256": "sha256:012eff1260094509e0249e659a44aaf0f05afabcb0928255fa68972e346fc5d8"
+    },
+    {
+      "path": "config/isolate.md",
+      "sha256": "sha256:cb0b7a8a2574241be54c50e00ca0e016b4ce923fdd11c27e85927dd41660f50d"
+    },
+    {
+      "path": "config/maxworkers.md",
+      "sha256": "sha256:1ee4a00d88106be0d0702c4c5da67a90b37d9ac593d745cd135b69e0e89cdd06"
+    },
+    {
+      "path": "config/mockreset.md",
+      "sha256": "sha256:dcc33fa1b850b874fbf958405d930041d6da9362db931269d9b36ecfe4bb68d6"
+    },
+    {
+      "path": "config/pool.md",
+      "sha256": "sha256:5fef8913ee237f24d0791e9fb00bf747fa3e8aa43656a07acc7fae85dbb9460d"
+    },
+    {
+      "path": "config/projects.md",
+      "sha256": "sha256:07cbc41bcd2fbe2ec6e67bbe5ea59c6fdf535e9f3390c78016f65f6ed1f436ce"
+    },
+    {
+      "path": "config/repeats.md",
+      "sha256": "sha256:a2501d38c71877aa08abdad198d2764b0cb5e9f99b1640bc70782023b0b56366"
+    },
+    {
+      "path": "config/reporters.md",
+      "sha256": "sha256:740c6af6b324c95c9e6af8571cda70f83dbc9b11500f1997c0fd39d9cb08d249"
+    },
+    {
+      "path": "config/resolvesnapshotpath.md",
+      "sha256": "sha256:858646cbf7ed246098ff2f027729b05a0fbbd2cd410c05334d0becb0e56de0d7"
+    },
+    {
+      "path": "config/restoremocks.md",
+      "sha256": "sha256:ed6a39e8adc49407ede7743c673c808465d25f09d5f4497ac056d8e3b1d5feae"
+    },
+    {
+      "path": "config/sequence.md",
+      "sha256": "sha256:b56e27a541033e1f72948d8bcbfd2134c6134ddbdcc9b8401a9327bf4b223bf8"
+    },
+    {
+      "path": "config/server.md",
+      "sha256": "sha256:81018a88443f98c5f8e6c8360a16730d80f41438ee069f329635263a1ca7e5ad"
+    },
+    {
+      "path": "config/setupfiles.md",
+      "sha256": "sha256:dc6ebaa8f94296b2dbf08075bd74d726e2db4baf50b569e86be3c1d912695801"
+    },
+    {
+      "path": "config/sharedviteserver.md",
+      "sha256": "sha256:d63bff8182bf3aae3c89cdf0ac705f60ba2e22e08c2a3bec338c814c2dea4b55"
+    },
+    {
+      "path": "config/snapshotformat.md",
+      "sha256": "sha256:61738d5d240f1041f78a799e78e8038419161d8d7d35e09bc450aeb7df4b6dbe"
+    },
+    {
+      "path": "config/snapshotserializers.md",
+      "sha256": "sha256:4196dab3183cb09a0f0262c8cf80825c9cb321935f8bfcc699d108cfc944c3ef"
+    },
+    {
+      "path": "config/tasktitlevalueformattruncate.md",
+      "sha256": "sha256:ab66fd655dbfeede48879c5a22251c1348f0ada52dfa99baca11f7ec31dcdbcc"
+    },
+    {
+      "path": "config/testnamepattern.md",
+      "sha256": "sha256:e7036e05531763dd152008b1ec0f4b1ae192210c0d7c2de976e0b09225f32c95"
+    },
+    {
+      "path": "config/testtimeout.md",
+      "sha256": "sha256:ba54937613d4e26d71b15c11e194d22cd78522b669fe1d05b55369dbc7595994"
+    },
+    {
+      "path": "config/typecheck.md",
+      "sha256": "sha256:7104da62bb92b0706b4ae9aac21985e3102f1e8d715375858aa089441aff7021"
+    },
+    {
+      "path": "config/unstubenvs.md",
+      "sha256": "sha256:4af3ba50dc88ef942d83923438ace2507eab0d3a57fa2d291350376fb1b4a313"
+    },
+    {
+      "path": "config/unstubglobals.md",
+      "sha256": "sha256:7406c4e3436b1bf6342d311be7b86509c682943391bafa9ffcae2af064d62c10"
+    },
+    {
+      "path": "config/update.md",
+      "sha256": "sha256:7005fc77969bbc9f95490f4473c07ebe6b9b8aeccc1f0399cdfeca0d6fb2f952"
+    },
+    {
+      "path": "config/watch.md",
+      "sha256": "sha256:00483ec551f33e5b73905ed89292d180382a7ea463fb8bd635beebea89111ac6"
+    },
+    {
+      "path": "guide/advanced/benchmark-provider.md",
+      "sha256": "sha256:83fc906f3a3479a2f05a5ae9ba326189452379501a3e24f8888e107ec4874279"
+    },
+    {
+      "path": "guide/advanced/pool.md",
+      "sha256": "sha256:98bc90923a96914f0b1bb22e462eca8472da97e44a5bf69e4fdc649a29a5f6ed"
+    },
+    {
+      "path": "guide/benchmarking.md",
+      "sha256": "sha256:e086b99d313cabad0fc89e6fbf524e09c4b4a201b588eac716eb485d7fa94e23"
+    },
+    {
+      "path": "guide/browser/component-testing.md",
+      "sha256": "sha256:5586abf200e5b6ad9f7464ca07289a860aa7264f4fabfdf3304453f1deda46d8"
+    },
+    {
+      "path": "guide/browser/index.md",
+      "sha256": "sha256:4ad68f4f513fb3541a848657bd508252e2f3261826a0890deb033341d5b5bf2d"
+    },
+    {
+      "path": "guide/browser/multiple-setups.md",
+      "sha256": "sha256:f2ed7546ea6698c8c00a266d55d2b117260a4d5392a4b8df7ac1a3807a09e27b"
+    },
+    {
+      "path": "guide/browser/playwright-traces.md",
+      "sha256": "sha256:141ae464b9568a13ee9efc2343d4f6131eab66e13fcc869f1f9b2fa830e9d723"
+    },
+    {
+      "path": "guide/browser/trace-view.md",
+      "sha256": "sha256:ce853b45e50c8a1a46b177869fd32fbda3661e3c2d7cf36f8cbf5141516b0aec"
+    },
+    {
+      "path": "guide/browser/visual-regression-testing.md",
+      "sha256": "sha256:1feb91e42d97f6a38ba2819d8cecd2b12fb0bc2992e2bd730a567fc58bcf9f87"
+    },
+    {
+      "path": "guide/browser/why.md",
+      "sha256": "sha256:6bb719cddec9d1178d6f8db662c9c105442d850d90a0040e73c96069c4b0d175"
+    },
+    {
+      "path": "guide/cli.md",
+      "sha256": "sha256:2686a141b27181ab96441a410d92085aa34b8dae103ef70024ea87c89dd9da4b"
+    },
+    {
+      "path": "guide/common-errors.md",
+      "sha256": "sha256:bab38e5f48a192e17696ec4b32d9cdbefd6bc9449978aaf53b2c726549d70a18"
+    },
+    {
+      "path": "guide/coverage.md",
+      "sha256": "sha256:148c509e9170554910bbb9bb934c456a17268b726a91ef8a3f7ca620ba59feb6"
+    },
+    {
+      "path": "guide/environment.md",
+      "sha256": "sha256:719b34384e4e6649abcf784b0f822ffd390a9efa6f8b309eb1e63979246fef7b"
+    },
+    {
+      "path": "guide/filtering.md",
+      "sha256": "sha256:7816c1df52229be26df70bb55de84d8d79b4df8b3ecca2433b1ba5fbad443bd2"
+    },
+    {
+      "path": "guide/improving-performance.md",
+      "sha256": "sha256:dae355ae09954f4958294a9ac905080a07267b038900f90f1b4e020e51cd84be"
+    },
+    {
+      "path": "guide/learn/async.md",
+      "sha256": "sha256:7963abf7b6dbe055f9ec1d1d9cffaf7a998e1fcfa761f74b8d602ec5c5201775"
+    },
+    {
+      "path": "guide/learn/snapshots.md",
+      "sha256": "sha256:c23d3fb8289528cd01209a75b29df70907b978adb464fbe58e33733538ca43cd"
+    },
+    {
+      "path": "guide/migration/index.md",
+      "sha256": "sha256:8c1fec19c67171fba5b0e972b510e351f40c5d3cc37219ed0c72b718c16cb2a9"
+    },
+    {
+      "path": "guide/migration/jest.md",
+      "sha256": "sha256:da78a5f0af5ebb13ecaf8abea5c4c162831c8c5e1a854ec247fece49ea2d498a"
+    },
+    {
+      "path": "guide/migration/mocha.md",
+      "sha256": "sha256:b2996030d33b9d22b436c1f23a496c54edb1f42dc84685917c8d3be17e6920db"
+    },
+    {
+      "path": "guide/mocking.md",
+      "sha256": "sha256:3a255eabe4049ef1961c3ffd1e2db9aa647463f7f7d9a5f430554f9f02cc2292"
+    },
+    {
+      "path": "guide/mocking/classes.md",
+      "sha256": "sha256:602bdf51359e1dafd98d1a19637a671e95a0ac568b270d0f2b8eb08f948477de"
+    },
+    {
+      "path": "guide/mocking/functions.md",
+      "sha256": "sha256:7e1ec18873d26d543a91b2655f885b1f8001a91a3501b1202fb478637cc044df"
+    },
+    {
+      "path": "guide/mocking/modules.md",
+      "sha256": "sha256:2af7a217d96f7590057293a0ea70572d0f45768c40bf60a44f468f08f1abab5b"
+    },
+    {
+      "path": "guide/mocking/timers.md",
+      "sha256": "sha256:242467f4df2b7ca08063c5e57f2b9433befeb3d65f063155b2515c32c7a4b61a"
+    },
+    {
+      "path": "guide/parallelism.md",
+      "sha256": "sha256:5644cbf74f53953a92ccf5f2f630ef284e9711a87979df44d79606c89c8fc92d"
+    },
+    {
+      "path": "guide/profiling-test-performance.md",
+      "sha256": "sha256:2e1be4a5d37a33656933ccdc3187a648ddb2dd545b52acf3364c947488e427bd"
+    },
+    {
+      "path": "guide/projects.md",
+      "sha256": "sha256:c1d3663c64be8c132a17d5dc1d4af6c39643379ef98a06f12720a91706fb35ea"
+    },
+    {
+      "path": "guide/recipes/affected-tests.md",
+      "sha256": "sha256:1fef383ec176ee5fe27826980d159f8a9449df73ac8cdfb8eaf5c8dbb877ff39"
+    },
+    {
+      "path": "guide/recipes/browser-locators.md",
+      "sha256": "sha256:7f8614ce7589231fa97a5101c551a69d623f4ee29a39e483857f559d14e3f52c"
+    },
+    {
+      "path": "guide/recipes/db-transaction.md",
+      "sha256": "sha256:4bd7b8ad09942819cfa281b9cfd8974ab79f435ba14aaf89a557b3191c298331"
+    },
+    {
+      "path": "guide/recipes/disable-isolation.md",
+      "sha256": "sha256:4107466d86c4101eb0e59b674753ea5503e0f5bfe7335d5eea3c0384e9905acb"
+    },
+    {
+      "path": "guide/recipes/wait-for.md",
+      "sha256": "sha256:6342ac84d8370b34f0119e83072a69491e4516cae67d3d451b5e4340901c9aab"
+    },
+    {
+      "path": "guide/reporters.md",
+      "sha256": "sha256:192bb80c7f7ed8d8b7acd46f055eb3a0a10481eee9f84e1d3eb10e043db91746"
+    },
+    {
+      "path": "guide/snapshot.md",
+      "sha256": "sha256:955ba48310784ae3f7c31df8f66a31a1afc1368c2d37de1412a9ae431dcbe06a"
+    },
+    {
+      "path": "guide/testing-types.md",
+      "sha256": "sha256:4ea79f51eb69764afa7b58f855a62a4ce1618b904c2667e651fb62f3519d741a"
+    },
+    {
+      "path": "releases.md",
+      "sha256": "sha256:842436c9bc9c53bd56a6e24fb46ecd0c56e225de81a17c7b1288151a46597e6c"
+    }
+  ],
+  "leaves": [
+    "skills/vitest/references/browser-mode.md",
+    "skills/vitest/references/config-and-projects.md",
+    "skills/vitest/references/coverage.md",
+    "skills/vitest/references/filtering.md",
+    "skills/vitest/references/flakiness.md",
+    "skills/vitest/references/local-vs-ci.md",
+    "skills/vitest/references/migration.md",
+    "skills/vitest/references/mocking.md",
+    "skills/vitest/references/performance.md",
+    "skills/vitest/references/snapshots.md",
+    "skills/vitest/references/timers-and-async.md"
+  ]
+}
