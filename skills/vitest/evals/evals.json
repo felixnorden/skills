@@ -1,0 +1,134 @@
+{
+  "skill": "vitest",
+  "trigger_cases": [
+    {
+      "query": "A test passes locally but fails in CI and nothing changed.",
+      "should_trigger": true,
+      "split": "train"
+    },
+    {
+      "query": "The suite only fails when every test runs together.",
+      "should_trigger": true,
+      "split": "train"
+    },
+    {
+      "query": "A mock stops recording calls after the first test in the file.",
+      "should_trigger": true,
+      "split": "train"
+    },
+    {
+      "query": "I need to run one test file in one project without editing the config.",
+      "should_trigger": true,
+      "split": "train"
+    },
+    {
+      "query": "The config file is ignored and the wrong projects run.",
+      "should_trigger": true,
+      "split": "train"
+    },
+    {
+      "query": "Fake timers stop moving, and an async assertion is never awaited.",
+      "should_trigger": true,
+      "split": "train"
+    },
+    {
+      "query": "Snapshots churn after we upgraded from Jest, and some are obsolete.",
+      "should_trigger": true,
+      "split": "validation"
+    },
+    {
+      "query": "Coverage thresholds fail even though every test passes.",
+      "should_trigger": true,
+      "split": "validation"
+    },
+    {
+      "query": "The suite takes twenty minutes, and one benchmark result looks wrong.",
+      "should_trigger": true,
+      "split": "validation"
+    },
+    {
+      "query": "A browser test stopped finding the element it used to match.",
+      "should_trigger": true,
+      "split": "validation"
+    },
+    {
+      "query": "Where should the double boundary sit when a function talks to a database: mock the repository or fake it?",
+      "should_trigger": false,
+      "split": "train"
+    },
+    {
+      "query": "Should the payments client get a stub or a spy, or is the design the problem?",
+      "should_trigger": false,
+      "split": "train"
+    },
+    {
+      "query": "Write a Playwright end-to-end test that logs in and checks the dashboard heading.",
+      "should_trigger": false,
+      "split": "train"
+    },
+    {
+      "query": "How do we make the quality dashboard look better for management?",
+      "should_trigger": false,
+      "split": "train"
+    },
+    {
+      "query": "Add a GitHub Actions workflow that builds and publishes the package.",
+      "should_trigger": false,
+      "split": "train"
+    },
+    {
+      "query": "Set up Mocha with a TypeScript loader for an existing Node service.",
+      "should_trigger": false,
+      "split": "train"
+    },
+    {
+      "query": "Fix the Vite build so it emits sourcemaps for a production bundle.",
+      "should_trigger": false,
+      "split": "validation"
+    },
+    {
+      "query": "Write a pytest fixture that returns a database connection.",
+      "should_trigger": false,
+      "split": "validation"
+    },
+    {
+      "query": "Resolve this TypeScript error about a missing property on an interface.",
+      "should_trigger": false,
+      "split": "validation"
+    },
+    {
+      "query": "Explain the theory behind test doubles and when mocking too much hides a real bug.",
+      "should_trigger": false,
+      "split": "validation"
+    }
+  ],
+  "output_cases": [
+    {
+      "id": "local-vs-ci-divergence",
+      "prompt": "A test suite passes on my machine but fails in our CI pipeline on the same commit. The failing file contains a focused test marked with `.only` that I added while debugging. Explain the most likely cause, name the setting and its default, and give one check that separates this cause from a snapshot update difference.",
+      "assertions": [
+        "The answer names the stray `.only` interaction with the `allowOnly` CI default.",
+        "The answer names a second distinct cause and the setting that explains it.",
+        "The answer gives one check that separates the two causes."
+      ]
+    },
+    {
+      "id": "mock-lifecycle-after-upgrade",
+      "prompt": "After an upgrade, one test file fails because a mock returns `undefined` in the second test, and another test asserts on calls recorded in a `beforeAll` hook. The team has `clearMocks` turned off. Explain what clearing versus resetting a mock does, why automatic clearing is unsafe with concurrent tests, and which unhoisted call replaces a hoisted `vi.mock` inside a test.",
+      "assertions": [
+        "The answer distinguishes clearing from resetting, including that `mockReset` drops the queued implementation.",
+        "The answer states that automatic clearing is unsafe with concurrent tests.",
+        "The answer names `vi.doMock` as the unhoisted alternative to a hoisted call."
+      ]
+    },
+    {
+      "id": "browser-locator-strictness",
+      "prompt": "A browser-mode test that used `getByText('Item')` stopped matching after an upgrade, and the element now reads `Item 1`. Explain the default that changed, name the setting that controls it, give the small per-call fix and the fix that matches the element by its whole accessible name, name the matcher for a partial text match, and name where to look when the locator itself fails.",
+      "assertions": [
+        "The answer names `browser.locators.exact` defaulting on and how to override it.",
+        "The answer gives the partial fix and the exact-name fix, naming `toMatchTextContent` as the partial matcher.",
+        "The answer names the failure-inspection surface, such as the ARIA snapshot or trace view."
+      ]
+    }
+  ]
+}

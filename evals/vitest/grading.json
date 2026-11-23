@@ -1,0 +1,44 @@
+{
+  "local-vs-ci-divergence": {
+    "The answer names the stray `.only` interaction with the `allowOnly` CI default.": {
+      "result": "PASS",
+      "evidence": "**Cause:** the file's `.only` flag, not the environment in general. `allowOnly` defaults to `!process.env.CI`. Locally it is `true`, so only the focused test runs and the file passes. In CI it is `false`, so Vitest rejects the focused run \u2014 you get an error naming the test marked `.only` (or a run of everything, including tests your local run skipped). The `CI` variable is read once when the config object is created, so the pipeline's value governs the whole run. **Setting and default:** `allowOnly`, default `!process.env.CI`."
+    },
+    "The answer names a second distinct cause and the setting that explains it.": {
+      "result": "PASS",
+      "evidence": "The remaining candidate is `update`, which defaults to `false` and then resolves to `new` locally and `none` in CI; check that by running the file twice with `CI=1` and seeing whether the second run fails on a missing snapshot the first never wrote."
+    },
+    "The answer gives one check that separates the two causes.": {
+      "result": "PASS",
+      "evidence": "npx vitest run path/to/failing.test.ts --allowOnly=false - Fails with the same `.only` error \u2192 `allowOnly` is the cause. Fix: delete the `.only`; do not pass `--allowOnly=true` in the pipeline. - Passes \u2192 selection is not the cause. The remaining candidate is `update`, which defaults to `false` and then resolves to `new` locally and `none` in CI; check that by running the file twice with `CI=1` and seeing whether the second run fails on a missing snapshot the first never wrote."
+    }
+  },
+  "mock-lifecycle-after-upgrade": {
+    "The answer distinguishes clearing from resetting, including that `mockReset` drops the queued implementation.": {
+      "result": "PASS",
+      "evidence": "| `mockReset()` / `vi.resetAllMocks()` | emptied | dropped \u2014 the mock returns `undefined` | So a mock that returns `undefined` in the second test was **reset**, not cleared. Clearing alone never changes a return value. Look for `mockReset`, `vi.resetAllMocks()`, or `resetMocks` in the config, and check whether anything in the file calls `mockReturnValue` only once, in the first test."
+    },
+    "The answer states that automatic clearing is unsafe with concurrent tests.": {
+      "result": "PASS",
+      "evidence": "`clearMocks: true` runs `vi.clearAllMocks()` **before every test**. With `test.concurrent` that is a global side effect: a test that finishes clears the call history that another test is still asserting on. The result is an empty history in a test that just called the function, and it varies run to run."
+    },
+    "The answer names `vi.doMock` as the unhoisted alternative to a hoisted call.": {
+      "result": "PASS",
+      "evidence": "`vi.doMock()`. `vi.mock` is hoisted above every import, so it throws anywhere except module top level, and it only affects imports that resolve after hoisting. `vi.doMock` is not hoisted: it affects only the imports made **after** the call, so the per-test pattern is"
+    }
+  },
+  "browser-locator-strictness": {
+    "The answer names `browser.locators.exact` defaulting on and how to override it.": {
+      "result": "PASS",
+      "evidence": "**Default that changed:** `browser.locators.exact` now defaults to `true`. Every text locator must match the element's whole text, case-sensitively, after trimming whitespace. So `getByText('Item')` no longer matches an element reading `Item 1` \u2014 it fails instead of matching loosely. A locator options object also takes `exact: false` per call. A `RegExp` argument ignores the option entirely. This keeps the strict default for every other locator."
+    },
+    "The answer gives the partial fix and the exact-name fix, naming `toMatchTextContent` as the partial matcher.": {
+      "result": "PASS",
+      "evidence": "**Fix that matches the whole accessible name:** use a role query with the full name: page.getByRole('button', { name: 'Item 1' }) **Matcher for a partial text match:** `toMatchTextContent` (accepts a partial string or `RegExp`). `toHaveTextContent` compares the whole text for equality, so it is the wrong matcher for a label with a changing suffix."
+    },
+    "The answer names the failure-inspection surface, such as the ARIA snapshot or trace view.": {
+      "result": "PASS",
+      "evidence": "**When the locator itself fails:** read what the failure printed. The default `browser.locators.errorFormat` is `'all'` \u2014 the ARIA snapshot first, then the HTML; narrow it to `'aria'` or `'html'`. Check the ARIA snapshot before the HTML: it shows the accessible name the locator actually saw, so a role query that fails usually means the element has no accessible name. For \"what did the page look like\", record a trace: the trace view keeps failed tests by default, and the Playwright provider adds `browser.trace` (default `'off'`, use `'retain-on-failure'`). **When the locator itself fails:** read what the failure printed. The default `browser.locators.errorFormat` is `'all'` \u2014 the ARIA snapshot first, then the HTML; narrow it to `'aria'` or `'html'`. Check the ARIA snapshot before the HTML: it shows the accessible name the locator actually saw, so a role query that fails usually means the element has no accessible name. For \"what did the page look like\", record a trace: the trace view keeps failed tests by default, and the Playwright provider adds `browser.trace` (default `'off'`, use `'retain-on-failure'`)."
+    }
+  }
+}
