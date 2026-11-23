@@ -38,7 +38,7 @@ Use AGENTS.md as your guide when creating new skills to ensure they meet quality
 
 ## Available Skills
 
-Nine skills ship in `skills/`:
+Ten skills ship in `skills/`:
 
 | Skill | What it does |
 | --- | --- |
@@ -51,6 +51,7 @@ Nine skills ship in `skills/`:
 | `foundry-chisel` | Evaluates and prototypes Solidity in the Chisel REPL. |
 | `solidity-development` | Security patterns, gas optimization, and NatSpec documentation standards for smart contracts. |
 | `effect-ts` | Effect programming: error handling, dependency injection, layers, schemas, streams, and testing. |
+| `vitest` | Routes Vitest symptoms, from a CI-only failure to a locator that stopped matching, to one diagnostic reference each, and names the defaults that contradict agent memory. |
 
 Each skill carries an `evals/evals.json` set and a recorded result in the repository's `evals/` directory. See [evals/README.md](evals/README.md).
 

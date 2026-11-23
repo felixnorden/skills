@@ -13,6 +13,7 @@ Runs per trigger case: 3
 | planning-workflow | 31 of 32 trigger cases pass | 6 of 6 assertions pass |
 | solidity-development | 34 of 34 trigger cases pass | 6 of 6 assertions pass |
 | tdd | 32 of 32 trigger cases pass | 7 of 7 assertions pass |
+| vitest | 36 of 40 trigger cases pass | 9 of 9 assertions pass |
 | writing-for-agents | 35 of 36 trigger cases pass | 8 of 8 assertions pass |
 
 Per-skill detail lives in `evals/<skill>/summary.md`.
