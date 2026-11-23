@@ -42,6 +42,10 @@ const INDEX_MENTION_THRESHOLD = 3;
 // Frontmatter keys that no target harness reads. A value here is dead weight.
 const UNUSED_METADATA_KEYS = ["aliases"];
 
+// Frontmatter keys the Agent Skills spec defines. Any other top-level key is
+// rejected by the claude.ai packager, so it is a portability error.
+const SPEC_FRONTMATTER_KEYS = ["name", "description", "license", "compatibility", "metadata"];
+
 type Level = "error" | "warning";
 
 interface Finding {
@@ -75,9 +79,10 @@ function parseFrontmatter(text: string): Frontmatter | null {
   return null;
 }
 
-/** File line number (zero-based) for a frontmatter line index. */
+// File line number (one-based) for a frontmatter line index. The opening ---
+// is file line 1 and fm.lines starts after it, so the offset is two.
 function fmLine(index: number): number {
-  return index;
+  return index + 2;
 }
 
 interface ScalarResult {
@@ -198,6 +203,9 @@ async function validateSkill(skillDir: string): Promise<void> {
     if (/(^|\s)(use this skill|you can|you will|you'll|your|you|i can|i'll)\b/i.test(value)) {
       add(skillFile, fmLine(description.index), "error", "description uses first or second person; use a verb phrase plus \"Use when\"");
     }
+    if (!/\buse when\b/i.test(value)) {
+      add(skillFile, fmLine(description.index), "error", 'description has no "Use when" clause');
+    }
   }
 
   // An unquoted ": " inside a plain scalar breaks YAML: the value becomes a
@@ -217,6 +225,15 @@ async function validateSkill(skillDir: string): Promise<void> {
     if (index >= 0) {
       add(skillFile, fmLine(index), "warning", `metadata.${key} is not read by any target harness`);
     }
+  }
+
+  // Frontmatter keys outside the spec fail the claude.ai packager.
+  for (let i = 0; i < fm.lines.length; i += 1) {
+    const match = /^([A-Za-z_][A-Za-z0-9_-]*)\s*:/.exec(fm.lines[i] ?? "");
+    if (!match) continue;
+    const key = match[1] ?? "";
+    if (SPEC_FRONTMATTER_KEYS.includes(key)) continue;
+    add(skillFile, fmLine(i), "error", `frontmatter key "${key}" is not in the Agent Skills spec`);
   }
 
   // body
