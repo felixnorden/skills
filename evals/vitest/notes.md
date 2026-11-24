@@ -28,8 +28,10 @@ query in place; no case was added or removed.
 - Round two: "Configure Jest to collect coverage for a Node package." became
   "Set up Mocha with a TypeScript loader for an existing Node service.", and
   "Should I choose a stub or a spy for the payments client in this unit?" became
-  "From a test-design view, should the payments client get a stub or a spy?",
-  which removed vocabulary the description carries.
+  "From a test-design view, should the payments client get a stub or a spy?", so
+  the query no longer reads as a direct request for one of the two mechanisms.
+  That intermediate wording was working state; round three replaced it before
+  the set was committed, so no artifact records it.
 - Round three: that stub-or-spy query became "Should the payments client get a
   stub or a spy, or is the design the problem?", and "Explain the theory behind
   test doubles and when isolation hides a real bug." became "Explain the theory
@@ -46,7 +48,7 @@ stated at the measured value rather than tuned further.
 
 `grading.json` quotes the enabled arm verbatim: each evidence string is one or
 more fragments of that file's lines, copied exactly, including table pipes and
-bold markers. One entry is a suffix of a line and one joins three lines, so the
-quote is a fragment sequence, not necessarily a whole line. The quotes come from
-the fast tier; the strong tier answers the same prompts with the same settings,
-matchers, and API names.
+bold markers. Two entries are partial lines and five join more than one fragment,
+so a quote is a fragment sequence, not necessarily a whole line. The quotes come
+from the fast tier; the strong tier answers the same prompts with the same
+settings, matchers, and API names.

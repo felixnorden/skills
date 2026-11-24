@@ -62,8 +62,8 @@ scored 0/3, then 2/3; `Configure Jest to collect coverage` scored 3/3, then 0/3.
 Trigger detection counts a read of the reference file, so a model checking
 whether the skill applies registers as a hit. Negatives close to the domain sit
 on the 0.5 threshold and flip between samples. Positive cases scored 10/10 in
-every run. Two near-miss cases were reworded with operator approval to remove
-vocabulary shared with the description; the variance persisted on other cases.
+every run. Two near-miss cases were reworded with operator approval; the
+variance persisted on other cases.
 
 ## Final set
 
