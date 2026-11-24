@@ -67,7 +67,8 @@ vocabulary shared with the description; the variance persisted on other cases.
 
 ## Final set
 
-The shipped set then replaced the two remaining double-design negatives after
-five runs showed that family triggering on both models. The measured result of the
-shipped set is in `summary.md` (36 of 40, with 10 of 10 positives on both models),
-and the reason the gate is stated at that value is in `notes.md`.
+Three rounds of rewording then went through the operator, each reworded in place
+and each recorded in `notes.md`. The shipped set keeps three double-family
+negatives; one of them was never reworded. The measured result of the shipped set
+is in `summary.md` (36 of 40, with 10 of 10 positives on both models), and the
+reason the gate is stated at that value is in `notes.md`.

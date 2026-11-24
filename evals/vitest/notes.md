@@ -19,18 +19,34 @@ measured value.
 
 ## Rewording history
 
-Two rounds of rewording went through the operator.
+Three rounds of rewording, each approved by the operator. Every round reworded one
+query in place; no case was added or removed.
 
-- Round one replaced a coverage-goal negative that the coverage leaf answers.
-- Round two replaced two near-miss negatives whose vocabulary overlapped the
-  description, then a third round replaced the two remaining double-design
-  negatives after five runs showed the same family keep triggering.
+- Round one: "How do we raise the coverage number so the dashboard looks better?"
+  became "How do we make the quality dashboard look better for management?",
+  because the coverage leaf answers the first one.
+- Round two: "Configure Jest to collect coverage for a Node package." became
+  "Set up Mocha with a TypeScript loader for an existing Node service.", and
+  "Should I choose a stub or a spy for the payments client in this unit?" became
+  "From a test-design view, should the payments client get a stub or a spy?",
+  which removed vocabulary the description carries.
+- Round three: that stub-or-spy query became "Should the payments client get a
+  stub or a spy, or is the design the problem?", and "Explain the theory behind
+  test doubles and when isolation hides a real bug." became "Explain the theory
+  behind test doubles and when mocking too much hides a real bug."
+
+A third double-family negative, "Where should the double boundary sit when a
+function talks to a database: mock the repository or fake it?", was never
+reworded. It failed on the fast tier in the final run, which is why the gate is
+stated at the measured value rather than tuned further.
 
 `baseline.md` keeps the first run, unedited, so the change is visible.
 
 ## Output evidence
 
-`grading.json` quotes the enabled arm verbatim: each evidence string is a line
-copied from `outputs/<case>__<model>__enabled.md`, including table pipes and bold
-markers. The quotes come from the fast tier; the strong tier answers the same
-prompts.
+`grading.json` quotes the enabled arm verbatim: each evidence string is one or
+more fragments of that file's lines, copied exactly, including table pipes and
+bold markers. One entry is a suffix of a line and one joins three lines, so the
+quote is a fragment sequence, not necessarily a whole line. The quotes come from
+the fast tier; the strong tier answers the same prompts with the same settings,
+matchers, and API names.

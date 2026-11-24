@@ -132,9 +132,10 @@ the description alone. Three lessons:
   exclusion "do not use to implement code" made "implement the login feature"
   trigger more often, not less. Prefer positive trigger phrasing.
 - Rewording a near-miss moves the failure to another near-miss. Five runs of the
-  `vitest` set kept ten of ten positives and eight of ten negatives, while the
-  two failing negatives changed with each rewording. State the gate at the
-  measured value and name the artifact; do not tune a three-run rate to zero.
+  `vitest` set kept ten of ten positives in every run and eight of ten negatives
+  in each two-model run, while the failing negatives changed with each rewording.
+  State the gate at the measured value and name the artifact; do not tune a
+  three-run rate to zero.
 
 Run the trigger phase at three runs while tuning. One run cannot separate signal
 from model noise.
