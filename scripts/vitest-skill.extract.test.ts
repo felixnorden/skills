@@ -14,7 +14,7 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { citationFor, extractFactSheet, jobFor, lockProblems, type Lock } from "./vitest-skill.extract.ts";
+import { citationFor, extractFactSheet, jobFor, leavesForDoc, lockProblems, type Lock } from "./vitest-skill.extract.ts";
 import { MANIFEST } from "./vitest-skill.manifest.ts";
 import { renderSkeleton } from "./vitest-skill.render.ts";
 
@@ -116,5 +116,16 @@ describe("lock", () => {
 
     const leaves = { ...lock, leaves: lock.leaves.slice(1) };
     expect(lockProblems(leaves, lock.commit)[0]).toContain("lock leaves do not match the manifest");
+  });
+});
+
+describe("changed leaves", () => {
+  test("maps one pinned doc to every leaf that reads it", () => {
+    expect(leavesForDoc("guide/migration/index.md")).toEqual(["flakiness", "mocking", "migration"]);
+    expect(leavesForDoc("config/coverage.md")).toEqual(["coverage"]);
+  });
+
+  test("returns no leaf for a doc outside the manifest", () => {
+    expect(leavesForDoc("guide/not-a-real-page.md")).toEqual([]);
   });
 });

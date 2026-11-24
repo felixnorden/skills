@@ -22,6 +22,7 @@
  *   --docs-dir <dir>   read docs from <dir> instead of the cache (offline runs)
  *   --write-lock <p>   write the provenance lock from the cache, sorted by path
  *   --check            re-fetch the pin, compare digests, exit 1 on drift
+ *   --changed-leaves   name the leaves a pin bump makes stale, exit 1 on drift
  */
 
 import { createHash } from "node:crypto";
@@ -345,19 +346,14 @@ export async function writeLock(path: string): Promise<void> {
   console.log(`wrote ${path}: tag=${lock.tag} commit=${lock.commit} docs=${docs.length} leaves=${leaves.length}`);
 }
 
-/**
- * Re-fetch the pinned docs and report drift against the lock. Drift covers a
- * moved tag (the commit changed), a doc whose bytes changed, a doc that the
- * lock names but the pinned tree lacks, and any difference between the lock's
- * doc set and leaves and the manifest the generator reads today.
- */
-export async function checkLock(path: string): Promise<boolean> {
-  const lock = JSON.parse(await readFile(path, "utf8")) as Lock;
-  const commit = await resolveCommit();
-  const problems = lockProblems(lock, commit);
-  let ok = problems.length === 0;
-  for (const problem of problems) console.error(problem);
+/** Locked docs whose bytes at the resolved commit no longer match. */
+interface Drift {
+  changed: string[];
+  missing: string[];
+}
 
+/** Compare every locked doc against the bytes served for one commit. */
+async function driftAgainstPin(lock: Lock, commit: string): Promise<Drift> {
   const changed: string[] = [];
   const missing: string[] = [];
   // The bytes are read through the commit, not the tag, so a moved tag cannot
@@ -372,10 +368,59 @@ export async function checkLock(path: string): Promise<boolean> {
       changed.push(doc.path);
     }
   }
-  console.log(`${lock.tag}: docs=${lock.docs.length} changed=${changed.length} missing=${missing.length}`);
-  for (const doc of changed) console.error(`changed: docs/${doc}`);
-  for (const doc of missing) console.error(`missing: docs/${doc}`);
-  return ok && changed.length + missing.length === 0;
+  return { changed, missing };
+}
+
+/** Leaves that read one pinned doc, in manifest order. */
+export function leavesForDoc(path: string): string[] {
+  return MANIFEST.filter((job) => job.docs.includes(path)).map((job) => job.leaf);
+}
+
+/**
+ * Report the leaves a pin bump makes stale. One line per changed or missing doc,
+ * naming the leaves that cite it, so a resync re-curates only what moved.
+ */
+async function reportChangedLeaves(path: string): Promise<boolean> {
+  const lock = JSON.parse(await readFile(path, "utf8")) as Lock;
+  const commit = await resolveCommit();
+  const drift = await driftAgainstPin(lock, commit);
+  const leaves = new Set<string>();
+  for (const [kind, docs] of [
+    ["changed", drift.changed],
+    ["missing", drift.missing],
+  ] as const) {
+    for (const doc of docs) {
+      const owners = leavesForDoc(doc);
+      for (const leaf of owners) leaves.add(leaf);
+      const target = owners.length > 0 ? owners.join(", ") : "no manifest leaf";
+      console.log(`${kind}: docs/${doc} -> ${target}`);
+    }
+  }
+  console.log(`changed=${drift.changed.length} missing=${drift.missing.length} leaves=${leaves.size}`);
+  for (const leaf of leaves) console.log(`re-curate: skills/vitest/references/${leaf}.md`);
+  return drift.changed.length + drift.missing.length === 0;
+}
+
+/**
+ * Re-fetch the pinned docs and report drift against the lock. Drift covers a
+ * moved tag (the commit changed), a doc whose bytes changed, a doc that the
+ * lock names but the pinned tree lacks, and any difference between the lock's
+ * doc set and leaves and the manifest the generator reads today.
+ */
+export async function checkLock(path: string): Promise<boolean> {
+  const lock = JSON.parse(await readFile(path, "utf8")) as Lock;
+  const commit = await resolveCommit();
+  const problems = lockProblems(lock, commit);
+  let ok = problems.length === 0;
+  for (const problem of problems) console.error(problem);
+
+  const drift = await driftAgainstPin(lock, commit);
+  console.log(
+    `${lock.tag}: docs=${lock.docs.length} changed=${drift.changed.length} missing=${drift.missing.length}`,
+  );
+  for (const doc of drift.changed) console.error(`changed: docs/${doc}`);
+  for (const doc of drift.missing) console.error(`missing: docs/${doc}`);
+  return ok && drift.changed.length + drift.missing.length === 0;
 }
 
 /** Resolve the pinned tag to a commit SHA and fill the docs cache. */
@@ -445,6 +490,10 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (args.includes("--changed-leaves")) {
+    process.exit((await reportChangedLeaves(flag("--changed-leaves") ?? LOCK_FILE)) ? 0 : 1);
+  }
+
   if (args.includes("--check")) {
     process.exit((await checkLock(flag("--check") ?? LOCK_FILE)) ? 0 : 1);
   }
@@ -452,7 +501,7 @@ async function main(): Promise<void> {
   const leaf = flag("--facts") ?? flag("--leaf");
   if (!leaf) {
     console.error(
-      "usage: --fetch | --leaf <leaf> | --facts <leaf> [--docs-dir <dir>] | --write-lock <path> | --check",
+      "usage: --fetch | --leaf <leaf> | --facts <leaf> [--docs-dir <dir>] | --write-lock <path> | --check | --changed-leaves",
     );
     process.exit(1);
   }
