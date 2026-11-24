@@ -24,8 +24,9 @@ committed.
 
 1. Change `PIN.tag` in `scripts/vitest-skill.manifest.ts`.
 2. `bun run scripts/vitest-skill.extract.ts --changed-leaves` prints one line per
-   moved page with the leaves that cite it, then the files to re-curate. It exits
-   1 while anything moved.
+   moved page with the leaves that cite it, then the files to re-curate. It also
+   reports a lock whose tag, commit, doc set, or leaf list no longer matches, and
+   exits 1 while either kind of drift remains.
 3. For each named leaf: `bun run scripts/vitest-skill.render.ts --leaf <leaf>
    --out /tmp/skeleton-<leaf>.md`, then diff the skeleton against the leaf and
    move what is missing.

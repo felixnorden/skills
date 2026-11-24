@@ -185,7 +185,7 @@ export function citationsIn(text: string): string[] {
   return out;
 }
 
-/** G11: compare every existing leaf's citations with its manifest doc set. */
+/** G11: compare every manifest leaf's citations, and fail on one that is missing. */
 async function verify(): Promise<boolean> {
   let leaves = 0;
   let mismatches = 0;

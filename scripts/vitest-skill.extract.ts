@@ -383,6 +383,8 @@ export function leavesForDoc(path: string): string[] {
 async function reportChangedLeaves(path: string): Promise<boolean> {
   const lock = JSON.parse(await readFile(path, "utf8")) as Lock;
   const commit = await resolveCommit();
+  const problems = lockProblems(lock, commit);
+  for (const problem of problems) console.error(problem);
   const drift = await driftAgainstPin(lock, commit);
   const leaves = new Set<string>();
   for (const [kind, docs] of [
@@ -396,9 +398,11 @@ async function reportChangedLeaves(path: string): Promise<boolean> {
       console.log(`${kind}: docs/${doc} -> ${target}`);
     }
   }
-  console.log(`changed=${drift.changed.length} missing=${drift.missing.length} leaves=${leaves.size}`);
+  console.log(
+    `changed=${drift.changed.length} missing=${drift.missing.length} leaves=${leaves.size} problems=${problems.length}`,
+  );
   for (const leaf of leaves) console.log(`re-curate: skills/vitest/references/${leaf}.md`);
-  return drift.changed.length + drift.missing.length === 0;
+  return problems.length === 0 && drift.changed.length + drift.missing.length === 0;
 }
 
 /**
@@ -440,7 +444,7 @@ export async function fetchDocs(): Promise<void> {
   const missing = wanted.filter((path) => !present.has(`docs/${path}`));
   for (const path of wanted) {
     if (missing.includes(path)) continue;
-    const response = await fetch(`${RAW_BASE}/${PIN.repo}/${PIN.tag}/docs/${path}`);
+    const response = await fetch(`${RAW_BASE}/${PIN.repo}/${commit}/docs/${path}`);
     if (!response.ok) {
       throw new Error(`docs/${path} returned ${response.status} ${response.statusText}`);
     }

@@ -15,7 +15,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { citationFor, extractFactSheet, jobFor, leavesForDoc, lockProblems, type Lock } from "./vitest-skill.extract.ts";
-import { MANIFEST } from "./vitest-skill.manifest.ts";
+import { MANIFEST, PIN } from "./vitest-skill.manifest.ts";
 import { renderSkeleton } from "./vitest-skill.render.ts";
 
 const FIXTURES = join(import.meta.dir, "__fixtures__", "vitest-docs");
@@ -98,9 +98,18 @@ describe("render", () => {
 const LOCK_FILE = join(import.meta.dir, "vitest-skill.lock.json");
 
 describe("lock", () => {
-  test("accepts the committed lock against its own commit", async () => {
+  test("accepts the shipped lock against its own tag, commit, doc set, and leaves", async () => {
     const lock = JSON.parse(await readFile(LOCK_FILE, "utf8")) as Lock;
     expect(lockProblems(lock, lock.commit)).toEqual([]);
+    expect(lock.tag).toBe(PIN.tag);
+  });
+
+  test("reports a wrong tag on its own", async () => {
+    const lock = JSON.parse(await readFile(LOCK_FILE, "utf8")) as Lock;
+    const tagged = { ...lock, tag: "v0.0.0" };
+    const problems = lockProblems(tagged, lock.commit);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain("lock tag");
   });
 
   test("reports a stale commit, a missing doc, and an unmatched leaf list", async () => {
