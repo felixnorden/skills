@@ -2,7 +2,7 @@
 
 Each skill has an eval set at `skills/<skill>/evals/evals.json`. The runner
 `scripts/run-evals.ts` executes a set in two arms and writes results under
-`evals/<skill>/`. The `evals/` tree is untracked.
+`evals/<skill>/`. Authored evidence is committed there; raw run output is not.
 
 ## Two arms
 
@@ -55,6 +55,12 @@ with the skill's `SKILL.md`. A positive case passes above a trigger rate of one
 half. A negative case passes below it. The runner exits non-zero when a trigger
 case fails.
 
+That rule counts a *verification read*: a model that opens the router to check
+whether the skill applies and then declines registers as a hit. Near-miss
+negatives therefore sit on the threshold and move between runs. Read a negative
+failure against the run transcript before rewriting the query; `evals/vitest/`
+keeps a worked example in `notes.md`.
+
 Output grading is separate. Add `grading.json` next to the eval set:
 
 ```json
@@ -91,6 +97,9 @@ bun run scripts/run-evals.ts --skill tdd --phase trigger
 bun run scripts/run-evals.ts --skill tdd --grade-only 1
 ```
 
+A skill generated from pinned documentation keeps its own runbook, with its
+gates and its resync loop. The worked example is `scripts/vitest-skill.md`.
+
 ## Scope note
 
 These evals measure the pi harness. The other target harnesses (Claude Code,
@@ -100,19 +109,21 @@ shared frontmatter surface and the name-to-directory match.
 ## Version control
 
 The repository tracks the authored eval files only: `evals.json`, `README.md`,
-`summary.md`, `grading.json`, `baseline.md`, and the legacy benchmark notes.
+`summary.md`, `grading.json`, `baseline.md`, `notes.md`, and the legacy benchmark
+notes.
 
 Raw run output stays out of git. The `.gitignore` rules exclude `runs/`,
 `outputs/`, and `results.json`. These files are large and reproducible from the
 commands above.
 
-Timing: the repository adds the authored eval files after the skill refactor
-completes. Until then every file under `evals/` is untracked.
+The authored files ship with the skill. `evals/vitest/` is the current example:
+`baseline.md` keeps the first run unedited, `summary.md` is generated, and
+`notes.md` records what the generator cannot say.
 
 ## Description tuning
 
 The trigger phase measures one thing: whether the model opens `SKILL.md` from
-the description alone. Two lessons from the `planning-workflow` slice:
+the description alone. Three lessons:
 
 - A colon followed by a space inside an unquoted frontmatter value breaks YAML.
   The value becomes a nested mapping, the harness drops the field, and every
@@ -120,6 +131,10 @@ the description alone. Two lessons from the `planning-workflow` slice:
 - Negative exclusions can backfire when they repeat a word from the query. The
   exclusion "do not use to implement code" made "implement the login feature"
   trigger more often, not less. Prefer positive trigger phrasing.
+- Rewording a near-miss moves the failure to another near-miss. Five runs of the
+  `vitest` set kept ten of ten positives and eight of ten negatives, while the
+  two failing negatives changed with each rewording. State the gate at the
+  measured value and name the artifact; do not tune a three-run rate to zero.
 
 Run the trigger phase at three runs while tuning. One run cannot separate signal
 from model noise.
