@@ -136,6 +136,10 @@ before the edit.
 - List required packages and confirm they exist in the execution environment.
 - Use fully qualified MCP tool names: `ServerName:tool_name`.
 
+A script that produces or checks skill content keeps a runbook of its gates
+beside it. `scripts/vitest-skill.md` is the worked example: the gate list, the
+resync loop, and the curation step the scripts deliberately leave to a human.
+
 ## Naming
 
 Gerund form is preferred: `processing-pdfs`, `analyzing-spreadsheets`.

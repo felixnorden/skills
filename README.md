@@ -55,6 +55,8 @@ Ten skills ship in `skills/`:
 
 Each skill carries an `evals/evals.json` set and a recorded result in the repository's `evals/` directory. See [evals/README.md](evals/README.md).
 
+A skill generated from pinned documentation keeps a runbook next to its scripts. For `vitest`, see [scripts/vitest-skill.md](scripts/vitest-skill.md): the four gates, the resync loop, and what curation leaves to a human.
+
 ## For Users
 
 Agent skills integrate with compatible AI agents and enhance their capabilities in specific domains. When you work with an agent on a relevant task, the agent automatically accesses the appropriate skill knowledge.
